@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yogacloak — first drop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+  :root {
+    --ink:#1F2421; --bas:#2E3633; --sgd:#4A5A52; --sage:#7C8C82;
+    --clay:#9A8E86; --fog:#C4C9C5; --bone:#ECEAE3; --paper:#F4F3EE;
+    --rule:rgba(31,36,33,0.12); --rulel:rgba(236,234,227,0.14);
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{background:var(--ink);scroll-behavior:smooth;}
+  body{font-family:'Hanken Grotesk',sans-serif;background:var(--ink);color:var(--bone);-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+  /* ── HERO ── */
+  .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;padding:40px 52px 44px;position:relative;overflow:hidden;}
+  .hero-glow{position:absolute;top:-200px;right:-180px;width:680px;height:680px;background:radial-gradient(circle,rgba(124,140,130,0.18),transparent 62%);pointer-events:none;}
+  .hero-glow2{position:absolute;bottom:-240px;left:-160px;width:560px;height:560px;background:radial-gradient(circle,rgba(154,142,134,0.10),transparent 66%);pointer-events:none;}
+  .hero-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;}
+  .wordmark{font-size:18px;font-weight:300;letter-spacing:-.02em;text-transform:lowercase;color:var(--bone);}
+  .wordmark span{font-weight:800;}
+  .hero-label{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--sage);padding-top:4px;}
+  .hero-center{position:relative;padding:0 0 20px;}
+  .hero-eyebrow{font-size:10px;letter-spacing:.44em;text-transform:uppercase;color:var(--sage);margin-bottom:22px;}
+  .hero-title{font-size:clamp(58px,9vw,116px);font-weight:300;letter-spacing:-.04em;line-height:.88;text-transform:lowercase;color:var(--bone);margin-bottom:32px;}
+  .hero-title strong{font-weight:800;display:block;}
+  .hero-body{font-size:15px;color:var(--fog);max-width:460px;line-height:1.75;margin-bottom:40px;}
+  .hero-cta{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone);text-decoration:none;border-bottom:1px solid rgba(236,234,227,0.3);padding-bottom:3px;transition:border-color .2s;}
+  .hero-cta:hover{border-color:var(--bone);}
+  .hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;position:relative;}
+  .availability-bar{display:flex;gap:36px;}
+  .avail-label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);margin-bottom:6px;}
+  .avail-count{font-size:32px;font-weight:800;letter-spacing:-.04em;color:var(--bone);line-height:1;}
+  .avail-of{font-size:11px;color:var(--clay);margin-top:3px;}
+  .avail-track{width:100%;height:2px;background:rgba(236,234,227,0.12);border-radius:1px;margin-top:10px;overflow:hidden;}
+  .avail-fill{height:100%;background:var(--sage);border-radius:1px;transition:width .6s ease;}
+
+  /* ── LEARN MORE ── */
+  .learn{background:var(--paper);color:var(--ink);padding:96px 52px;}
+  .learn-inner{max-width:900px;}
+  .section-label{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:var(--sage);margin-bottom:28px;}
+  .learn-headline{font-size:clamp(28px,4vw,50px);font-weight:800;letter-spacing:-.03em;text-transform:lowercase;line-height:1.05;color:var(--ink);margin-bottom:28px;max-width:680px;}
+  .learn-body{font-size:15px;color:var(--sgd);max-width:560px;line-height:1.82;margin-bottom:48px;}
+  .learn-tagline{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--clay);}
+
+  /* Products */
+  .products-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0;}
+  .product-card{border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+  .product-card-head{background:var(--ink);color:var(--bone);padding:22px 24px 20px;}
+  .product-card-tag{font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--sage);margin-bottom:6px;}
+  .product-card-name{font-size:22px;font-weight:800;text-transform:lowercase;letter-spacing:-.02em;}
+  .product-card-price{font-size:13px;color:var(--fog);margin-top:5px;}
+  .product-card-body{padding:20px 24px;background:var(--bone);}
+  .product-card-desc{font-size:13px;color:var(--bas);line-height:1.75;margin-bottom:14px;}
+  .deposit-pill{display:inline-block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sgd);border:1px solid rgba(74,90,82,0.35);border-radius:20px;padding:4px 10px;}
+
+  /* Quote */
+  .learn-quote{margin-top:52px;padding-top:44px;border-top:1px solid var(--rule);}
+  .quote-text{font-size:clamp(18px,2.8vw,26px);font-weight:500;letter-spacing:-.01em;color:var(--ink);line-height:1.45;max-width:660px;margin-bottom:14px;}
+  .quote-attr{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--clay);}
+
+  /* ── RESERVE ── */
+  .reserve{background:var(--ink);padding:96px 52px;border-top:1px solid var(--rulel);}
+  .reserve-layout{display:grid;grid-template-columns:1fr 420px;gap:80px;max-width:1000px;}
+  .reserve-left{}
+  .reserve h2{font-size:clamp(34px,5.5vw,62px);font-weight:800;letter-spacing:-.04em;text-transform:lowercase;color:var(--bone);line-height:.92;margin-bottom:18px;}
+  .reserve-sub{font-size:14px;color:var(--fog);line-height:1.8;max-width:380px;margin-bottom:40px;}
+
+  /* Live counters sidebar */
+  .reserve-counts{}
+  .count-block{padding:20px 0;border-bottom:1px solid var(--rulel);}
+  .count-block:first-child{padding-top:0;}
+  .count-block:last-child{border-bottom:none;}
+  .count-product{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);margin-bottom:8px;}
+  .count-number{font-size:48px;font-weight:800;letter-spacing:-.05em;color:var(--bone);line-height:1;}
+  .count-total{font-size:12px;color:var(--clay);margin-top:3px;}
+  .count-track{width:100%;height:1px;background:rgba(236,234,227,0.10);margin-top:12px;overflow:hidden;}
+  .count-fill{height:100%;background:var(--sage);transition:width .8s ease;}
+
+  /* Slots */
+  .slots-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;}
+  .slot-option{border:1px solid var(--rulel);border-radius:2px;padding:18px 18px 16px;cursor:pointer;transition:border-color .18s,background .18s;position:relative;user-select:none;}
+  .slot-option:hover:not(.sold-out){border-color:var(--sage);}
+  .slot-option.selected{border-color:var(--sage);background:rgba(124,140,130,0.07);}
+  .slot-option.sold-out{opacity:.38;cursor:not-allowed;}
+  .slot-check{position:absolute;top:14px;right:14px;width:16px;height:16px;border:1px solid var(--rulel);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .18s,border-color .18s;}
+  .slot-option.selected .slot-check{background:var(--sage);border-color:var(--sage);}
+  .slot-check-dot{width:6px;height:6px;background:var(--bone);border-radius:50%;opacity:0;transition:opacity .18s;}
+  .slot-option.selected .slot-check-dot{opacity:1;}
+  .slot-name{font-size:14px;font-weight:700;text-transform:lowercase;letter-spacing:-.01em;color:var(--bone);margin-bottom:3px;}
+  .slot-sub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);margin-bottom:9px;}
+  .slot-deposit{font-size:12px;color:var(--fog);}
+  .slot-deposit strong{color:var(--bone);font-weight:600;}
+  .slot-remaining{font-size:10px;color:var(--clay);margin-top:6px;}
+  .slot-soldout-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin-top:6px;}
+
+  /* Size */
+  .size-field{display:none;flex-direction:column;gap:7px;margin-bottom:22px;}
+  .size-field label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);}
+  .size-row{display:flex;gap:8px;margin-top:2px;}
+  .size-btn{font-family:'Hanken Grotesk',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--fog);background:transparent;border:1px solid var(--rulel);border-radius:2px;padding:8px 16px;cursor:pointer;transition:border-color .18s,color .18s,background .18s;}
+  .size-btn:hover{border-color:var(--sage);color:var(--bone);}
+  .size-btn.active{border-color:var(--sage);color:var(--bone);background:rgba(124,140,130,0.1);}
+
+  /* Fields */
+  .form-fields{display:flex;flex-direction:column;gap:13px;margin-bottom:24px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);}
+  .field input{background:transparent;border:1px solid var(--rulel);border-radius:2px;padding:13px 14px;font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--bone);outline:none;transition:border-color .18s;width:100%;}
+  .field input::placeholder{color:rgba(196,201,197,0.35);}
+  .field input:focus{border-color:var(--sage);}
+
+  /* Deposit summary */
+  .deposit-summary{display:none;border-top:1px solid var(--rulel);border-bottom:1px solid var(--rulel);padding:18px 0;margin-bottom:24px;justify-content:space-between;align-items:center;}
+  .ds-label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);}
+  .ds-note{font-size:11px;color:var(--clay);margin-top:3px;}
+  .ds-amount{font-size:26px;font-weight:800;letter-spacing:-.04em;color:var(--bone);}
+
+  /* Submit */
+  .submit-btn{width:100%;background:var(--bone);color:var(--ink);font-family:'Hanken Grotesk',sans-serif;font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;border:none;border-radius:2px;padding:18px 24px;cursor:pointer;transition:background .18s;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .submit-btn:hover:not(:disabled){background:var(--fog);}
+  .submit-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .fine-print{font-size:11px;color:var(--sgd);line-height:1.75;margin-top:18px;}
+  .form-error{font-size:12px;color:#c97a6a;margin-top:10px;display:none;line-height:1.5;}
+
+  /* Loading spinner */
+  .spinner{width:14px;height:14px;border:2px solid rgba(31,36,33,0.2);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite;display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Success */
+  .success-state{display:none;padding:48px 0 20px;}
+  .success-mark{width:48px;height:48px;border-radius:50%;border:1px solid var(--sage);display:flex;align-items:center;justify-content:center;margin-bottom:28px;color:var(--sage);font-size:18px;}
+  .success-title{font-size:36px;font-weight:800;letter-spacing:-.04em;text-transform:lowercase;color:var(--bone);margin-bottom:12px;}
+  .success-body{font-size:14px;color:var(--fog);line-height:1.8;max-width:400px;}
+
+  /* ── FOOTER ── */
+  footer{background:var(--bas);padding:36px 52px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--rulel);}
+  .foot-mark{font-size:13px;font-weight:300;text-transform:lowercase;color:var(--fog);letter-spacing:-.01em;}
+  .foot-mark span{font-weight:800;}
+  .foot-sub{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sgd);}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:860px){
+    .reserve-layout{grid-template-columns:1fr;gap:48px;}
+    .reserve-counts{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rulel);padding-top:0;}
+    .count-block{padding:16px 20px 16px 0;}
+  }
+  @media(max-width:680px){
+    .hero,.learn,.reserve{padding-left:28px;padding-right:28px;}
+    .hero{padding-top:32px;padding-bottom:36px;}
+    footer{padding:28px;flex-direction:column;gap:14px;text-align:center;}
+    .products-grid,.slots-row,.field-row{grid-template-columns:1fr;}
+    .hero-bottom{flex-direction:column;gap:24px;align-items:flex-start;}
+    .availability-bar{gap:24px;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-top">
+    <div class="wordmark">yoga<span>cloak</span></div>
+    <div class="hero-label">First Drop ✦ 100 of each</div>
+  </div>
+  <div class="hero-center">
+    <div class="hero-eyebrow">Coming soon ✦ Reserve now</div>
+    <h1 class="hero-title">for after<strong>class.</strong></h1>
+    <p class="hero-body">What you reach for when you're still sweaty and not ready for real clothes. The Cloak. The Wrap. 100 of each, first drop only.</p>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;">
+      <a href="#learn" class="hero-cta">
+        Learn more
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#reserve" class="hero-cta">
+        Reserve your spot
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <div class="availability-bar">
+      <div class="avail-item">
+        <div class="avail-label">the cloak</div>
+        <div class="avail-count" id="hero-cloak-count">—</div>
+        <div class="avail-of">of 100 left</div>
+        <div class="avail-track"><div class="avail-fill" id="hero-cloak-fill" style="width:100%"></div></div>
+      </div>
+      <div class="avail-item">
+        <div class="avail-label">the wrap</div>
+        <div class="avail-count" id="hero-wrap-count">—</div>
+        <div class="avail-of">of 100 left</div>
+        <div class="avail-track"><div class="avail-fill" id="hero-wrap-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div class="foot-sub">yogacloak.com</div>
+  </div>
+</section>
+
+<!-- ── LEARN MORE ── -->
+<section class="learn" id="learn">
+  <div class="learn-inner">
+    <div class="section-label">What it is</div>
+    <h2 class="learn-headline">handles the sweat.<br>folds into your bag.</h2>
+    <p class="learn-body">
+      Not a robe, not a hoodie, not a towel you fight with.
+      YogaCloak is the layer you put on after class to get home.
+      Matte microfiber. Small logo. Two pieces made for two different ways home.
+      Built from ~300 GSM recycled microfiber — flat finish, no heather, no shine.
+    </p>
+    <div class="learn-tagline">Recovery wear ✦ For after class</div>
+
+    <div class="products-grid" style="margin-top:40px;">
+      <div class="product-card">
+        <div class="product-card-head">
+          <div class="product-card-tag">For the drive</div>
+          <div class="product-card-name">the cloak</div>
+          <div class="product-card-price">$98 — $20 deposit to reserve</div>
+        </div>
+        <div class="product-card-body">
+          <p class="product-card-desc">Hooded open-front drape. Falls long over the outfit. Hood, dropped ¾ sleeves, side slits, two hidden snaps at neck and above navel. ~300 GSM recycled microfiber.</p>
+          <div class="deposit-pill">Two sizes: XS–M · L–XL</div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-head">
+          <div class="product-card-tag">For the walk</div>
+          <div class="product-card-name">the wrap</div>
+          <div class="product-card-price">$68 — $15 deposit to reserve</div>
+        </div>
+        <div class="product-card-body">
+          <p class="product-card-desc">Oversized rectangular drape. One hidden snap so it stays on. Packs down small. ~200–230 GSM, lighter weight. Clean bound edges. Matte graphite.</p>
+          <div class="deposit-pill">One size</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="learn-quote">
+      <p class="quote-text">"The Cloak is for the drive. The Wrap is for the walk."</p>
+      <div class="quote-attr">YogaCloak ✦ First drop, 2026</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RESERVE ── -->
+<section class="reserve" id="reserve">
+  <div class="reserve-layout">
+
+    <!-- Left: form -->
+    <div class="reserve-left">
+      <div class="section-label">First Drop ✦ 100 of each</div>
+      <h2>reserve<br>your spot.</h2>
+      <p class="reserve-sub">Put down a deposit and your name is in line. It counts toward your total when the drop ships. One cloak, one wrap max.</p>
+
+      <div id="reserve-form">
+        <!-- Pick items -->
+        <div class="slots-row">
+          <div class="slot-option" id="slot-cloak" onclick="toggleSlot('cloak')">
+            <div class="slot-check"><div class="slot-check-dot"></div></div>
+            <div class="slot-name">the cloak</div>
+            <div class="slot-sub">for the drive · $98</div>
+            <div class="slot-deposit">Deposit <strong>$20</strong></div>
+            <div class="slot-remaining" id="form-cloak-remaining">— spots left</div>
+          </div>
+          <div class="slot-option" id="slot-wrap" onclick="toggleSlot('wrap')">
+            <div class="slot-check"><div class="slot-check-dot"></div></div>
+            <div class="slot-name">the wrap</div>
+            <div class="slot-sub">for the walk · $68</div>
+            <div class="slot-deposit">Deposit <strong>$15</strong></div>
+            <div class="slot-remaining" id="form-wrap-remaining">— spots left</div>
+          </div>
+        </div>
+
+        <!-- Cloak size -->
+        <div class="size-field" id="cloak-size-field">
+          <label>Cloak size</label>
+          <div class="size-row">
+            <button class="size-btn" onclick="selectSize('XS-M')" data-size="XS-M">XS – M</button>
+            <button class="size-btn" onclick="selectSize('L-XL')" data-size="L-XL">L – XL</button>
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="form-fields">
+          <div class="field-row">
+            <div class="field">
+              <label>First name</label>
+              <input type="text" id="first-name" placeholder="Ava" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label>Last name</label>
+              <input type="text" id="last-name" placeholder="Chen" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="ava@example.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Phone — for text updates</label>
+            <input type="tel" id="phone" placeholder="+1 (555) 000-0000" autocomplete="tel">
+          </div>
+        </div>
+
+        <!-- Deposit summary -->
+        <div class="deposit-summary" id="deposit-summary">
+          <div>
+            <div class="ds-label">Deposit due today</div>
+            <div class="ds-note">credited toward your order</div>
+          </div>
+          <div class="ds-amount" id="deposit-total">$0</div>
+        </div>
+
+        <div class="form-error" id="form-error"></div>
+
+        <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">
+          <span id="btn-label">Reserve my spot</span>
+          <div class="spinner" id="btn-spinner"></div>
+          <svg id="btn-arrow" width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <p class="fine-print">Your deposit secures your place in line and counts toward your final price when the drop ships. Deposits are non-refundable but transferable. One cloak and one wrap max per person.</p>
+      </div>
+
+      <div class="success-state" id="success-state">
+        <div class="success-mark">✦</div>
+        <div class="success-title">you're in.</div>
+        <p class="success-body">We'll text and email you when the drop is ready. Your deposit is confirmed. Welcome to the first 100.</p>
+      </div>
+    </div>
+
+    <!-- Right: live counts -->
+    <div class="reserve-counts">
+      <div class="count-block">
+        <div class="count-product">The Cloak — for the drive</div>
+        <div class="count-number" id="sidebar-cloak-count">—</div>
+        <div class="count-total">of 100 remaining</div>
+        <div class="count-track"><div class="count-fill" id="sidebar-cloak-fill" style="width:100%"></div></div>
+      </div>
+      <div class="count-block">
+        <div class="count-product">The Wrap — for the walk</div>
+        <div class="count-number" id="sidebar-wrap-count">—</div>
+        <div class="count-total">of 100 remaining</div>
+        <div class="count-track"><div class="count-fill" id="sidebar-wrap-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-mark">yoga<span>cloak</span></div>
+  <div class="foot-sub">for after class ✦</div>
+</footer>
+
+<script>
+// ─── Config ───────────────────────────────────────────────────────────────────
+// Replace this with your deployed backend URL before going live.
+const API_BASE = "https://your-domain.vercel.app";
+// For local dev: const API_BASE = "http://localhost:3000";
+
+const TOTAL = 100;
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let avail = { cloak: null, wrap: null };
+let sel   = { cloak: false, wrap: false, cloakSize: null };
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+(async function init() {
+  await fetchAvailability();
+  // Refresh every 30s so counts stay live without full reload
+  setInterval(fetchAvailability, 30_000);
+})();
+
+async function fetchAvailability() {
+  try {
+    const res = await fetch(`${API_BASE}/api/availability`);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    avail.cloak = data.cloak;
+    avail.wrap  = data.wrap;
+    renderCounts();
+    updateSoldOutState();
+  } catch {
+    // On error, leave counts as dashes — don't break the page
+  }
+}
+
+function renderCounts() {
+  const c = avail.cloak;
+  const w = avail.wrap;
+
+  // Hero
+  document.getElementById("hero-cloak-count").textContent = c ?? "—";
+  document.getElementById("hero-wrap-count").textContent  = w ?? "—";
+  document.getElementById("hero-cloak-fill").style.width  = c != null ? (c / TOTAL * 100) + "%" : "100%";
+  document.getElementById("hero-wrap-fill").style.width   = w != null ? (w / TOTAL * 100) + "%" : "100%";
+
+  // Form remaining labels
+  document.getElementById("form-cloak-remaining").textContent = c != null ? `${c} spot${c !== 1 ? "s" : ""} left` : "—";
+  document.getElementById("form-wrap-remaining").textContent  = w != null ? `${w} spot${w !== 1 ? "s" : ""} left` : "—";
+
+  // Sidebar
+  document.getElementById("sidebar-cloak-count").textContent = c ?? "—";
+  document.getElementById("sidebar-wrap-count").textContent  = w ?? "—";
+  document.getElementById("sidebar-cloak-fill").style.width  = c != null ? (c / TOTAL * 100) + "%" : "100%";
+  document.getElementById("sidebar-wrap-fill").style.width   = w != null ? (w / TOTAL * 100) + "%" : "100%";
+}
+
+function updateSoldOutState() {
+  if (avail.cloak !== null && avail.cloak <= 0) {
+    const el = document.getElementById("slot-cloak");
+    el.classList.add("sold-out");
+    el.onclick = null;
+    el.querySelector(".slot-remaining").textContent = "";
+    const lbl = document.createElement("div");
+    lbl.className = "slot-soldout-label";
+    lbl.textContent = "Sold out";
+    el.appendChild(lbl);
+  }
+  if (avail.wrap !== null && avail.wrap <= 0) {
+    const el = document.getElementById("slot-wrap");
+    el.classList.add("sold-out");
+    el.onclick = null;
+    el.querySelector(".slot-remaining").textContent = "";
+    const lbl = document.createElement("div");
+    lbl.className = "slot-soldout-label";
+    lbl.textContent = "Sold out";
+    el.appendChild(lbl);
+  }
+}
+
+// ─── Selection ────────────────────────────────────────────────────────────────
+function toggleSlot(which) {
+  const el = document.getElementById(`slot-${which}`);
+  if (el.classList.contains("sold-out")) return;
+
+  if (which === "cloak") {
+    sel.cloak = !sel.cloak;
+    el.classList.toggle("selected", sel.cloak);
+    const sf = document.getElementById("cloak-size-field");
+    sf.style.display = sel.cloak ? "flex" : "none";
+    if (!sel.cloak) { sel.cloakSize = null; clearSizes(); }
+  }
+  if (which === "wrap") {
+    sel.wrap = !sel.wrap;
+    el.classList.toggle("selected", sel.wrap);
+  }
+  updateDepositSummary();
+}
+
+function clearSizes() {
+  document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
+}
+
+function selectSize(size) {
+  sel.cloakSize = size;
+  document.querySelectorAll(".size-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.size === size)
+  );
+}
+
+function updateDepositSummary() {
+  const show = sel.cloak || sel.wrap;
+  const el   = document.getElementById("deposit-summary");
+  el.style.display = show ? "flex" : "none";
+  let total = 0;
+  if (sel.cloak) total += 20;
+  if (sel.wrap)  total += 15;
+  document.getElementById("deposit-total").textContent = `$${total}`;
+}
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+function validate() {
+  if (!sel.cloak && !sel.wrap) return "Choose at least one item to reserve.";
+  if (sel.cloak && !sel.cloakSize) return "Choose a size for the cloak.";
+  const first = val("first-name"), last = val("last-name");
+  const email = val("email"), phone = val("phone");
+  if (!first || !last) return "Enter your full name.";
+  if (!email || !email.includes("@")) return "Enter a valid email address.";
+  if (!phone) return "Enter a phone number for text updates.";
+  return null;
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+async function handleSubmit() {
+  clearError();
+  const err = validate();
+  if (err) return showError(err);
+
+  setLoading(true);
+
+  const product = sel.cloak && sel.wrap ? "both" : sel.cloak ? "cloak" : "wrap";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reserve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product,
+        size: sel.cloakSize,
+        firstName: val("first-name"),
+        lastName:  val("last-name"),
+        email:     val("email"),
+        phone:     val("phone"),
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setLoading(false);
+      return showError(data.error || "Something went wrong. Please try again.");
+    }
+
+    // Redirect to Stripe Checkout
+    window.location.href = data.url;
+
+  } catch {
+    setLoading(false);
+    showError("Network error. Check your connection and try again.");
+  }
+}
+
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+function setLoading(on) {
+  const btn    = document.getElementById("submit-btn");
+  const label  = document.getElementById("btn-label");
+  const spinner = document.getElementById("btn-spinner");
+  const arrow  = document.getElementById("btn-arrow");
+  btn.disabled = on;
+  label.textContent = on ? "Redirecting..." : "Reserve my spot";
+  spinner.style.display = on ? "block" : "none";
+  arrow.style.display   = on ? "none"  : "block";
+}
+
+function showError(msg) {
+  const el = document.getElementById("form-error");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+function clearError() {
+  const el = document.getElementById("form-error");
+  el.style.display = "none";
+}
+
+// Called from /success page if you want to show the success state inline
+// instead of a separate page. Optional.
+function showSuccess() {
+  document.getElementById("reserve-form").style.display = "none";
+  const s = document.getElementById("success-state");
+  s.style.display = "block";
+  s.scrollIntoView({ behavior: "smooth", block: "center" });
+  // Optimistically decrement display counts
+  if (sel.cloak && avail.cloak !== null) avail.cloak = Math.max(0, avail.cloak - 1);
+  if (sel.wrap  && avail.wrap  !== null) avail.wrap  = Math.max(0, avail.wrap  - 1);
+  renderCounts();
+}
+</script>
+</body>
+</html>
