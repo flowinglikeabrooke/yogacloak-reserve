@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/api/reserve", "destination": "/api-reserve.js" },
+    { "source": "/api/availability", "destination": "/api-availability.js" },
+    { "source": "/api/webhook", "destination": "/api-webhook.js" },
+    { "source": "/", "destination": "/yogacloak-landing.html" }
+  ]
+}
