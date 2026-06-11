@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yogacloak — reserve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+  :root {
+    --ink:#1F2421; --bas:#2E3633; --sgd:#4A5A52; --sage:#7C8C82;
+    --clay:#9A8E86; --fog:#C4C9C5; --bone:#ECEAE3; --paper:#F4F3EE;
+    --r-pill:100px; --r:16px; --r-lg:24px;
+  }
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  html { font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialiased; }
+  body {
+    background:var(--ink); color:var(--bone);
+    line-height:1.618; min-height:100svh;
+    position:relative; overflow-x:hidden;
+  }
+
+  .glow-1 {
+    position:fixed; top:-150px; right:-110px; width:540px; height:540px;
+    background:radial-gradient(circle,rgba(124,140,130,0.22),transparent 64%);
+    pointer-events:none; z-index:0;
+  }
+  .glow-2 {
+    position:fixed; bottom:-190px; left:-120px; width:480px; height:480px;
+    background:radial-gradient(circle,rgba(154,142,134,0.12),transparent 66%);
+    pointer-events:none; z-index:0;
+  }
+
+  /* ── Layout: two-column on wide, single on mobile ── */
+  .page {
+    position:relative; z-index:1;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto 1fr;
+  }
+
+  /* Nav spans full width */
+  .nav {
+    grid-column:1/-1;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:36px 52px;
+    border-bottom:1px solid rgba(236,234,227,0.06);
+  }
+  .wordmark { font-size:16px; font-weight:300; letter-spacing:-.02em; text-transform:lowercase; color:var(--bone); }
+  .wordmark span { font-weight:800; }
+  .back {
+    font-size:9px; letter-spacing:.28em; text-transform:uppercase;
+    color:rgba(124,140,130,0.45); text-decoration:none;
+    display:flex; align-items:center; gap:7px;
+    transition:color .2s;
+  }
+  .back:hover { color:var(--sage); }
+
+  /* Left column — big editorial headline + item selection */
+  .col-left {
+    padding:64px 52px 72px;
+    border-right:1px solid rgba(236,234,227,0.06);
+    display:flex; flex-direction:column; gap:0;
+  }
+
+  .eyebrow {
+    font-size:9px; letter-spacing:.44em; text-transform:uppercase;
+    color:rgba(124,140,130,0.5); margin-bottom:20px;
+  }
+
+  .page-title {
+    font-size:clamp(52px,6vw,84px);
+    font-weight:800; letter-spacing:-.045em;
+    text-transform:lowercase; color:var(--bone);
+    line-height:.88; margin-bottom:64px;
+  }
+
+  /* Product cards — editorial, not form-like */
+  .product-cards { display:flex; flex-direction:column; gap:2px; }
+
+  .product-card {
+    border:1px solid rgba(236,234,227,0.09);
+    border-radius:var(--r-lg);
+    padding:28px 28px 24px;
+    cursor:pointer;
+    position:relative;
+    transition:border-color .2s, background .2s;
+    user-select:none;
+  }
+  .product-card + .product-card { margin-top:10px; }
+  .product-card:hover:not(.sold-out) { border-color:rgba(124,140,130,0.3); }
+  .product-card.on { border-color:var(--sage); background:rgba(124,140,130,0.06); }
+  .product-card.sold-out { opacity:.28; cursor:not-allowed; }
+
+  /* Top row inside card */
+  .card-top {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom:20px;
+  }
+  .card-name-block {}
+  .card-tag {
+    font-size:8px; letter-spacing:.34em; text-transform:uppercase;
+    color:rgba(124,140,130,0.55); margin-bottom:6px;
+  }
+  .card-name {
+    font-size:28px; font-weight:800; text-transform:lowercase;
+    letter-spacing:-.03em; color:var(--bone); line-height:1;
+  }
+
+  .card-radio {
+    width:18px; height:18px; border-radius:50%; flex-shrink:0;
+    border:1px solid rgba(236,234,227,0.16);
+    display:flex; align-items:center; justify-content:center;
+    margin-top:4px;
+    transition:background .2s, border-color .2s;
+  }
+  .product-card.on .card-radio { background:var(--sage); border-color:var(--sage); }
+  .card-dot { width:6px; height:6px; background:var(--bone); border-radius:50%; opacity:0; transition:opacity .2s; }
+  .product-card.on .card-dot { opacity:1; }
+
+  /* Bottom row inside card */
+  .card-bottom {
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-top:1px solid rgba(236,234,227,0.07);
+    padding-top:16px;
+  }
+  .card-price {
+    font-size:22px; font-weight:300; letter-spacing:-.02em; color:var(--bone);
+  }
+  .card-dep-block { text-align:right; }
+  .card-dep-label {
+    font-size:8px; letter-spacing:.28em; text-transform:uppercase;
+    color:rgba(124,140,130,0.45); margin-bottom:3px;
+  }
+  .card-dep-amt {
+    font-size:15px; font-weight:700; color:rgba(236,234,227,0.7);
+  }
+  .card-left {
+    font-size:9px; color:rgba(154,142,134,0.4); margin-top:2px;
+  }
+
+  /* Size selector — inline, subtle */
+  .size-wrap {
+    display:none; align-items:center; gap:10px;
+    margin-top:10px; padding:14px 18px;
+    border:1px solid rgba(236,234,227,0.07);
+    border-radius:var(--r);
+  }
+  .size-wrap.show { display:flex; }
+  .size-lbl {
+    font-size:8px; letter-spacing:.3em; text-transform:uppercase;
+    color:rgba(124,140,130,0.45); flex-shrink:0;
+  }
+  .size-btn {
+    font-family:'Hanken Grotesk',sans-serif;
+    font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+    color:rgba(196,201,197,0.4); background:transparent;
+    border:1px solid rgba(236,234,227,0.1); border-radius:var(--r-pill);
+    padding:7px 16px; cursor:pointer;
+    transition:border-color .18s, color .18s, background .18s;
+  }
+  .size-btn:hover { border-color:var(--sage); color:var(--bone); }
+  .size-btn.on { border-color:var(--sage); color:var(--bone); background:rgba(124,140,130,0.1); }
+
+  /* Right column — form */
+  .col-right {
+    padding:64px 52px 72px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+
+  .form-top {}
+  .form-eyebrow {
+    font-size:9px; letter-spacing:.44em; text-transform:uppercase;
+    color:rgba(124,140,130,0.5); margin-bottom:48px;
+  }
+
+  .fields { display:flex; flex-direction:column; gap:14px; margin-bottom:0; }
+  .field-pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field label {
+    font-size:8px; letter-spacing:.34em; text-transform:uppercase;
+    color:rgba(124,140,130,0.5);
+  }
+  .field input {
+    background:transparent;
+    border:none;
+    border-bottom:1px solid rgba(236,234,227,0.12);
+    padding:12px 0;
+    font-family:'Hanken Grotesk',sans-serif;
+    font-size:15px; color:var(--bone); outline:none; width:100%;
+    border-radius:0;
+    transition:border-color .18s;
+  }
+  .field input::placeholder { color:rgba(196,201,197,0.18); }
+  .field input:focus { border-color:rgba(124,140,130,0.45); }
+
+  /* Form bottom — deposit + CTA */
+  .form-bottom { margin-top:auto; padding-top:48px; }
+
+  .dep-row {
+    display:none;
+    justify-content:space-between; align-items:baseline;
+    padding-bottom:24px;
+    margin-bottom:24px;
+    border-bottom:1px solid rgba(236,234,227,0.07);
+  }
+  .dep-lbl {
+    font-size:8px; letter-spacing:.34em; text-transform:uppercase;
+    color:rgba(124,140,130,0.45);
+  }
+  .dep-sub { font-size:10px; color:rgba(154,142,134,0.35); margin-top:3px; }
+  .dep-amt { font-size:36px; font-weight:800; letter-spacing:-.045em; color:var(--bone); }
+
+  .err { font-size:11px; color:#b07068; display:none; margin-bottom:14px; line-height:1.5; }
+
+  .cta {
+    width:100%; background:var(--bone); color:var(--ink);
+    font-family:'Hanken Grotesk',sans-serif;
+    font-size:10px; font-weight:700; letter-spacing:.26em; text-transform:uppercase;
+    border:none; border-radius:var(--r-pill);
+    padding:18px 24px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    transition:background .18s;
+  }
+  .cta:hover:not(:disabled) { background:var(--fog); }
+  .cta:disabled { opacity:.32; cursor:not-allowed; }
+
+  .fine {
+    font-size:9px; color:rgba(124,140,130,0.28);
+    margin-top:14px; line-height:1.7; text-align:center; letter-spacing:.02em;
+  }
+
+  .spin {
+    width:12px; height:12px;
+    border:1.5px solid rgba(31,36,33,0.2); border-top-color:var(--ink);
+    border-radius:50%; animation:spin .7s linear infinite; display:none;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* Success */
+  .success {
+    display:none; grid-column:1/-1;
+    align-items:center; justify-content:center;
+    text-align:center; padding:80px 52px;
+  }
+  .success-inner {}
+  .success-icon {
+    width:52px; height:52px; border-radius:50%;
+    border:1px solid rgba(124,140,130,0.28);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--sage); font-size:18px; margin:0 auto 28px;
+  }
+  .success-title {
+    font-size:64px; font-weight:800; letter-spacing:-.05em;
+    text-transform:lowercase; color:var(--bone); margin-bottom:12px;
+  }
+  .success-body { font-size:13px; color:rgba(196,201,197,0.38); }
+
+  /* Responsive */
+  @media(max-width:760px){
+    .page { grid-template-columns:1fr; }
+    .col-left { padding:48px 28px 40px; border-right:none; border-bottom:1px solid rgba(236,234,227,0.06); }
+    .col-right { padding:40px 28px 64px; }
+    .nav { padding:28px; }
+    .field-pair { grid-template-columns:1fr; }
+    .form-bottom { padding-top:36px; }
+  }
+  @media(prefers-reduced-motion:reduce){ *{ transition:none!important; animation:none!important; } }
+</style>
+</head>
+<body>
+
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<div class="page">
+
+  <nav class="nav">
+    <div class="wordmark">yoga<span>cloak</span></div>
+    <a href="yogacloak-index.html" class="back">
+      <svg width="10" height="8" viewBox="0 0 12 10" fill="none">
+        <path d="M11 5H1M5 1L1 5l4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back
+    </a>
+  </nav>
+
+  <!-- Left: what + pick -->
+  <div class="col-left" id="col-left">
+    <div class="eyebrow">First drop ✦ 100 of each</div>
+    <h1 class="page-title">what are<br>you taking<br>home.</h1>
+
+    <div class="product-cards">
+
+      <div class="product-card" id="card-cloak" onclick="pick('cloak')">
+        <div class="card-top">
+          <div class="card-name-block">
+            <div class="card-tag">For the drive</div>
+            <div class="card-name">the cloak</div>
+          </div>
+          <div class="card-radio"><div class="card-dot"></div></div>
+        </div>
+        <div class="card-bottom">
+          <div class="card-price">$98</div>
+          <div class="card-dep-block">
+            <div class="card-dep-label">To reserve</div>
+            <div class="card-dep-amt">$20</div>
+            <div class="card-left" id="left-cloak"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="size-wrap" id="size-wrap">
+        <span class="size-lbl">Size</span>
+        <button class="size-btn" data-size="XS-M" onclick="pickSize('XS-M')">XS – M</button>
+        <button class="size-btn" data-size="L-XL" onclick="pickSize('L-XL')">L – XL</button>
+      </div>
+
+      <div class="product-card" id="card-wrap" onclick="pick('wrap')">
+        <div class="card-top">
+          <div class="card-name-block">
+            <div class="card-tag">For the walk</div>
+            <div class="card-name">the wrap</div>
+          </div>
+          <div class="card-radio"><div class="card-dot"></div></div>
+        </div>
+        <div class="card-bottom">
+          <div class="card-price">$68</div>
+          <div class="card-dep-block">
+            <div class="card-dep-label">To reserve</div>
+            <div class="card-dep-amt">$15</div>
+            <div class="card-left" id="left-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: info + pay -->
+  <div class="col-right" id="col-right">
+    <div class="form-top">
+      <div class="form-eyebrow">Your details</div>
+      <div class="fields">
+        <div class="field-pair">
+          <div class="field"><label>First name</label><input id="fn" type="text" placeholder="Ava" autocomplete="given-name"></div>
+          <div class="field"><label>Last name</label><input id="ln" type="text" placeholder="Chen" autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label>Email</label><input id="em" type="email" placeholder="ava@example.com" autocomplete="email"></div>
+        <div class="field"><label>Phone</label><input id="ph" type="tel" placeholder="+1 (555) 000-0000" autocomplete="tel"></div>
+      </div>
+    </div>
+
+    <div class="form-bottom">
+      <div class="dep-row" id="dep-row">
+        <div>
+          <div class="dep-lbl">Deposit today</div>
+          <div class="dep-sub">credited to your order</div>
+        </div>
+        <div class="dep-amt" id="dep-amt">$0</div>
+      </div>
+
+      <div class="err" id="err"></div>
+
+      <button class="cta" id="cta" onclick="submit()">
+        <span id="cta-lbl">Pay deposit &amp; reserve</span>
+        <div class="spin" id="spin"></div>
+        <svg id="cta-arrow" width="12" height="9" viewBox="0 0 14 10" fill="none">
+          <path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <p class="fine">Non-refundable, transferable. One of each max.</p>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div class="success" id="success-view">
+    <div class="success-inner">
+      <div class="success-icon">✦</div>
+      <div class="success-title">you're in.</div>
+      <p class="success-body">We'll text and email you when the drop is ready.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "https://yogacloak-reserve.vercel.app";
+const TOTAL = 100;
+let av = { cloak:null, wrap:null };
+let sel = { cloak:false, wrap:false, size:null };
+
+(async () => {
+  try {
+    const r = await fetch(`${API}/api/availability`);
+    if (!r.ok) return;
+    const d = await r.json();
+    av = d;
+    setLeft("left-cloak", d.cloak, "cloak");
+    setLeft("left-wrap",  d.wrap,  "wrap");
+  } catch {}
+})();
+
+function setLeft(id, n, which) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (n === 0) {
+    el.textContent = "Sold out";
+    const card = document.getElementById(`card-${which}`);
+    card.classList.add("sold-out"); card.onclick = null;
+  } else if (n != null) {
+    el.textContent = `${n} left`;
+  }
+}
+
+function pick(which) {
+  const card = document.getElementById(`card-${which}`);
+  if (card.classList.contains("sold-out")) return;
+  sel[which] = !sel[which];
+  card.classList.toggle("on", sel[which]);
+  if (which === "cloak") {
+    document.getElementById("size-wrap").classList.toggle("show", sel.cloak);
+    if (!sel.cloak) { sel.size = null; document.querySelectorAll(".size-btn").forEach(b=>b.classList.remove("on")); }
+  }
+  refreshDep();
+}
+
+function pickSize(sz) {
+  sel.size = sz;
+  document.querySelectorAll(".size-btn").forEach(b => b.classList.toggle("on", b.dataset.size === sz));
+}
+
+function refreshDep() {
+  const show = sel.cloak || sel.wrap;
+  document.getElementById("dep-row").style.display = show ? "flex" : "none";
+  let t = 0; if (sel.cloak) t += 20; if (sel.wrap) t += 15;
+  document.getElementById("dep-amt").textContent = `$${t}`;
+}
+
+function g(id) { return document.getElementById(id).value.trim(); }
+
+async function submit() {
+  const e = document.getElementById("err"); e.style.display = "none";
+  if (!sel.cloak && !sel.wrap) return err("Choose the cloak, the wrap, or both.");
+  if (sel.cloak && !sel.size)  return err("Pick a size for the cloak.");
+  if (!g("fn") || !g("ln"))    return err("Enter your full name.");
+  if (!g("em") || !g("em").includes("@")) return err("Enter a valid email.");
+  if (!g("ph"))                return err("Enter your phone number.");
+
+  loading(true);
+  const product = sel.cloak && sel.wrap ? "both" : sel.cloak ? "cloak" : "wrap";
+  try {
+    const r = await fetch(`${API}/api/reserve`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({product, size:sel.size, firstName:g("fn"), lastName:g("ln"), email:g("em"), phone:g("ph")})
+    });
+    const d = await r.json();
+    if (!r.ok) { loading(false); return err(d.error || "Something went wrong."); }
+    window.location.href = d.url;
+  } catch { loading(false); err("Network error. Try again."); }
+}
+
+function err(msg) { const e = document.getElementById("err"); e.textContent = msg; e.style.display = "block"; }
+
+function loading(on) {
+  document.getElementById("cta").disabled = on;
+  document.getElementById("cta-lbl").textContent = on ? "Redirecting…" : "Pay deposit & reserve";
+  document.getElementById("spin").style.display = on ? "block" : "none";
+  document.getElementById("cta-arrow").style.display = on ? "none" : "block";
+}
+</script>
+</body>
+</html>
