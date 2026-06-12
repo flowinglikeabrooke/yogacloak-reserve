@@ -3,103 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>yogacloak — first drop</title>
+<title>yogacloak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink:#1F2421; --bas:#2E3633; --sgd:#4A5A52; --sage:#7C8C82;
-    --clay:#9A8E86; --fog:#C4C9C5; --bone:#ECEAE3; --paper:#F4F3EE;
-    --r-pill:100px; --r:20px; --r-lg:28px;
+    --ink:#1F2421; --sage:#7C8C82; --clay:#9A8E86;
+    --fog:#C4C9C5; --bone:#ECEAE3;
   }
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-  html{font-family:'Hanken Grotesk',sans-serif;-webkit-font-smoothing:antialiased;}
-  body{background:var(--ink);color:var(--bone);line-height:1.618;min-height:100svh;position:relative;overflow-x:hidden;}
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  html { font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialiased; }
+  body {
+    background:var(--ink); color:var(--bone);
+    min-height:100svh; overflow-x:hidden;
+  }
 
-  .glow-1{position:fixed;top:-150px;right:-110px;width:540px;height:540px;background:radial-gradient(circle,rgba(124,140,130,0.22),transparent 64%);pointer-events:none;z-index:0;}
-  .glow-2{position:fixed;bottom:-190px;left:-120px;width:480px;height:480px;background:radial-gradient(circle,rgba(154,142,134,0.12),transparent 66%);pointer-events:none;z-index:0;}
+  .glow-1 { position:fixed; top:-150px; right:-110px; width:540px; height:540px; background:radial-gradient(circle,rgba(124,140,130,0.2),transparent 64%); pointer-events:none; z-index:0; }
+  .glow-2 { position:fixed; bottom:-190px; left:-120px; width:480px; height:480px; background:radial-gradient(circle,rgba(154,142,134,0.1),transparent 66%); pointer-events:none; z-index:0; }
 
-  /* ── LANDING ── */
-  .page{min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;padding:40px 52px 48px;position:relative;z-index:1;}
-  .top{display:flex;justify-content:space-between;align-items:center;}
-  .wordmark{font-size:17px;font-weight:300;letter-spacing:-.02em;text-transform:lowercase;color:var(--bone);}
-  .wordmark span{font-weight:800;}
-  .center{padding:0;}
-  .eyebrow{font-size:9px;letter-spacing:.46em;text-transform:uppercase;color:var(--sage);margin-bottom:24px;opacity:.75;}
-  .headline{font-size:clamp(64px,10vw,130px);font-weight:300;letter-spacing:-.045em;line-height:.87;text-transform:lowercase;color:var(--bone);margin-bottom:52px;}
-  .headline strong{font-weight:800;display:block;}
-  .actions{display:flex;align-items:center;}
-  .reserve-btn{display:inline-flex;align-items:center;gap:12px;background:var(--bone);color:var(--ink);font-family:'Hanken Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;border-radius:var(--r-pill);padding:16px 32px;transition:background .18s;}
-  .reserve-btn:hover{background:var(--fog);}
-  .learn-btn{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(236,234,227,0.4);background:none;border:none;border-bottom:1px solid rgba(236,234,227,0.1);padding:2px 0;margin-left:24px;font-family:'Hanken Grotesk',sans-serif;cursor:pointer;transition:color .18s,border-color .18s;}
-  .learn-btn:hover{color:rgba(236,234,227,0.75);border-color:rgba(236,234,227,0.25);}
+  .page {
+    position:relative; z-index:1;
+    min-height:100svh;
+    display:flex; flex-direction:column;
+    justify-content:space-between;
+    padding:40px 48px 52px;
+  }
 
-  /* ── LEARN PANEL ── */
-  .learn-panel{display:none;position:fixed;inset:0;z-index:20;background:var(--ink);overflow-y:auto;}
-  .learn-panel.open{display:block;animation:fadeUp .3s ease;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  /* top */
+  .wordmark { font-size:15px; font-weight:300; letter-spacing:-.02em; text-transform:lowercase; color:var(--bone); }
+  .wordmark span { font-weight:800; }
 
-  .learn-nav{display:flex;justify-content:space-between;align-items:center;padding:36px 52px;border-bottom:1px solid rgba(236,234,227,0.07);}
-  .learn-wordmark{font-size:16px;font-weight:300;letter-spacing:-.02em;text-transform:lowercase;color:var(--bone);}
-  .learn-wordmark span{font-weight:800;}
-  .learn-close{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(124,140,130,0.5);background:none;border:none;cursor:pointer;font-family:'Hanken Grotesk',sans-serif;display:flex;align-items:center;gap:8px;transition:color .18s;}
-  .learn-close:hover{color:var(--sage);}
+  /* center */
+  .center {}
+  .soon { font-size:9px; letter-spacing:.46em; text-transform:uppercase; color:rgba(124,140,130,0.5); margin-bottom:20px; }
+  .headline {
+    font-size:clamp(64px,11vw,140px);
+    font-weight:300; letter-spacing:-.045em; line-height:.87;
+    text-transform:lowercase; color:var(--bone);
+    margin-bottom:52px;
+  }
+  .headline strong { font-weight:800; display:block; }
 
-  /* Lifestyle hero */
-  .learn-hero{width:100%;height:52vh;min-height:320px;max-height:520px;overflow:hidden;position:relative;}
-  .learn-hero img{width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(.85);}
-  .learn-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(31,36,33,0.7) 100%);}
-  .learn-hero-text{position:absolute;bottom:40px;left:52px;}
-  .learn-hero-eyebrow{font-size:9px;letter-spacing:.44em;text-transform:uppercase;color:rgba(196,201,197,0.6);margin-bottom:10px;}
-  .learn-hero-title{font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-.04em;text-transform:lowercase;color:var(--bone);line-height:.95;}
+  .cta-row { display:flex; align-items:center; gap:28px; }
 
-  .learn-inner{max-width:900px;margin:0 auto;padding:56px 52px 80px;}
-  .learn-body{font-size:15px;color:rgba(196,201,197,0.5);line-height:1.8;max-width:520px;margin-bottom:52px;font-weight:300;}
+  .btn {
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--bone); color:var(--ink);
+    font-family:'Hanken Grotesk',sans-serif;
+    font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase;
+    text-decoration:none; border-radius:100px; padding:15px 28px;
+    transition:background .18s;
+  }
+  .btn:hover { background:var(--fog); }
 
-  /* Product cards — expandable */
-  .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:52px;}
+  .learn {
+    font-size:10px; letter-spacing:.14em;
+    color:rgba(196,201,197,0.35);
+    background:none; border:none; cursor:pointer;
+    font-family:'Hanken Grotesk',sans-serif;
+    text-decoration:underline; text-underline-offset:4px;
+    text-decoration-color:rgba(196,201,197,0.15);
+    transition:color .18s;
+  }
+  .learn:hover { color:rgba(196,201,197,0.65); }
 
-  .product-tile{border-radius:var(--r-lg);overflow:hidden;border:1px solid rgba(236,234,227,0.09);cursor:pointer;transition:border-color .2s;}
-  .product-tile:hover{border-color:rgba(124,140,130,0.3);}
-  .product-tile.expanded{border-color:rgba(124,140,130,0.4);}
+  /* bottom */
+  .bottom { display:flex; align-items:flex-end; justify-content:space-between; }
+  .tagline { font-size:10px; color:rgba(124,140,130,0.35); letter-spacing:.06em; }
 
-  .tile-head{background:rgba(46,54,51,0.6);padding:26px 26px 20px;border-bottom:1px solid rgba(236,234,227,0.07);display:flex;justify-content:space-between;align-items:flex-start;}
-  .tile-head-left{}
-  .tile-tag{font-size:8px;letter-spacing:.36em;text-transform:uppercase;color:rgba(124,140,130,0.6);margin-bottom:7px;}
-  .tile-name{font-size:24px;font-weight:800;text-transform:lowercase;letter-spacing:-.025em;color:var(--bone);}
-  .tile-price{font-size:13px;color:rgba(196,201,197,0.35);margin-top:4px;}
-  .tile-chevron{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:rgba(124,140,130,0.4);transition:transform .25s;flex-shrink:0;margin-top:4px;}
-  .product-tile.expanded .tile-chevron{transform:rotate(180deg);}
+  /* learn panel */
+  .panel {
+    display:none;
+    position:fixed; inset:0; z-index:20;
+    background:var(--ink); overflow-y:auto;
+  }
+  .panel.open { display:block; animation:up .28s ease; }
+  @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
-  .tile-foot{background:rgba(31,36,33,0.4);padding:18px 26px;}
+  .panel-nav {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:36px 48px;
+  }
+  .close-btn {
+    font-size:9px; letter-spacing:.28em; text-transform:uppercase;
+    color:rgba(124,140,130,0.45); background:none; border:none; cursor:pointer;
+    font-family:'Hanken Grotesk',sans-serif; transition:color .18s;
+  }
+  .close-btn:hover { color:var(--sage); }
 
-  /* Expanded image reveal */
-  .tile-expand{max-height:0;overflow:hidden;transition:max-height .6s cubic-bezier(0.4, 0, 0.2, 1);}
-  .product-tile.expanded .tile-expand{max-height:500px;}
-  .tile-img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center top;display:block;}
-  .tile-expand-body{padding:20px 26px;border-top:1px solid rgba(236,234,227,0.07);}
-  .tile-desc{font-size:12px;color:rgba(196,201,197,0.45);line-height:1.75;margin-bottom:14px;}
+  /* hero photo */
+  .hero {
+    width:100%; height:55vh; min-height:300px; max-height:500px;
+    position:relative; overflow:hidden;
+  }
+  .hero img { width:100%; height:100%; object-fit:cover; object-position:center 15%; filter:brightness(.8); }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,transparent 40%,rgba(31,36,33,0.75) 100%); }
+  .hero-text { position:absolute; bottom:40px; left:48px; }
+  .hero-eyebrow { font-size:9px; letter-spacing:.4em; text-transform:uppercase; color:rgba(196,201,197,0.5); margin-bottom:8px; }
+  .hero-title { font-size:clamp(28px,4vw,46px); font-weight:800; letter-spacing:-.04em; text-transform:lowercase; color:var(--bone); line-height:.95; }
 
-  .tile-avail{margin-bottom:10px;}
-  .tile-count{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--bone);}
-  .tile-count-of{font-size:11px;color:rgba(124,140,130,0.55);letter-spacing:.04em;}
-  .tile-note{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(124,140,130,0.6);border:1px solid rgba(124,140,130,0.2);border-radius:100px;padding:5px 12px;display:inline-block;}
+  /* panel body */
+  .panel-body { max-width:560px; margin:0 auto; padding:52px 48px 80px; }
 
-  .learn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--bone);color:var(--ink);font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;text-decoration:none;border-radius:var(--r-pill);padding:16px 32px;transition:background .18s;}
-  .learn-cta:hover{background:var(--fog);}
+  .panel-intro { font-size:15px; color:rgba(196,201,197,0.45); line-height:1.8; font-weight:300; margin-bottom:52px; }
 
-  /* Contact */
-  .learn-contact{margin-top:48px;padding-top:32px;border-top:1px solid rgba(236,234,227,0.07);display:flex;justify-content:space-between;align-items:center;}
-  .contact-label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(124,140,130,0.4);}
-  .contact-email{font-size:13px;color:rgba(196,201,197,0.5);text-decoration:none;letter-spacing:.02em;transition:color .18s;}
-  .contact-email:hover{color:var(--bone);}
+  /* product cards */
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:48px; }
+
+  .card { border:1px solid rgba(236,234,227,0.09); border-radius:22px; overflow:hidden; cursor:pointer; transition:border-color .2s; }
+  .card:hover { border-color:rgba(124,140,130,0.3); }
+  .card.open { border-color:rgba(124,140,130,0.4); }
+
+  .card-top { padding:22px 22px 18px; }
+  .card-eyebrow { font-size:8px; letter-spacing:.32em; text-transform:uppercase; color:rgba(124,140,130,0.5); margin-bottom:6px; }
+  .card-name { font-size:22px; font-weight:800; text-transform:lowercase; letter-spacing:-.025em; color:var(--bone); }
+  .card-price { font-size:12px; color:rgba(196,201,197,0.3); margin-top:4px; }
+  .card-chevron { float:right; margin-top:-28px; color:rgba(124,140,130,0.35); transition:transform .3s; }
+  .card.open .card-chevron { transform:rotate(180deg); }
+
+  .card-expand { max-height:0; overflow:hidden; transition:max-height .5s cubic-bezier(0.4,0,0.2,1); }
+  .card.open .card-expand { max-height:600px; }
+  .card-img { width:100%; aspect-ratio:3/4; object-fit:cover; object-position:center top; display:block; }
+  .card-info { padding:16px 22px 20px; border-top:1px solid rgba(236,234,227,0.07); }
+  .card-desc { font-size:11px; color:rgba(196,201,197,0.4); line-height:1.75; margin-bottom:14px; }
+  .card-avail { font-size:11px; color:rgba(124,140,130,0.55); margin-bottom:10px; }
+  .card-avail strong { font-size:20px; font-weight:800; letter-spacing:-.03em; color:var(--bone); }
+  .card-note { font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:rgba(124,140,130,0.5); border:1px solid rgba(124,140,130,0.18); border-radius:100px; padding:4px 11px; display:inline-block; }
+
+  .panel-cta {
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--bone); color:var(--ink);
+    font-family:'Hanken Grotesk',sans-serif;
+    font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase;
+    text-decoration:none; border-radius:100px; padding:15px 28px;
+    transition:background .18s;
+  }
+  .panel-cta:hover { background:var(--fog); }
+
+  .contact { margin-top:40px; padding-top:28px; border-top:1px solid rgba(236,234,227,0.07); display:flex; justify-content:space-between; align-items:center; }
+  .contact-lbl { font-size:9px; letter-spacing:.32em; text-transform:uppercase; color:rgba(124,140,130,0.35); }
+  .contact-email { font-size:13px; color:rgba(196,201,197,0.4); text-decoration:none; transition:color .18s; }
+  .contact-email:hover { color:var(--bone); }
 
   @media(max-width:600px){
-    .page{padding:28px 28px 36px;}
-    .learn-nav{padding:24px 28px;}
-    .learn-inner{padding:40px 28px 64px;}
-    .product-grid{grid-template-columns:1fr;}
-    .learn-hero-text{left:28px;bottom:28px;}
+    .page { padding:28px 28px 40px; }
+    .panel-nav { padding:28px; }
+    .hero-text { left:28px; bottom:28px; }
+    .panel-body { padding:40px 28px 64px; }
+    .cards { grid-template-columns:1fr; }
+    .cta-row { flex-direction:column; align-items:flex-start; gap:16px; }
   }
   @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 </style>
@@ -110,158 +162,113 @@
 <div class="glow-2"></div>
 
 <div class="page">
-  <div class="top">
-    <div class="wordmark">yoga<span>cloak</span></div>
-  </div>
+  <div class="wordmark">yoga<span>cloak</span></div>
+
   <div class="center">
-    <div class="eyebrow">Coming soon</div>
+    <div class="soon">coming soon</div>
     <h1 class="headline">for after<strong>class.</strong></h1>
-    <div class="actions">
-      <a href="yogacloak-reserve-page.html" class="reserve-btn">
+    <div class="cta-row">
+      <a href="yogacloak-reserve-page.html" class="btn">
         Get yours
-        <svg width="12" height="9" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="11" height="8" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <button class="learn-btn" onclick="openLearn()">Learn more</button>
+      <button class="learn" onclick="document.getElementById('panel').classList.add('open');document.body.style.overflow='hidden'">
+        learn more
+      </button>
     </div>
+  </div>
+
+  <div class="bottom">
+    <div class="tagline">for after class</div>
   </div>
 </div>
 
-<!-- Learn panel -->
-<div class="learn-panel" id="learn">
-  <div class="learn-nav">
-    <div class="learn-wordmark">yoga<span>cloak</span></div>
-    <button class="learn-close" onclick="closeLearn()">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-      Close
-    </button>
+<!-- learn panel -->
+<div class="panel" id="panel">
+  <div class="panel-nav">
+    <div class="wordmark">yoga<span>cloak</span></div>
+    <button class="close-btn" onclick="document.getElementById('panel').classList.remove('open');document.body.style.overflow=''">close</button>
   </div>
 
-  <!-- Lifestyle hero -->
-  <div class="learn-hero">
-    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/lifestyle.png" alt="YogaCloak">
-    <div class="learn-hero-overlay"></div>
-    <div class="learn-hero-text">
-      <div class="learn-hero-eyebrow">For after class ✦</div>
-      <div class="learn-hero-title">you're not ready<br>for real clothes yet.</div>
+  <div class="hero">
+    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/lifestyle.png" alt="">
+    <div class="hero-overlay"></div>
+    <div class="hero-text">
+      <div class="hero-eyebrow">for after class</div>
+      <div class="hero-title">you're not ready<br>for real clothes yet.</div>
     </div>
   </div>
 
-  <div class="learn-inner">
-    <p class="learn-body">YogaCloak is the thing you put on to get home. Matte microfiber. Folds into your bag. Two vibes to get home — for the drive and for the walk.</p>
+  <div class="panel-body">
+    <p class="panel-intro">YogaCloak is the thing you put on to get home. Matte microfiber. Folds into your bag. Two vibes — for the drive and for the walk.</p>
 
-    <div class="product-grid">
-
-      <!-- Cloak -->
-      <div class="product-tile" id="tile-cloak" onclick="toggleTile('cloak')">
-        <div class="tile-head">
-          <div class="tile-head-left">
-            <div class="tile-tag">The drive home</div>
-            <div class="tile-name">the cloak</div>
-            <div class="tile-price">$98</div>
-          </div>
-          <div class="tile-chevron">
+    <div class="cards">
+      <div class="card" id="card-cloak" onclick="toggleCard('cloak')">
+        <div class="card-top">
+          <div class="card-eyebrow">the drive home</div>
+          <div class="card-name">the cloak</div>
+          <div class="card-price">$98</div>
+          <div class="card-chevron">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </div>
-        <div class="tile-expand">
-          <img class="tile-img" src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/CLOAK%20STILL.png" alt="The Cloak">
-          <div class="tile-expand-body">
-            <p class="tile-desc">Hooded open-front drape. Falls long, closes with two hidden snaps. Holds the sweat off the seat. ~300 GSM recycled microfiber, matte graphite.</p>
-            <div class="tile-avail">
-              <span class="tile-count" id="learn-cloak-count">100</span>
-              <span class="tile-count-of"> of 100 left</span>
-            </div>
-            <div class="tile-note">$20 deposit · XS–M or L–XL</div>
+        <div class="card-expand">
+          <img class="card-img" src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/CLOAK%20STILL.png" alt="the cloak">
+          <div class="card-info">
+            <p class="card-desc">Hooded open-front drape. Falls long, closes with two hidden snaps. ~300 GSM recycled microfiber, matte graphite.</p>
+            <div class="card-avail"><strong id="cloak-n">100</strong> of 100 left</div>
+            <div class="card-note">$20 deposit · XS–M or L–XL</div>
           </div>
-        </div>
-        <div class="tile-foot" id="tile-cloak-foot">
-          <div class="tile-avail">
-            <span class="tile-count" id="learn-cloak-count-2">100</span>
-            <span class="tile-count-of"> of 100 left</span>
-          </div>
-          <div class="tile-note">$20 deposit · XS–M or L–XL</div>
         </div>
       </div>
 
-      <!-- Wrap -->
-      <div class="product-tile" id="tile-wrap" onclick="toggleTile('wrap')">
-        <div class="tile-head">
-          <div class="tile-head-left">
-            <div class="tile-tag">The walk home</div>
-            <div class="tile-name">the wrap</div>
-            <div class="tile-price">$68</div>
-          </div>
-          <div class="tile-chevron">
+      <div class="card" id="card-wrap" onclick="toggleCard('wrap')">
+        <div class="card-top">
+          <div class="card-eyebrow">the walk home</div>
+          <div class="card-name">the wrap</div>
+          <div class="card-price">$68</div>
+          <div class="card-chevron">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </div>
-        <div class="tile-expand">
-          <img class="tile-img" src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/WRAP%20STILL.png" alt="The Wrap">
-          <div class="tile-expand-body">
-            <p class="tile-desc">Oversized rectangular drape with one hidden snap so it stays on. Lighter than the cloak. Packs down small. ~200 GSM, same matte graphite.</p>
-            <div class="tile-avail">
-              <span class="tile-count" id="learn-wrap-count">100</span>
-              <span class="tile-count-of"> of 100 left</span>
-            </div>
-            <div class="tile-note">$15 deposit · one size</div>
+        <div class="card-expand">
+          <img class="card-img" src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/WRAP%20STILL.png" alt="the wrap">
+          <div class="card-info">
+            <p class="card-desc">Oversized drape with one hidden snap. Lighter than the cloak. Packs down small. ~200 GSM, same matte graphite.</p>
+            <div class="card-avail"><strong id="wrap-n">100</strong> of 100 left</div>
+            <div class="card-note">$15 deposit · one size</div>
           </div>
-        </div>
-        <div class="tile-foot" id="tile-wrap-foot">
-          <div class="tile-avail">
-            <span class="tile-count" id="learn-wrap-count-2">100</span>
-            <span class="tile-count-of"> of 100 left</span>
-          </div>
-          <div class="tile-note">$15 deposit · one size</div>
         </div>
       </div>
-
     </div>
 
-    <a href="yogacloak-reserve-page.html" class="learn-cta">
+    <a href="yogacloak-reserve-page.html" class="panel-cta">
       Get yours
-      <svg width="12" height="9" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="11" height="8" viewBox="0 0 14 10" fill="none"><path d="M1 5h12M8 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
 
-    <div class="learn-contact">
-      <div class="contact-label">Questions</div>
+    <div class="contact">
+      <div class="contact-lbl">questions</div>
       <a href="mailto:hello@yogacloak.com" class="contact-email">hello@yogacloak.com</a>
     </div>
-
   </div>
 </div>
 
 <script>
-const API = "https://yogacloak-reserve.vercel.app";
-
-function openLearn() { document.getElementById('learn').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeLearn() { document.getElementById('learn').classList.remove('open'); document.body.style.overflow=''; }
-
-function toggleTile(which) {
-  const tile = document.getElementById(`tile-${which}`);
-  const foot = document.getElementById(`tile-${which}-foot`);
-  const isOpen = tile.classList.contains('expanded');
-  // close both first
-  ['cloak','wrap'].forEach(w => {
-    document.getElementById(`tile-${w}`).classList.remove('expanded');
-    document.getElementById(`tile-${w}-foot`).style.display = '';
-  });
-  if (!isOpen) {
-    tile.classList.add('expanded');
-    foot.style.display = 'none'; // hide static foot when expanded shows it inside
-  }
+function toggleCard(w) {
+  const el = document.getElementById(`card-${w}`);
+  const isOpen = el.classList.contains("open");
+  document.querySelectorAll(".card").forEach(c => c.classList.remove("open"));
+  if (!isOpen) el.classList.add("open");
 }
 
 (async () => {
   try {
-    const r = await fetch(API + "/api/availability");
+    const r = await fetch("https://yogacloak-reserve.vercel.app/api/availability");
     if (!r.ok) return;
     const d = await r.json();
-    ['learn-cloak-count','learn-cloak-count-2'].forEach(id => {
-      if (d.cloak != null) document.getElementById(id).textContent = d.cloak;
-    });
-    ['learn-wrap-count','learn-wrap-count-2'].forEach(id => {
-      if (d.wrap != null) document.getElementById(id).textContent = d.wrap;
-    });
+    if (d.cloak != null) document.getElementById("cloak-n").textContent = d.cloak;
+    if (d.wrap  != null) document.getElementById("wrap-n").textContent  = d.wrap;
   } catch {}
 })();
 </script>
