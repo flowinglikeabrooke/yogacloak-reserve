@@ -256,11 +256,9 @@
 
 <script>
 function toggleCard(w) {
-  const el = document.getElementById(`card-${w}`);
-  const isOpen = el.classList.contains("open");
-  document.querySelectorAll(".card").forEach(c => c.classList.remove("open"));
-  if (!isOpen) el.classList.add("open");
+  document.getElementById(`card-${w}`).classList.toggle("open");
 }
+
 
 (async () => {
   try {
