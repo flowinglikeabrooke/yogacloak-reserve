@@ -190,20 +190,13 @@
     <button class="close-btn" onclick="document.getElementById('panel').classList.remove('open');document.body.style.overflow=''">close</button>
   </div>
 
-  <div class="hero">
-    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/lifestyle.png" alt="">
-    <div class="hero-overlay"></div>
-    <div class="hero-text">
-      <div class="hero-eyebrow">for after class</div>
-      <div class="hero-title">you're not ready<br>for real clothes yet.</div>
-    </div>
-  </div>
+
 
   <div class="panel-body">
     <p class="panel-intro">YogaCloak is the thing you put on to get home. Matte microfiber. Folds into your bag. Two vibes — for the drive and for the walk.</p>
 
     <div class="cards">
-      <div class="card" id="card-cloak" onclick="toggleCard('cloak')">
+      <div class="card open" id="card-cloak" onclick="toggleCard('cloak')">
         <div class="card-top">
           <div class="card-eyebrow">the drive home</div>
           <div class="card-name">the cloak</div>
@@ -222,7 +215,7 @@
         </div>
       </div>
 
-      <div class="card" id="card-wrap" onclick="toggleCard('wrap')">
+      <div class="card open" id="card-wrap" onclick="toggleCard('wrap')">
         <div class="card-top">
           <div class="card-eyebrow">the walk home</div>
           <div class="card-name">the wrap</div>
