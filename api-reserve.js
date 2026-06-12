@@ -1,17 +1,5 @@
-/**
- * yogacloak — /api/reserve
- *
- * POST { product: "cloak"|"wrap"|"both", size, firstName, lastName, email, phone }
- *   → creates a Stripe Checkout session for the deposit(s)
- *   → logs a "pending" row to the Google Sheet
- *   → returns { url } for the frontend to redirect to
- *
- * The webhook (/api/webhook) flips the row to "confirmed" and
- * decrements availability once checkout.session.completed fires.
- */
-
 import Stripe from "stripe";
-import { logToSheet } from "./lib-sheets.js";
+import { logToSheet } from "../lib-sheets.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-04-10",
@@ -32,7 +20,6 @@ export default async function handler(req, res) {
 
   const { product, size, firstName, lastName, email, phone } = req.body || {};
 
-  // ── Validate ────────────────────────────────────────────────────────────
   if (!["cloak", "wrap", "both"].includes(product)) {
     return res.status(400).json({ error: "Invalid product selection." });
   }
@@ -43,7 +30,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Size is required for the cloak." });
   }
 
-  // ── Build line items ────────────────────────────────────────────────────
   const lineItems = [];
   if (product === "cloak" || product === "both") {
     lineItems.push({ price: PRICES.cloak, quantity: 1 });
@@ -59,19 +45,11 @@ export default async function handler(req, res) {
       mode: "payment",
       line_items: lineItems,
       customer_email: email,
-      success_url: `${siteUrl}/reserve?status=confirmed`,
-      cancel_url: `${siteUrl}/reserve?status=cancelled`,
-      metadata: {
-        product,
-        size: size || "",
-        firstName,
-        lastName,
-        email,
-        phone,
-      },
+      success_url: siteUrl + "/success?product=" + product,
+      cancel_url: siteUrl + "/reserve?status=cancelled",
+      metadata: { product, size: size || "", firstName, lastName, email, phone },
     });
 
-    // Log a pending row — webhook will flip it to "confirmed"
     try {
       await logToSheet({
         stripeSessionId: session.id,
