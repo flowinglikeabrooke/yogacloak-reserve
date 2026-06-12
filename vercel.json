@@ -4,6 +4,7 @@
     { "source": "/api/availability", "destination": "/api-availability.js" },
     { "source": "/api/webhook", "destination": "/api-webhook.js" },
     { "source": "/reserve", "destination": "/yogacloak-reserve-page.html" },
-    { "source": "/", "destination": "/yogacloak-index.html" }
+    { "source": "/", "destination": "/yogacloak-index.html" },
+        { "source": "/success", "destination": "/yogacloak-success-page.html" }
   ]
 }
