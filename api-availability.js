@@ -7,7 +7,7 @@
  * Reads from the same KV store as lib/availability.js
  */
 
-import { getAvailability } from "../lib/availability.js";
+import { getAvailability } from "./lib-availability.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGIN || "*");

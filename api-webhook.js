@@ -13,8 +13,8 @@
  */
 
 import Stripe from "stripe";
-import { decrementAvailability } from "../lib/availability.js";
-import { updateSheetStatus } from "../lib/sheets.js";
+import { decrementAvailability } from "./lib-availability.js";
+import { updateSheetStatus } from "./lib-sheets.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-04-10",
