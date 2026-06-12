@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yogacloak — reserved</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#1F2421; --sage:#7C8C82; --clay:#9A8E86;
+    --fog:#C4C9C5; --bone:#ECEAE3;
+  }
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  html { font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialiased; }
+  body {
+    background:var(--ink); color:var(--bone);
+    min-height:100svh; overflow-x:hidden;
+    display:flex; align-items:center; justify-content:center;
+    padding:40px;
+  }
+  .glow-1 { position:fixed; top:-150px; right:-110px; width:540px; height:540px; background:radial-gradient(circle,rgba(124,140,130,0.2),transparent 64%); pointer-events:none; z-index:0; }
+  .glow-2 { position:fixed; bottom:-190px; left:-120px; width:480px; height:480px; background:radial-gradient(circle,rgba(154,142,134,0.1),transparent 66%); pointer-events:none; z-index:0; }
+
+  .wrap { position:relative; z-index:1; max-width:520px; text-align:center; }
+
+  .mark { width:64px; height:64px; margin:0 auto 40px; border:1px solid rgba(124,140,130,0.4); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .mark svg { width:24px; height:24px; }
+
+  .eyebrow { font-size:9px; letter-spacing:.4em; text-transform:uppercase; color:rgba(124,140,130,0.55); margin-bottom:22px; }
+  .headline { font-size:clamp(40px,7vw,64px); font-weight:300; letter-spacing:-.045em; line-height:.95; text-transform:lowercase; color:var(--bone); margin-bottom:14px; }
+  .product { font-size:clamp(40px,7vw,64px); font-weight:800; letter-spacing:-.045em; line-height:.95; text-transform:lowercase; color:var(--bone); display:block; margin-bottom:40px; }
+
+  .note { font-size:14px; font-weight:300; line-height:1.8; color:rgba(196,201,197,0.5); margin-bottom:48px; }
+
+  .divider { width:40px; height:1px; background:rgba(124,140,130,0.3); margin:0 auto 40px; }
+
+  .soon { font-size:9px; letter-spacing:.46em; text-transform:uppercase; color:rgba(124,140,130,0.5); margin-bottom:14px; }
+  .year { font-size:clamp(48px,9vw,88px); font-weight:300; letter-spacing:-.05em; line-height:1; color:var(--bone); }
+
+  .back { display:inline-block; margin-top:52px; font-size:10px; letter-spacing:.14em; color:rgba(196,201,197,0.35); text-decoration:underline; text-underline-offset:4px; text-decoration-color:rgba(196,201,197,0.15); transition:color .18s; }
+  .back:hover { color:rgba(196,201,197,0.65); }
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<div class="wrap">
+  <div class="mark">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 6" stroke="#7C8C82" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <div class="eyebrow">reserved</div>
+  <h1 class="headline">you reserved</h1>
+  <span class="product" id="product">the cloak</span>
+
+  <p class="note">your deposit is in. we'll email you the details, and charge the balance when your piece ships.</p>
+
+  <div class="divider"></div>
+
+  <div class="soon">coming</div>
+  <div class="year">2027</div>
+
+  <a href="/" class="back">back to home</a>
+</div>
+
+<script>
+  const p = new URLSearchParams(location.search).get("product");
+  const el = document.getElementById("product");
+  if (p === "both") el.textContent = "the cloak + the wrap";
+  else if (p === "wrap") el.textContent = "the wrap";
+  else el.textContent = "the cloak";
+</script>
+</body>
+</html>
