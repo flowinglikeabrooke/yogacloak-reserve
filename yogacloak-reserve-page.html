@@ -67,7 +67,7 @@
     cursor:pointer;
     transition:border-color .18s, background .18s;
     user-select:none;
-    min-height:130px;
+    min-height:auto;
   }
   .item:hover:not(.sold-out) { border-color:rgba(124,140,130,0.3); }
   .item.on { border-color:var(--sage); background:rgba(124,140,130,0.06); }
@@ -169,6 +169,11 @@
     .field-row { grid-template-columns:1fr; }
   }
   @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+
+/* product thumbnails */
+.item-thumb { width:100%; aspect-ratio:3/4; overflow:hidden; border-radius:12px; margin-bottom:14px; }
+.item-thumb img { width:100%; height:100%; object-fit:cover; filter:brightness(.88) saturate(.9); display:block; transition:transform .5s ease; }
+.item:hover:not(.sold-out) .item-thumb img { transform:scale(1.04); }
 </style>
 </head>
 <body>
@@ -189,6 +194,7 @@
 
   <div class="items">
     <div class="item" id="item-cloak" onclick="pick('cloak')">
+<div class="item-thumb"><img src="cloak-product.jpg" alt="The Cloak" loading="lazy"></div>
       <div class="item-left">
         <div class="item-name">the cloak</div>
         <div class="item-sub">for the drive home</div>
@@ -201,6 +207,7 @@
     </div>
 
     <div class="item" id="item-wrap" onclick="pick('wrap')">
+<div class="item-thumb"><img src="wrap-product.jpg" alt="The Wrap" loading="lazy"></div>
       <div class="item-left">
         <div class="item-name">the wrap</div>
         <div class="item-sub">for the walk home</div>
