@@ -61,6 +61,15 @@ a { text-decoration:none; color:inherit; }
 .hero-coming { font-size:12px; letter-spacing:.26em; text-transform:uppercase; color:rgba(var(--cream),0.42); margin-bottom:42px; }
 .hero-intro .orb.o1 { width:560px; height:560px; top:-60px; left:4%; animation-delay:.4s; }
 .hero-intro .orb.o2 { width:480px; height:480px; bottom:-120px; right:4%; animation-delay:3s; }
+.hero-photo { position:relative; min-height:100svh; overflow:hidden; }
+.hero-photo-grid { position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; z-index:1; }
+.hero-photo-grid .hpg-cell { position:relative; overflow:hidden; }
+.hero-photo-grid img { width:100%; height:100%; object-fit:cover; display:block; }
+.hero-photo-scrim { position:absolute; inset:0; z-index:2; background:linear-gradient(to bottom, rgba(20,24,21,.34) 0%, rgba(20,24,21,.10) 30%, rgba(20,24,21,.55) 72%, rgba(20,24,21,.88) 100%); }
+.hero-photo-content { position:absolute; inset:0; z-index:3; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; text-align:center; padding:120px 24px clamp(54px,10vh,96px); text-shadow:0 2px 28px rgba(0,0,0,.5); }
+.hero-photo-content .hero-wordmark { font-size:clamp(44px,8vw,104px); margin-bottom:18px; }
+.hero-photo-content .hero-tagline { color:rgba(var(--cream),0.88); }
+.hero-photo-content .hero-coming { color:rgba(var(--cream),0.62); margin-bottom:30px; }
 /* cloak + wrap side by side */
 .product-pair { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:clamp(18px,3vw,44px); padding:clamp(44px,7vw,104px) clamp(24px,5vw,72px); }
 .pcard { position:relative; display:flex; flex-direction:column; }
@@ -192,6 +201,8 @@ a { text-decoration:none; color:inherit; }
   .hero img{object-position:center 60%;}
   .product-pair{grid-template-columns:1fr;gap:46px;padding:56px 22px;}
   .hero-wordmark{font-size:clamp(54px,18vw,104px);}
+  .hero-photo-grid{grid-template-columns:1fr;grid-template-rows:1fr 1fr;}
+  .hero-photo-content .hero-wordmark{font-size:clamp(40px,13vw,76px);}
 }
 /* stay-in-the-loop modal */
 .loop-ov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;
@@ -254,9 +265,13 @@ a { text-decoration:none; color:inherit; }
   <div class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
   <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
 </div>
-<section class="hero-intro">
-  <span class="orb o1"></span><span class="orb o2"></span>
-  <div class="hero-intro-inner">
+<section class="hero-photo">
+  <div class="hero-photo-grid">
+    <div class="hpg-cell"><img src="two-women-stairs.jpg" alt="Two friends heading home from class, wrapped in the Cloak"></div>
+    <div class="hpg-cell"><img src="cloak-on-hook.jpg" alt="The Cloak hanging on a hook by the door"></div>
+  </div>
+  <div class="hero-photo-scrim"></div>
+  <div class="hero-photo-content">
     <div class="hero-wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
     <span class="hero-tagline">for after class</span>
     <span class="hero-coming">Coming 2027</span>
@@ -308,20 +323,6 @@ a { text-decoration:none; color:inherit; }
         <span class="phold pop"><strong>$20</strong> holds yours</span>
       </div>
     </div>
-  </div>
-</section>
-<div class="ed-row ed-row--left-wide">
-  <div class="ed-cell">
-    <img src="two-women-stairs.jpg" alt="Two women heading to class with yoga mats" class="parallax">
-  </div>
-  <div class="ed-cell">
-    <img src="cloak-on-hook.jpg" alt="The Cloak hanging on a hook by the door" class="parallax">
-  </div>
-</div>
-<section class="text-band">
-  <div class="text-band-inner reveal">
-    <span class="eyebrow">For after class</span>
-    <h2>Not quite ready<br><strong>for real clothes yet.</strong></h2>
   </div>
 </section>
 <section class="fabric">
