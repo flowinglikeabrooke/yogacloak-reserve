@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yogacloak — questions</title>
+<meta name="description" content="Everything about the first run — the pieces, the deposit, and what reserving means. yogacloak, for after class. Coming 2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1E2320; --ink-2:#252b27; --sage:#7C8C82; --clay:#9A8E86;
+  --fog:#C4C9C5; --bone:#ECEAE3; --cream:236,234,227;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-family:'Hanken Grotesk',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--bone);overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+
+.orb{position:absolute;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle, rgba(var(--cream),0.16), rgba(var(--cream),0.05) 45%, transparent 70%);
+  animation:breathe 11s ease-in-out infinite;will-change:transform,opacity;}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.45;}50%{transform:scale(1.22);opacity:.9;}}
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
+
+.eyebrow{font-size:11px;letter-spacing:.16em;color:rgba(var(--cream),0.6);text-transform:uppercase;}
+.wordmark{font-size:21px;letter-spacing:-.005em;line-height:1;}
+.wordmark .thin{font-weight:400;}
+.wordmark .bold{font-weight:600;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:11px;
+  background:var(--bone);color:var(--ink);font-size:13px;font-weight:600;letter-spacing:.01em;
+  padding:16px 34px;border-radius:100px;transition:background .2s, transform .2s, box-shadow .2s;
+  box-shadow:0 10px 30px -12px rgba(0,0,0,0.5);}
+.btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 16px 38px -14px rgba(0,0,0,0.55);}
+.btn svg{width:15px;height:15px;}
+
+/* topbar */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:40;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:24px 44px;transition:background .35s, padding .35s, backdrop-filter .35s;
+  background:rgba(30,35,32,0.72);backdrop-filter:blur(14px);}
+.topbar .reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .2s;}
+.topbar .reserve-link:hover{opacity:.7;}
+
+/* intro */
+.faq-hero{position:relative;overflow:hidden;min-height:60svh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:clamp(140px,20vh,220px) 24px clamp(60px,10vh,110px);background:var(--ink);}
+.faq-hero .orb.o1{width:540px;height:540px;top:-80px;left:2%;animation-delay:.4s;}
+.faq-hero .orb.o2{width:460px;height:460px;bottom:-150px;right:2%;animation-delay:3s;}
+.faq-hero-in{position:relative;z-index:2;max-width:680px;}
+.faq-hero .eyebrow{display:block;margin-bottom:22px;}
+.faq-hero h1{font-size:clamp(40px,7vw,78px);font-weight:300;letter-spacing:-.04em;line-height:1.0;margin-bottom:22px;}
+.faq-hero h1 strong{font-weight:600;}
+.faq-hero p{font-size:clamp(15px,1.7vw,18px);font-weight:300;line-height:1.7;color:rgba(var(--cream),0.6);max-width:460px;margin:0 auto;}
+
+/* faq body */
+.faq-wrap{max-width:760px;margin:0 auto;padding:clamp(40px,8vh,90px) clamp(24px,5vw,40px) clamp(70px,12vh,140px);}
+.faq-group{margin-bottom:clamp(40px,6vh,72px);}
+.faq-group:last-child{margin-bottom:0;}
+.faq-group-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(124,140,130,0.9);
+  padding-bottom:18px;margin-bottom:6px;border-bottom:1px solid rgba(var(--cream),0.10);}
+
+.faq-item{border-bottom:1px solid rgba(var(--cream),0.10);}
+.faq-q{width:100%;background:none;border:none;cursor:pointer;text-align:left;color:var(--bone);
+  font-family:inherit;font-size:clamp(17px,2.1vw,21px);font-weight:400;letter-spacing:-.01em;line-height:1.4;
+  padding:26px 44px 26px 0;position:relative;transition:color .2s;}
+.faq-q:hover{color:#fff;}
+.faq-q .ic{position:absolute;right:4px;top:50%;width:16px;height:16px;transform:translateY(-50%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.faq-q .ic::before,.faq-q .ic::after{content:"";position:absolute;background:rgba(var(--cream),0.7);border-radius:2px;}
+.faq-q .ic::before{left:0;top:7px;width:16px;height:2px;}
+.faq-q .ic::after{left:7px;top:0;width:2px;height:16px;transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.faq-item.open .faq-q .ic{transform:translateY(-50%) rotate(180deg);}
+.faq-item.open .faq-q .ic::after{transform:scaleY(0);}
+.faq-a{overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.4,0,.2,1);}
+.faq-a-in{padding:0 44px 28px 0;font-size:15px;font-weight:300;line-height:1.75;color:rgba(var(--cream),0.62);}
+.faq-a-in strong{font-weight:500;color:rgba(var(--cream),0.85);}
+
+/* closing cta */
+.faq-cta{position:relative;overflow:hidden;text-align:center;padding:clamp(120px,20vh,220px) 24px;min-height:82svh;display:flex;align-items:center;justify-content:center;background:var(--ink-2);}
+.faq-cta-bg{position:absolute;inset:0;z-index:0;}
+.faq-cta-bg img{width:100%;height:100%;object-fit:cover;object-position:center;}
+.faq-cta-scrim{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse 70% 60% at center, rgba(20,24,21,.55), rgba(20,24,21,.18) 75%), linear-gradient(to bottom, rgba(20,24,21,.34) 0%, rgba(20,24,21,.30) 45%, rgba(20,24,21,.66) 100%);}
+.faq-cta .orb.o1{width:480px;height:480px;top:-120px;left:8%;animation-delay:1s;}
+.faq-cta .orb.o2{width:400px;height:400px;bottom:-130px;right:8%;animation-delay:4s;}
+.faq-cta-in{position:relative;z-index:2;}
+.faq-cta .eyebrow{display:block;margin-bottom:20px;color:rgba(var(--cream),0.65);}
+.faq-cta h2{font-size:clamp(34px,5.5vw,62px);font-weight:300;letter-spacing:-.04em;line-height:1.02;margin-bottom:30px;}
+.faq-cta h2 strong{font-weight:600;}
+.faq-cta .still{margin-top:30px;font-size:14px;font-weight:300;color:rgba(var(--cream),0.5);}
+.faq-cta .still a{color:rgba(var(--cream),0.8);border-bottom:1px solid rgba(var(--cream),0.25);padding-bottom:1px;transition:color .2s;}
+.faq-cta .still a:hover{color:var(--bone);}
+
+/* footer */
+.footer{padding:56px 44px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;background:var(--ink);}
+.footer-right{text-align:right;}
+.footer .lbl{display:block;font-size:11px;letter-spacing:.12em;color:rgba(160,176,166,0.85);margin-bottom:8px;}
+.footer .email{font-size:17px;color:rgba(var(--cream),0.92);transition:color .2s;}
+.footer .email:hover{color:var(--bone);}
+.footer .tag{font-size:11px;letter-spacing:.06em;color:rgba(160,176,166,0.6);margin-top:14px;}
+.footer a.home-link{transition:opacity .2s;}
+.footer a.home-link:hover{opacity:.7;}
+
+@media(max-width:640px){
+  .topbar{padding:18px 22px;}
+  .faq-wrap{padding-left:22px;padding-right:22px;}
+  .footer{padding:40px 22px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="yogacloak-index.html" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
+  <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
+</div>
+
+<section class="faq-hero">
+  <span class="orb o1"></span>
+  <span class="orb o2"></span>
+  <div class="faq-hero-in">
+    <span class="eyebrow">The first run</span>
+    <h1>Questions,<br><strong>answered.</strong></h1>
+    <p>Everything worth knowing before you reserve — the pieces, the deposit, and what happens between now and 2027.</p>
+  </div>
+</section>
+
+<div class="faq-wrap">
+
+  <div class="faq-group">
+    <div class="faq-group-label">The basics</div>
+    <div class="faq-item">
+      <button class="faq-q">What is yogacloak?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">A small line of recovery-wear made for the moment after class — the layer you pull on still warm and keep on until you're through your own front door. Two pieces to start: <strong>the Cloak</strong> and <strong>the Wrap</strong>. Quiet, dark, built for heat.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">When does it launch?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">The first run lands in <strong>2027</strong>. We're making it in limited numbers, so reserving now is the way to be sure you get one — and the way to hear first when it's ready.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Where do you ship?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">We'll open with shipping across the US and grow from there. Reserve now and you'll be the first to know the day we reach you.</div></div>
+    </div>
+  </div>
+
+  <div class="faq-group">
+    <div class="faq-group-label">Reserving &amp; deposits</div>
+    <div class="faq-item">
+      <button class="faq-q">What does reserving actually do?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">It holds your piece from the first run and locks your place in line. A small deposit now, no full charge until it ships — so you're set, with nothing else to think about until 2027.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">How much is the deposit?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in"><strong>$25</strong> holds the Cloak (<strong>$98</strong> total). <strong>$20</strong> holds the Wrap (<strong>$68</strong> total). Whatever you put down comes straight off your final price — it's not an extra fee, just an early piece of it.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Is my deposit refundable?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">Completely. Change your mind any time before we ship and we'll refund it in full, no questions asked.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">When am I charged the rest?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">Only when your piece is ready to ship in 2027. We'll email you first, with the balance due then — never a surprise charge.</div></div>
+    </div>
+  </div>
+
+  <div class="faq-group">
+    <div class="faq-group-label">The pieces &amp; care</div>
+    <div class="faq-item">
+      <button class="faq-q">Cloak or Wrap — what's the difference?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in"><strong>The Cloak</strong> is the fuller layer: hooded and open-front, falling to mid-thigh with two hidden snaps, around 300 GSM. For the drive home. <strong>The Wrap</strong> is lighter — an oversized rectangular drape with a single snap, around 200 GSM, packs down to nothing. For the walk home.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What's it made of?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">Brushed recycled microfiber in matte graphite — deeply absorbent, soft the second it touches skin, and dark enough to go anywhere. Roughly 300 GSM for the Cloak, 200 for the Wrap.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What size are they?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">Both are one size, cut oversized to drape rather than fit. They're meant to fall the same whether you're coming off a hot class or a slow cool-down.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">How do I care for it?<span class="ic"></span></button>
+      <div class="faq-a"><div class="faq-a-in">Machine wash cold, hang or lay flat to dry. Skip the softener — the fabric is soft on its own and stays more absorbent without it.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<section class="faq-cta">
+  <div class="faq-cta-bg"><img src="drive-home.jpg" alt="A man in the Cloak walking to his car at sunset, the drive home"></div>
+  <div class="faq-cta-scrim"></div>
+  <div class="faq-cta-in">
+    <span class="eyebrow">Reserving now</span>
+    <h2>Reserve <strong>yours.</strong></h2>
+    <a href="yogacloak-reserve-page.html" class="btn">Reserve now
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p class="still">Still curious? <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a></p>
+  </div>
+</section>
+
+<footer class="footer">
+  <a href="yogacloak-index.html" class="wordmark home-link"><span class="thin">yoga</span><span class="bold">cloak</span></a>
+  <div class="footer-right">
+    <div class="lbl">Say hello</div>
+    <a href="mailto:hello@yogacloak.com" class="email">hello@yogacloak.com</a>
+    <div class="tag">For after class</div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.faq-item').forEach(function(item){
+  var q=item.querySelector('.faq-q'), a=item.querySelector('.faq-a');
+  q.addEventListener('click',function(){
+    var open=item.classList.contains('open');
+    if(open){ item.classList.remove('open'); a.style.maxHeight=null; }
+    else{ item.classList.add('open'); a.style.maxHeight=a.scrollHeight+'px'; }
+  });
+});
+window.addEventListener('resize',function(){
+  document.querySelectorAll('.faq-item.open .faq-a').forEach(function(a){ a.style.maxHeight=a.scrollHeight+'px'; });
+});
+</script>
+</body>
+</html>
