@@ -136,10 +136,10 @@ a { text-decoration:none; color:inherit; }
 .after-item-label { position:absolute; bottom:16px; left:16px; z-index:2; }
 .after-item-label span { font-size:10px; letter-spacing:.15em; color:rgba(var(--cream),0.6); text-transform:uppercase; }
 .after-item::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(30,35,32,0.65) 0%, transparent 50%); pointer-events:none; }
-.fabric { display:grid; grid-template-columns:1fr 1fr; align-items:stretch; gap:0; min-height:74svh; }
-.fabric-img { position:relative; overflow:hidden; height:100%; min-height:400px; }
+.fabric { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:clamp(36px,5vw,80px); padding:clamp(84px,15vh,180px) clamp(40px,6vw,96px); }
+.fabric-img { position:relative; overflow:hidden; border-radius:18px; aspect-ratio:4/5; box-shadow:0 30px 70px -30px rgba(0,0,0,0.55); }
 .fabric-img img { width:100%; height:100%; object-fit:cover; object-position:center 35%; filter:brightness(.94) saturate(.96); }
-.fabric-text { padding:clamp(48px,8vw,120px) clamp(32px,6vw,88px); }
+.fabric-text { padding:0; }
 .fabric-text .eyebrow { display:block; margin-bottom:28px; }
 .fabric-text h3 { font-size:clamp(28px,3.8vw,52px); font-weight:300; letter-spacing:-.03em; line-height:1.1; margin-bottom:28px; }
 .fabric-text h3 strong { font-weight:600; }
@@ -163,7 +163,9 @@ a { text-decoration:none; color:inherit; }
 .closing .year { font-size:13px; letter-spacing:.18em; color:rgba(124,140,130,0.75); margin-bottom:38px; }
 .footer { padding:56px 44px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
 .footer-right { text-align:right; }
-.footer .lbl { font-size:11px; letter-spacing:.12em; color:rgba(160,176,166,0.85); margin-bottom:8px; }
+.footer .lbl { display:block; font-size:11px; letter-spacing:.12em; color:rgba(160,176,166,0.85); margin-bottom:8px; }
+.footer a.faq-link { transition:color .2s; }
+.footer a.faq-link:hover { color:var(--bone); }
 .footer .email { font-size:17px; color:rgba(var(--cream),0.92); transition:color .2s; }
 .footer .email:hover { color:var(--bone); }
 .footer .tag { font-size:11px; letter-spacing:.06em; color:rgba(160,176,166,0.6); margin-top:14px; }
@@ -188,8 +190,7 @@ a { text-decoration:none; color:inherit; }
   .atmo-grid{grid-template-columns:1fr;gap:4px;padding:4px;}
   .atmo-cell--tall{grid-row:span 1;}
   .after-strip{grid-template-columns:1fr 1fr;gap:4px;padding:0 4px;}
-  .fabric{grid-template-columns:1fr;}
-  .fabric-img{min-height:56svh;}
+  .fabric{grid-template-columns:1fr; padding:clamp(56px,9vh,96px) 24px; gap:34px;}
   .ed-row--left-wide,.ed-row--right-wide{grid-template-columns:1fr;}
   .ed-row--left-wide .ed-cell:first-child,.ed-row--left-wide .ed-cell:last-child,
   .ed-row--right-wide .ed-cell:first-child{min-height:72svh;}
@@ -267,6 +268,7 @@ a { text-decoration:none; color:inherit; }
   <div class="hero-photo-bg"><img src="hero-duo.jpg" alt="Two friends heading home from class wrapped in the Cloak, beside the Cloak hanging on a hook"></div>
   <div class="hero-photo-scrim"></div>
   <div class="hero-photo-content">
+    <span class="wordmark hero-wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></span>
     <span class="hero-tagline">for after class</span>
     <span class="hero-coming">Coming 2027</span>
     <a href="yogacloak-reserve-page.html" class="btn">Reserve now
@@ -339,7 +341,7 @@ a { text-decoration:none; color:inherit; }
 <section class="closing">
   <span class="orb o1"></span><span class="orb o2"></span>
   <div class="closing-inner reveal">
-    <span class="eyebrow">First run &middot; Reserving now</span>
+    <span class="eyebrow">Reserving now</span>
     <h2>Reserve <strong>yours.</strong></h2>
     <div class="year">Coming 2027</div>
     <a href="yogacloak-reserve-page.html" class="btn pop">Reserve now
@@ -350,7 +352,7 @@ a { text-decoration:none; color:inherit; }
 <footer class="footer">
   <div class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
   <div class="footer-right">
-    <div class="lbl">Say hello</div>
+    <a href="yogacloak-faq.html" class="lbl faq-link">Have questions?</a>
     <a href="mailto:hello@yogacloak.com" class="email">hello@yogacloak.com</a>
     <div class="tag">For after class</div>
   </div>
