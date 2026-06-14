@@ -64,8 +64,8 @@ a { text-decoration:none; color:inherit; }
 /* cloak + wrap side by side */
 .product-pair { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:clamp(18px,3vw,44px); padding:clamp(44px,7vw,104px) clamp(24px,5vw,72px); }
 .pcard { position:relative; display:flex; flex-direction:column; }
-.pcard-photo { position:relative; overflow:hidden; border-radius:22px; box-shadow:0 30px 70px -30px rgba(0,0,0,0.6); aspect-ratio:4/5; margin-bottom:30px; }
-.pcard-photo img { width:100%; height:100%; object-fit:cover; object-position:center 8%; }
+.pcard-photo { position:relative; overflow:hidden; border-radius:22px; background:#151618; box-shadow:0 30px 70px -30px rgba(0,0,0,0.6); aspect-ratio:4/5; margin-bottom:30px; }
+.pcard-photo img { width:100%; height:100%; object-fit:contain; }
 .pcard-info { display:flex; flex-direction:column; }
 .promise { position:relative; padding:clamp(100px,17vh,200px) 28px; text-align:center; overflow:hidden; }
 .promise .inner { position:relative; z-index:2; max-width:900px; margin:0 auto; }
@@ -229,12 +229,11 @@ a { text-decoration:none; color:inherit; }
 </head>
 <body>
 <div class="loop-ov" id="loopOv" aria-hidden="true">
-  <div class="loop-card" id="loopCard" role="dialog" aria-modal="true" aria-label="Stay in the loop">
+  <div class="loop-card" id="loopCard" role="dialog" aria-modal="true" aria-label="Be the first to know">
     <button class="loop-close" id="loopClose" aria-label="Close">&times;</button>
     <div class="loop-form">
-      <span class="loop-eyebrow">Stay in the loop</span>
-      <h3>Be first <strong>through the door.</strong></h3>
-      <p>We open the first run in 2027. Leave your number and we'll text you the moment reservations go live — nothing else.</p>
+      <h3>Be the first <strong>to know.</strong></h3>
+      <p>for after class — coming 2027</p>
       <div class="loop-field">
         <label for="loopPhone">Phone</label>
         <input id="loopPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel">
@@ -281,7 +280,7 @@ a { text-decoration:none; color:inherit; }
 <section class="product-pair">
   <div class="pcard reveal" id="cloak">
     <div class="pcard-photo">
-      <img src="cloak.jpg" alt="The Cloak, worn leaving class in the desert">
+      <img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape with pockets">
     </div>
     <div class="pcard-info">
       <div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
@@ -298,7 +297,7 @@ a { text-decoration:none; color:inherit; }
   </div>
   <div class="pcard reveal" id="wrap">
     <div class="pcard-photo">
-      <img src="wrap.jpg" alt="The Wrap, worn on a city sidewalk">
+      <img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape">
     </div>
     <div class="pcard-info">
       <div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
