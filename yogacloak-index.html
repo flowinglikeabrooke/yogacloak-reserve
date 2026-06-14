@@ -51,6 +51,22 @@ a { text-decoration:none; color:inherit; }
 .hero-meta { font-size:12px; letter-spacing:.14em; color:rgba(var(--cream),0.55); }
 .scroll-cue { position:absolute; left:clamp(24px,5vw,80px); bottom:28px; z-index:3; font-size:10px; letter-spacing:.22em; color:rgba(var(--cream),0.45); animation:bob 2.4s ease-in-out infinite; }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+/* centered intro hero (photo-less) */
+.hero-intro { position:relative; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 24px; overflow:hidden; }
+.hero-intro-inner { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
+.hero-wordmark { font-size:clamp(58px,13vw,168px); line-height:.88; letter-spacing:-.035em; margin-bottom:26px; }
+.hero-wordmark .thin { font-weight:300; }
+.hero-wordmark .bold { font-weight:700; }
+.hero-tagline { font-size:clamp(15px,2vw,22px); letter-spacing:.03em; color:rgba(var(--cream),0.72); margin-bottom:16px; }
+.hero-coming { font-size:12px; letter-spacing:.26em; text-transform:uppercase; color:rgba(var(--cream),0.42); margin-bottom:42px; }
+.hero-intro .orb.o1 { width:560px; height:560px; top:-60px; left:4%; animation-delay:.4s; }
+.hero-intro .orb.o2 { width:480px; height:480px; bottom:-120px; right:4%; animation-delay:3s; }
+/* cloak + wrap side by side */
+.product-pair { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:clamp(18px,3vw,44px); padding:clamp(44px,7vw,104px) clamp(24px,5vw,72px); }
+.pcard { position:relative; display:flex; flex-direction:column; }
+.pcard-photo { position:relative; overflow:hidden; border-radius:22px; box-shadow:0 30px 70px -30px rgba(0,0,0,0.6); aspect-ratio:4/5; margin-bottom:30px; }
+.pcard-photo img { width:100%; height:100%; object-fit:cover; object-position:center 8%; }
+.pcard-info { display:flex; flex-direction:column; }
 .promise { position:relative; padding:clamp(100px,17vh,200px) 28px; text-align:center; overflow:hidden; }
 .promise .inner { position:relative; z-index:2; max-width:900px; margin:0 auto; }
 .promise p { font-size:clamp(24px,3.4vw,42px); font-weight:300; line-height:1.36; letter-spacing:-.015em; }
@@ -171,6 +187,8 @@ a { text-decoration:none; color:inherit; }
   .ed-break--tall{height:70svh;}
   .ed-break--mid{height:58svh;}
   .hero img{object-position:center 60%;}
+  .product-pair{grid-template-columns:1fr;gap:46px;padding:56px 22px;}
+  .hero-wordmark{font-size:clamp(54px,18vw,104px);}
 }
 /* stay-in-the-loop modal */
 .loop-ov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;
@@ -234,21 +252,15 @@ a { text-decoration:none; color:inherit; }
   <div class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
   <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
 </div>
-<section class="hero">
-  <div class="hero-imgwrap" id="heroImg">
-    <img src="hero-drive-desert.jpg" alt="Man crossing a desert parking lot at dusk with his mat, the Cloak over his shoulders">
-  </div>
-  <div class="hero-grad"></div>
-  <div class="hero-grad-left"></div>
-  <div class="hero-content">
-    <span class="eyebrow">For after class</span>
-    <h1>Made for the moment<br><strong>after heat.</strong></h1>
-    <div class="hero-sub">
-      <a href="yogacloak-reserve-page.html" class="btn">Reserve yours
-        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <span class="hero-meta">Recovery-wear &middot; Coming 2027</span>
-    </div>
+<section class="hero-intro">
+  <span class="orb o1"></span><span class="orb o2"></span>
+  <div class="hero-intro-inner">
+    <div class="hero-wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
+    <span class="hero-tagline">for after class</span>
+    <span class="hero-coming">Coming 2027</span>
+    <a href="yogacloak-reserve-page.html" class="btn">Reserve now
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
   </div>
   <div class="scroll-cue">Scroll</div>
 </section>
@@ -266,21 +278,39 @@ a { text-decoration:none; color:inherit; }
     <h2>From the studio to<br><strong>the sidewalk.</strong></h2>
   </div>
 </div>
-<section class="product" id="cloak">
-  <div class="pphoto parallax">
-    <img src="cloak.jpg" alt="The Cloak, worn leaving class in the desert">
+<section class="product-pair">
+  <div class="pcard reveal" id="cloak">
+    <div class="pcard-photo">
+      <img src="cloak.jpg" alt="The Cloak, worn leaving class in the desert">
+    </div>
+    <div class="pcard-info">
+      <div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
+      <div class="pname">The Cloak</div>
+      <div class="pprice"><span class="amt">$98</span></div>
+      <p class="pdesc">Dark, soft, quiet, ready. The one you pull on still warm from class and don't take off until you're through your own front door.</p>
+      <div class="pcta-row">
+        <a href="yogacloak-reserve-page.html?product=cloak" class="btn">Reserve the Cloak
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <span class="phold pop"><strong>$25</strong> holds yours</span>
+      </div>
+    </div>
   </div>
-  <div class="pinfo reveal">
-    <span class="orb"></span>
-    <div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
-    <div class="pname">The Cloak</div>
-    <div class="pprice"><span class="amt">$98</span></div>
-    <p class="pdesc">Dark, soft, quiet, ready. The one you pull on still warm from class and don't take off until you're through your own front door.</p>
-    <div class="pcta-row">
-      <a href="yogacloak-reserve-page.html?product=cloak" class="btn">Reserve the Cloak
-        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <span class="phold pop"><strong>$25</strong> holds yours</span>
+  <div class="pcard reveal" id="wrap">
+    <div class="pcard-photo">
+      <img src="wrap.jpg" alt="The Wrap, worn on a city sidewalk">
+    </div>
+    <div class="pcard-info">
+      <div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
+      <div class="pname">The Wrap</div>
+      <div class="pprice"><span class="amt">$68</span></div>
+      <p class="pdesc">Lighter, looser, easy to knot and go. The block-and-a-half to the car. The coffee run. The ride home. Wears in. Wears everywhere.</p>
+      <div class="pcta-row">
+        <a href="yogacloak-reserve-page.html?product=wrap" class="btn">Reserve the Wrap
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <span class="phold pop"><strong>$20</strong> holds yours</span>
+      </div>
     </div>
   </div>
 </section>
@@ -300,24 +330,6 @@ a { text-decoration:none; color:inherit; }
     <h2>Not quite ready<br><strong>for real clothes yet.</strong></h2>
   </div>
 </div>
-<section class="product flip" id="wrap">
-  <div class="pphoto parallax">
-    <img src="wrap.jpg" alt="The Wrap, worn on a city sidewalk">
-  </div>
-  <div class="pinfo reveal">
-    <span class="orb"></span>
-    <div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
-    <div class="pname">The Wrap</div>
-    <div class="pprice"><span class="amt">$68</span></div>
-    <p class="pdesc">Lighter, looser, easy to knot and go. The block-and-a-half to the car. The coffee run. The ride home. Wears in. Wears everywhere.</p>
-    <div class="pcta-row">
-      <a href="yogacloak-reserve-page.html?product=wrap" class="btn">Reserve the Wrap
-        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <span class="phold pop"><strong>$20</strong> holds yours</span>
-    </div>
-  </div>
-</section>
 <section class="fabric">
   <div class="fabric-img">
     <img src="fabric-weave.jpg" alt="Fabric texture close-up" class="parallax">
