@@ -36,8 +36,8 @@
   .wordmark { font-size:15px; font-weight:300; letter-spacing:-.02em; text-transform:lowercase; color:var(--bone); }
   .wordmark span { font-weight:800; }
   .back {
-    font-size:9px; letter-spacing:.26em; text-transform:uppercase;
-    color:rgba(124,140,130,0.45); text-decoration:none;
+    font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:rgba(168,182,172,0.9); text-decoration:none;
     transition:color .18s;
   }
   .back:hover { color:var(--sage); }
@@ -45,15 +45,15 @@
   /* headline */
   .hed {
     font-size:clamp(38px,9vw,52px); font-weight:800;
-    letter-spacing:-.04em; text-transform:lowercase;
+    letter-spacing:-.04em;
     color:var(--bone); line-height:.9;
     margin-bottom:48px;
   }
 
   /* section label */
   .lbl {
-    font-size:9px; letter-spacing:.4em; text-transform:uppercase;
-    color:rgba(124,140,130,0.45); margin-bottom:16px;
+    font-size:11px; letter-spacing:.4em; text-transform:uppercase;
+    color:rgba(168,182,172,0.9); margin-bottom:16px;
   }
 
   /* item pick */
@@ -69,18 +69,18 @@
     user-select:none;
     min-height:auto;
   }
-  .item:hover:not(.sold-out) { border-color:rgba(124,140,130,0.3); }
+  .item:hover:not(.sold-out) { border-color:rgba(168,182,172,0.72); }
   .item.on { border-color:var(--sage); background:rgba(124,140,130,0.06); }
   .item.sold-out { opacity:.25; cursor:not-allowed; }
 
   .item-left {}
-  .item-name { font-size:20px; font-weight:800; text-transform:lowercase; letter-spacing:-.02em; color:var(--bone); }
-  .item-sub { font-size:11px; color:rgba(154,142,134,0.5); margin-top:3px; }
-  .item-left-count { font-size:9px; color:rgba(124,140,130,0.5); margin-top:6px; }
+  .item-name { font-size:21px; font-weight:800; letter-spacing:-.02em; color:var(--bone); }
+  .item-sub { font-size:11px; color:rgba(184,174,166,0.85); margin-top:3px; }
+  .item-left-count { font-size:11px; color:rgba(168,182,172,0.9); margin-top:6px; }
 
   .item-right { margin-top:auto; padding-top:16px; }
   .item-price { font-size:20px; font-weight:300; color:var(--bone); }
-  .item-dep { font-size:10px; color:rgba(124,140,130,0.5); margin-top:2px; }
+  .item-dep { font-size:10px; color:rgba(168,182,172,0.9); margin-top:2px; }
 
   /* size — spans full width below both cards */
   .size-section {
@@ -100,17 +100,17 @@
     border-radius:20px;
   }
   .size-section.show { display:block; }
-  .size-lbl { font-size:9px; letter-spacing:.4em; text-transform:uppercase; color:rgba(124,140,130,0.45); margin-bottom:12px; }
+  .size-lbl { font-size:11px; letter-spacing:.4em; text-transform:uppercase; color:rgba(168,182,172,0.9); margin-bottom:12px; }
   .size-btns { display:flex; gap:8px; }
   .size-btn {
     flex:1; font-family:'Hanken Grotesk',sans-serif;
     font-size:13px; font-weight:600; letter-spacing:-.01em;
-    color:rgba(196,201,197,0.4); background:transparent;
+    color:rgba(222,226,222,0.75); background:transparent;
     border:1px solid rgba(236,234,227,0.1);
     border-radius:100px; padding:12px 0; cursor:pointer;
     transition:border-color .18s, color .18s, background .18s;
   }
-  .size-btn:hover { border-color:rgba(124,140,130,0.4); color:var(--bone); }
+  .size-btn:hover { border-color:rgba(168,182,172,0.88); color:var(--bone); }
   .size-btn.on { border-color:var(--sage); color:var(--bone); background:rgba(124,140,130,0.1); }
 
   /* divider */
@@ -122,7 +122,7 @@
   /* fields */
   .fields { display:flex; flex-direction:column; gap:8px; margin-bottom:28px; }
   .field { display:flex; flex-direction:column; gap:5px; }
-  .field label { font-size:8px; letter-spacing:.36em; text-transform:uppercase; color:rgba(124,140,130,0.45); }
+  .field label { font-size:10px; letter-spacing:.36em; text-transform:uppercase; color:rgba(168,182,172,0.9); }
   .field input {
     background:transparent; border:none;
     border-bottom:1px solid rgba(236,234,227,0.1);
@@ -130,8 +130,8 @@
     font-size:15px; color:var(--bone); outline:none;
     transition:border-color .18s;
   }
-  .field input::placeholder { color:rgba(196,201,197,0.18); }
-  .field input:focus { border-color:rgba(124,140,130,0.4); }
+  .field input::placeholder { color:rgba(214,218,214,0.45); }
+  .field input:focus { border-color:rgba(168,182,172,0.88); }
   .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
   /* deposit */
@@ -141,8 +141,8 @@
     padding-bottom:24px;
     border-bottom:1px solid rgba(236,234,227,0.07);
   }
-  .dep-label { font-size:9px; letter-spacing:.36em; text-transform:uppercase; color:rgba(124,140,130,0.4); }
-  .dep-sub { font-size:10px; color:rgba(124,140,130,0.3); margin-top:3px; }
+  .dep-label { font-size:11px; letter-spacing:.36em; text-transform:uppercase; color:rgba(168,182,172,0.88); }
+  .dep-sub { font-size:10px; color:rgba(168,182,172,0.72); margin-top:3px; }
   .dep-amount { font-size:38px; font-weight:800; letter-spacing:-.05em; color:var(--bone); }
 
   /* error */
@@ -159,7 +159,7 @@
   }
   .cta:hover:not(:disabled) { background:var(--fog); }
   .cta:disabled { opacity:.3; cursor:not-allowed; }
-  .fine { font-size:9px; color:rgba(124,140,130,0.25); text-align:center; margin-top:14px; letter-spacing:.02em; }
+  .fine { font-size:11px; color:rgba(168,182,172,0.62); text-align:center; margin-top:14px; letter-spacing:.02em; }
 
   .spin { width:11px; height:11px; border:1.5px solid rgba(31,36,33,0.2); border-top-color:var(--ink); border-radius:50%; animation:spin .7s linear infinite; display:none; }
   @keyframes spin { to { transform:rotate(360deg); } }
@@ -185,10 +185,10 @@
 
   <nav class="nav">
     <div class="wordmark">yoga<span>cloak</span></div>
-    <a href="yogacloak-index.html" class="back">← back</a>
+    <a href="yogacloak-index.html" class="back">← Back</a>
   </nav>
 
-  <h1 class="hed">what are you<br>taking home?</h1>
+  <h1 class="hed">What are you<br>taking home?</h1>
 
   <div class="lbl">Pick yours</div>
 
@@ -196,26 +196,26 @@
     <div class="item" id="item-cloak" onclick="pick('cloak')">
 <div class="item-thumb"><img src="cloak-product.jpg" alt="The Cloak" loading="lazy"></div>
       <div class="item-left">
-        <div class="item-name">the cloak</div>
-        <div class="item-sub">for the drive home</div>
+        <div class="item-name">The Cloak</div>
+        <div class="item-sub">For the drive home</div>
         <div class="item-left-count" id="left-cloak">100 of 100 left</div>
       </div>
       <div class="item-right">
         <div class="item-price">$98</div>
-        <div class="item-dep">$20 to reserve</div>
+        <div class="item-dep">$25 to reserve</div>
       </div>
     </div>
 
     <div class="item" id="item-wrap" onclick="pick('wrap')">
 <div class="item-thumb"><img src="wrap-product.jpg" alt="The Wrap" loading="lazy"></div>
       <div class="item-left">
-        <div class="item-name">the wrap</div>
-        <div class="item-sub">for the walk home</div>
+        <div class="item-name">The Wrap</div>
+        <div class="item-sub">For the walk home</div>
         <div class="item-left-count" id="left-wrap">100 of 100 left</div>
       </div>
       <div class="item-right">
         <div class="item-price">$68</div>
-        <div class="item-dep">$15 to reserve</div>
+        <div class="item-dep">$20 to reserve</div>
       </div>
     </div>
 
@@ -283,7 +283,7 @@ let sel = { cloak:false, wrap:false, size:null };
 function soldOut(w) {
   const el = document.getElementById(`item-${w}`);
   el.classList.add("sold-out"); el.onclick = null;
-  document.getElementById(`left-${w}`).textContent = "sold out";
+  document.getElementById(`left-${w}`).textContent = "Sold out";
 }
 
 function pick(w) {
@@ -309,7 +309,7 @@ function refreshDep() {
   document.getElementById("dep").style.display = show ? "flex" : "none";
   document.getElementById("div").classList.toggle("show", show);
   document.getElementById("form-section").classList.toggle("show", show);
-  let t = 0; if (sel.cloak) t += 20; if (sel.wrap) t += 15;
+  let t = 0; if (sel.cloak) t += 25; if (sel.wrap) t += 20;
   document.getElementById("dep-amt").textContent = `$${t}`;
   if (show) setTimeout(() => document.getElementById("form-section").scrollIntoView({behavior:"smooth", block:"start"}), 50);
 }

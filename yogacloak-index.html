@@ -35,12 +35,12 @@ a { text-decoration:none; color:inherit; }
 .wordmark { font-size:21px; letter-spacing:-.005em; line-height:1; }
 .wordmark .thin { font-weight:400; }
 .wordmark .bold { font-weight:600; }
-.topbar .reserve-link { font-size:12px; font-weight:600; color:var(--bone); border-bottom:1.5px solid rgba(var(--cream),0.35); padding-bottom:3px; transition:border-color .2s; }
-.topbar .reserve-link:hover { border-color:var(--bone); }
+.topbar .reserve-link { font-size:12px; font-weight:600; color:var(--bone); transition:opacity .2s; }
+.topbar .reserve-link:hover { opacity:.7; }
 .hero { position:relative; height:100svh; min-height:600px; overflow:hidden;
   display:flex; align-items:flex-end; justify-content:flex-start; }
 .hero-imgwrap { position:absolute; inset:0; overflow:hidden; will-change:transform; }
-.hero img { width:100%; height:115%; object-fit:cover; object-position:center 25%; filter:brightness(.75) saturate(0.95); }
+.hero img { width:100%; height:115%; object-fit:cover; object-position:center 70%; filter:brightness(.75) saturate(0.95); }
 .hero-grad { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(30,35,32,0.3) 0%, transparent 28%, transparent 42%, rgba(30,35,32,0.72) 78%, rgba(30,35,32,0.97) 100%); }
 .hero-grad-left { position:absolute; inset:0; background:linear-gradient(to right, rgba(30,35,32,0.45) 0%, transparent 55%); }
 .hero-content { position:relative; z-index:3; padding:0 clamp(24px,5vw,80px) clamp(60px,9vh,100px); max-width:900px; }
@@ -136,10 +136,10 @@ a { text-decoration:none; color:inherit; }
 .closing .year { font-size:13px; letter-spacing:.18em; color:rgba(124,140,130,0.75); margin-bottom:38px; }
 .footer { padding:56px 44px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
 .footer-right { text-align:right; }
-.footer .lbl { font-size:11px; letter-spacing:.12em; color:rgba(124,140,130,0.55); margin-bottom:8px; }
-.footer .email { font-size:15px; color:rgba(var(--cream),0.6); transition:color .2s; }
+.footer .lbl { font-size:11px; letter-spacing:.12em; color:rgba(160,176,166,0.85); margin-bottom:8px; }
+.footer .email { font-size:17px; color:rgba(var(--cream),0.92); transition:color .2s; }
 .footer .email:hover { color:var(--bone); }
-.footer .tag { font-size:11px; letter-spacing:.06em; color:rgba(124,140,130,0.4); margin-top:14px; }
+.footer .tag { font-size:11px; letter-spacing:.06em; color:rgba(160,176,166,0.6); margin-top:14px; }
 .float-reserve { position:fixed; left:50%; bottom:26px; z-index:45;
   transform:translateX(-50%) translateY(26px) scale(.92); opacity:0; pointer-events:none;
   display:inline-flex; align-items:center; gap:10px;
@@ -170,7 +170,39 @@ a { text-decoration:none; color:inherit; }
   .hero-sub{flex-direction:column;align-items:flex-start;gap:16px;}
   .ed-break--tall{height:70svh;}
   .ed-break--mid{height:58svh;}
+  .hero img{object-position:center 60%;}
 }
+/* stay-in-the-loop modal */
+.loop-ov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:rgba(20,24,21,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s ease;}
+.loop-ov.show{opacity:1;visibility:visible;}
+.loop-card{position:relative;width:100%;max-width:420px;background:var(--bone);color:var(--ink);
+  border-radius:28px;padding:clamp(30px,5vw,44px);box-shadow:0 40px 90px -30px rgba(0,0,0,.6);
+  transform:translateY(16px) scale(.98);transition:transform .55s cubic-bezier(.2,.7,.2,1);}
+.loop-ov.show .loop-card{transform:none;}
+.loop-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;background:transparent;
+  cursor:pointer;color:rgba(30,35,32,.42);font-size:24px;line-height:1;transition:color .2s;}
+.loop-close:hover{color:var(--ink);}
+.loop-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:600;}
+.loop-card h3{font-size:clamp(26px,5vw,32px);font-weight:300;letter-spacing:-.03em;line-height:1.04;margin:14px 0 10px;}
+.loop-card h3 strong{font-weight:700;}
+.loop-card p{font-size:14px;line-height:1.5;color:rgba(30,35,32,.64);margin-bottom:22px;}
+.loop-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.loop-field label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(30,35,32,.55);font-weight:600;}
+.loop-field input{font-family:inherit;font-size:16px;color:var(--ink);background:rgba(30,35,32,.04);
+  border:1.5px solid rgba(30,35,32,.14);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .2s,background .2s;}
+.loop-field input::placeholder{color:rgba(30,35,32,.34);}
+.loop-field input:focus{border-color:var(--sage);background:rgba(124,140,130,.07);}
+.loop-btn{width:100%;background:var(--ink);color:var(--bone);font-family:inherit;font-size:13px;font-weight:600;
+  letter-spacing:.02em;border:none;border-radius:100px;padding:16px;cursor:pointer;transition:background .2s,transform .2s;}
+.loop-btn:hover{background:#2c332e;transform:translateY(-1px);}
+.loop-fine{font-size:11px;color:rgba(30,35,32,.45);text-align:center;margin-top:14px;line-height:1.5;}
+.loop-thanks{display:none;text-align:center;padding:6px 0 2px;}
+.loop-thanks h3{margin:0 0 8px;}
+.loop-thanks p{margin:0;}
+.loop-card.done .loop-form{display:none;}
+.loop-card.done .loop-thanks{display:block;}
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;scroll-behavior:auto!important;}
   .reveal>*,.pop,.pphoto,.pphoto img{opacity:1!important;transform:none!important;transition:none!important;}
@@ -178,6 +210,26 @@ a { text-decoration:none; color:inherit; }
 </style>
 </head>
 <body>
+<div class="loop-ov" id="loopOv" aria-hidden="true">
+  <div class="loop-card" id="loopCard" role="dialog" aria-modal="true" aria-label="Stay in the loop">
+    <button class="loop-close" id="loopClose" aria-label="Close">&times;</button>
+    <div class="loop-form">
+      <span class="loop-eyebrow">Stay in the loop</span>
+      <h3>Be first <strong>through the door.</strong></h3>
+      <p>We open the first run in 2027. Leave your number and we'll text you the moment reservations go live — nothing else.</p>
+      <div class="loop-field">
+        <label for="loopPhone">Phone</label>
+        <input id="loopPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel">
+      </div>
+      <button class="loop-btn" id="loopSubmit">Keep me posted</button>
+      <p class="loop-fine">One text when we launch. No spam, ever.</p>
+    </div>
+    <div class="loop-thanks">
+      <h3>You're <strong>on the list.</strong></h3>
+      <p>We'll be in touch when the first run opens.</p>
+    </div>
+  </div>
+</div>
 <div class="topbar" id="topbar">
   <div class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
   <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
@@ -228,7 +280,7 @@ a { text-decoration:none; color:inherit; }
       <a href="yogacloak-reserve-page.html?product=cloak" class="btn">Reserve the Cloak
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <span class="phold pop"><strong>$20</strong> holds yours</span>
+      <span class="phold pop"><strong>$25</strong> holds yours</span>
     </div>
   </div>
 </section>
@@ -262,24 +314,10 @@ a { text-decoration:none; color:inherit; }
       <a href="yogacloak-reserve-page.html?product=wrap" class="btn">Reserve the Wrap
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <span class="phold pop"><strong>$15</strong> holds yours</span>
+      <span class="phold pop"><strong>$20</strong> holds yours</span>
     </div>
   </div>
 </section>
-<div class="atmo-grid">
-  <div class="atmo-cell atmo-cell--tall">
-    <img src="hooded-cloak-duo.jpg" alt="Two women in hooded cloaks leaving the studio" class="parallax">
-    <div class="atmo-label">The Cloak</div>
-  </div>
-  <div class="atmo-cell">
-    <img src="fabric-weave.jpg" alt="Close-up of the woven fabric texture" class="parallax">
-    <div class="atmo-label">The fabric</div>
-  </div>
-  <div class="atmo-cell">
-    <img src="lifestyle-street.jpg" alt="Wrapped and walking, coffee in hand" class="parallax">
-    <div class="atmo-label">The moment</div>
-  </div>
-</div>
 <section class="fabric">
   <div class="fabric-img">
     <img src="fabric-weave.jpg" alt="Fabric texture close-up" class="parallax">
@@ -366,6 +404,33 @@ function onScroll(){
 }
 window.addEventListener('scroll',onScroll,{passive:true});
 onScroll();
+/* stay-in-the-loop modal */
+(function(){
+  var ov=document.getElementById('loopOv'),card=document.getElementById('loopCard'),
+      closeBtn=document.getElementById('loopClose'),submitBtn=document.getElementById('loopSubmit'),
+      phone=document.getElementById('loopPhone');
+  if(!ov)return;
+  var KEY='yc_loop_seen';
+  function seen(){try{return localStorage.getItem(KEY)==='1';}catch(e){return false;}}
+  function mark(){try{localStorage.setItem(KEY,'1');}catch(e){}}
+  function open(){ov.classList.add('show');ov.setAttribute('aria-hidden','false');setTimeout(function(){try{phone.focus();}catch(e){}},320);}
+  function close(){ov.classList.remove('show');ov.setAttribute('aria-hidden','true');mark();}
+  if(!seen()){setTimeout(open,1100);}
+  closeBtn.addEventListener('click',close);
+  ov.addEventListener('click',function(e){if(e.target===ov)close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close();});
+  function go(){
+    var v=(phone.value||'').trim(),digits=v.replace(/\D/g,'');
+    if(digits.length<7){phone.style.borderColor='#a06860';phone.focus();return;}
+    mark();
+    try{fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:v,source:'loop-popup'})}).catch(function(){});}catch(e){}
+    card.classList.add('done');
+    setTimeout(close,2000);
+  }
+  submitBtn.addEventListener('click',go);
+  phone.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+})();
+
 </script>
 </body>
 </html>
