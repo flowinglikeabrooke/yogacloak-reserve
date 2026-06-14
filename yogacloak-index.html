@@ -136,9 +136,9 @@ a { text-decoration:none; color:inherit; }
 .after-item-label { position:absolute; bottom:16px; left:16px; z-index:2; }
 .after-item-label span { font-size:10px; letter-spacing:.15em; color:rgba(var(--cream),0.6); text-transform:uppercase; }
 .after-item::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(30,35,32,0.65) 0%, transparent 50%); pointer-events:none; }
-.fabric { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:0; min-height:60svh; }
+.fabric { display:grid; grid-template-columns:1fr 1fr; align-items:stretch; gap:0; min-height:74svh; }
 .fabric-img { position:relative; overflow:hidden; height:100%; min-height:400px; }
-.fabric-img img { width:100%; height:100%; object-fit:cover; filter:brightness(.82) saturate(.9); }
+.fabric-img img { width:100%; height:100%; object-fit:cover; object-position:center 35%; filter:brightness(.94) saturate(.96); }
 .fabric-text { padding:clamp(48px,8vw,120px) clamp(32px,6vw,88px); }
 .fabric-text .eyebrow { display:block; margin-bottom:28px; }
 .fabric-text h3 { font-size:clamp(28px,3.8vw,52px); font-weight:300; letter-spacing:-.03em; line-height:1.1; margin-bottom:28px; }
@@ -275,14 +275,6 @@ a { text-decoration:none; color:inherit; }
   </div>
   <div class="scroll-cue">Scroll</div>
 </section>
-<div class="ed-break ed-break--tall">
-  <img src="community-street.jpg" alt="Friends walking together after class, wrapped in yogacloaks" class="parallax" style="object-position:center 30%">
-  <div class="ed-break-grad"></div>
-  <div class="ed-break-caption reveal">
-    <span class="eyebrow">In the wild</span>
-    <h2>From the studio to<br><strong>the sidewalk.</strong></h2>
-  </div>
-</div>
 <section class="product-pair">
   <div class="pcard reveal" id="cloak">
     <div class="pcard-photo">
@@ -292,7 +284,7 @@ a { text-decoration:none; color:inherit; }
       <div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
       <div class="pname">The Cloak</div>
       <div class="pprice"><span class="amt">$98</span></div>
-      <p class="pdesc">Dark, soft, quiet, ready. The one you pull on still warm from class and don't take off until you're through your own front door.</p>
+      <p class="pdesc">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin. The layer you pull on still warm from class and keep on until you're through your own front door.</p>
       <div class="pcta-row">
         <a href="yogacloak-reserve-page.html?product=cloak" class="btn">Reserve the Cloak
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -309,7 +301,7 @@ a { text-decoration:none; color:inherit; }
       <div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
       <div class="pname">The Wrap</div>
       <div class="pprice"><span class="amt">$68</span></div>
-      <p class="pdesc">Lighter, looser, easy to knot and go. The block-and-a-half to the car. The coffee run. The ride home. Wears in. Wears everywhere.</p>
+      <p class="pdesc">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing. For the block-and-a-half to the car, the coffee run, the ride home. Wears in, wears everywhere.</p>
       <div class="pcta-row">
         <a href="yogacloak-reserve-page.html?product=wrap" class="btn">Reserve the Wrap
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -319,9 +311,17 @@ a { text-decoration:none; color:inherit; }
     </div>
   </div>
 </section>
+<div class="ed-break ed-break--tall">
+  <img src="studio-to-street.jpg" alt="Four friends walking the sidewalk after class, one wrapped in the Wrap" class="parallax" style="object-position:center 28%">
+  <div class="ed-break-grad"></div>
+  <div class="ed-break-caption reveal">
+    <span class="eyebrow">The Wrap</span>
+    <h2>From the studio to<br><strong>the sidewalk.</strong></h2>
+  </div>
+</div>
 <section class="fabric">
   <div class="fabric-img">
-    <img src="fabric-weave.jpg" alt="Fabric texture close-up" class="parallax">
+    <img src="material.jpg" alt="The Cloak draped over a collarbone, sweat still on the skin">
   </div>
   <div class="fabric-text reveal">
     <span class="eyebrow">The material</span>
@@ -379,7 +379,7 @@ const ioPhoto=new IntersectionObserver(entries=>{
 },{threshold:0.04,rootMargin:'0px 0px -6% 0px'});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 document.querySelectorAll('.pphoto').forEach(el=>ioPhoto.observe(el));
-const frames=document.querySelectorAll('.parallax img,.ed-break img,.ed-cell img,.atmo-cell img,.after-item img,.fabric-img img');
+const frames=document.querySelectorAll('.parallax img,.ed-break img,.ed-cell img,.atmo-cell img,.after-item img');
 let ticking=false;
 function onScroll(){
   topbar.classList.toggle('solid',window.scrollY>40);
@@ -396,7 +396,7 @@ function onScroll(){
         const r=img.parentElement.getBoundingClientRect();
         if(r.bottom<-200||r.top>vh+200)return;
         const p=(vh*.5-(r.top+r.height/2))/(vh+r.height);
-        img.style.transform='translateY('+(p*5)+'%)';
+        img.style.transform='translateY('+(p*3)+'%)';
       });
       ticking=false;
     });
