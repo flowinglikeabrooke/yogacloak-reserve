@@ -77,6 +77,9 @@ a { text-decoration:none; color:inherit; }
 .ed-break img { width:100%; height:100%; object-fit:cover; display:block; filter:brightness(.85) saturate(.9); will-change:transform; }
 .ed-break--tall { height:90svh; min-height:560px; }
 .ed-break--mid { height:72svh; min-height:440px; }
+.text-band { position:relative; display:flex; align-items:flex-end; min-height:58svh; padding:clamp(48px,9vh,96px) clamp(24px,5vw,72px); background:var(--ink); overflow:hidden; }
+.text-band-inner h2 { font-size:clamp(28px,4.2vw,58px); font-weight:300; letter-spacing:-.035em; line-height:1.05; margin-top:14px; max-width:560px; }
+.text-band-inner h2 strong { font-weight:600; }
 .ed-break-caption { position:absolute; bottom:clamp(28px,5vh,56px); left:clamp(24px,5vw,72px); z-index:3; }
 .ed-break-caption .eyebrow { color:rgba(var(--cream),0.65); }
 .ed-break-caption h2 { font-size:clamp(28px,4.2vw,58px); font-weight:300; letter-spacing:-.035em; line-height:1.05; margin-top:14px; max-width:560px; }
@@ -159,12 +162,12 @@ a { text-decoration:none; color:inherit; }
 .float-reserve { position:fixed; left:50%; bottom:26px; z-index:45;
   transform:translateX(-50%) translateY(26px) scale(.92); opacity:0; pointer-events:none;
   display:inline-flex; align-items:center; gap:10px;
-  background:var(--bone); color:var(--ink); font-size:13px; font-weight:600;
-  padding:16px 38px; border-radius:100px; box-shadow:0 18px 44px -14px rgba(0,0,0,0.6);
+  background:var(--bone); color:var(--ink); font-size:12px; font-weight:600;
+  padding:11px 24px; border-radius:100px; box-shadow:0 14px 34px -14px rgba(0,0,0,0.55);
   transition:opacity .45s ease, transform .55s cubic-bezier(.34,1.4,.64,1), background .2s; }
 .float-reserve.show { opacity:1; transform:translateX(-50%) translateY(0) scale(1); pointer-events:auto; }
 .float-reserve:hover { background:#fff; }
-.float-reserve svg { width:15px; height:15px; }
+.float-reserve svg { width:13px; height:13px; }
 @media(max-width:860px){
   .topbar,.topbar.solid{padding:18px 22px;}
   .product{grid-template-columns:1fr;padding:18px;gap:0;}
@@ -315,14 +318,12 @@ a { text-decoration:none; color:inherit; }
     <img src="cloak-on-hook.jpg" alt="The Cloak hanging on a hook by the door" class="parallax">
   </div>
 </div>
-<div class="ed-break ed-break--mid">
-  <img src="wrap-fabric-macro.jpg" alt="Close-up of the Wrap's brushed fabric draped over the hip" class="parallax">
-  <div class="ed-break-grad"></div>
-  <div class="ed-break-caption reveal">
+<section class="text-band">
+  <div class="text-band-inner reveal">
     <span class="eyebrow">For after class</span>
     <h2>Not quite ready<br><strong>for real clothes yet.</strong></h2>
   </div>
-</div>
+</section>
 <section class="fabric">
   <div class="fabric-img">
     <img src="fabric-weave.jpg" alt="Fabric texture close-up" class="parallax">
