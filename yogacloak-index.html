@@ -16,27 +16,17 @@ html { font-family:'Hanken Grotesk',sans-serif; -webkit-font-smoothing:antialias
 body { background:var(--ink); color:var(--bone); overflow-x:hidden; }
 img { display:block; }
 a { text-decoration:none; color:inherit; }
-
-/* ── breathing cream orbs ── */
 .orb { position:absolute; border-radius:50%; pointer-events:none; z-index:0;
   background:radial-gradient(circle, rgba(var(--cream),0.16), rgba(var(--cream),0.05) 45%, transparent 70%);
   animation:breathe 11s ease-in-out infinite; will-change:transform,opacity; }
 @keyframes breathe { 0%,100%{ transform:scale(1); opacity:.45; } 50%{ transform:scale(1.22); opacity:.9; } }
-
-/* ── shared ── */
-.eyebrow { font-size:11px; letter-spacing:.16em; color:rgba(var(--cream),0.6); }
-.btn {
-  display:inline-flex; align-items:center; justify-content:center; gap:11px;
-  background:var(--bone); color:var(--ink);
-  font-size:13px; font-weight:600; letter-spacing:.01em;
-  padding:16px 34px; border-radius:100px;
-  transition:background .2s, transform .2s, box-shadow .2s;
-  box-shadow:0 10px 30px -12px rgba(0,0,0,0.5);
-}
+.eyebrow { font-size:11px; letter-spacing:.16em; color:rgba(var(--cream),0.6); text-transform:uppercase; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:11px;
+  background:var(--bone); color:var(--ink); font-size:13px; font-weight:600; letter-spacing:.01em;
+  padding:16px 34px; border-radius:100px; transition:background .2s, transform .2s, box-shadow .2s;
+  box-shadow:0 10px 30px -12px rgba(0,0,0,0.5); }
 .btn:hover { background:#fff; transform:translateY(-2px); box-shadow:0 16px 38px -14px rgba(0,0,0,0.55); }
 .btn svg { width:15px; height:15px; }
-
-/* ── top bar ── */
 .topbar { position:fixed; top:0; left:0; right:0; z-index:40;
   display:flex; justify-content:space-between; align-items:center;
   padding:24px 44px; transition:background .35s, padding .35s, backdrop-filter .35s;
@@ -47,64 +37,54 @@ a { text-decoration:none; color:inherit; }
 .wordmark .bold { font-weight:600; }
 .topbar .reserve-link { font-size:12px; font-weight:600; color:var(--bone); border-bottom:1.5px solid rgba(var(--cream),0.35); padding-bottom:3px; transition:border-color .2s; }
 .topbar .reserve-link:hover { border-color:var(--bone); }
-
-/* ── hero ── */
-.hero { position:relative; height:100svh; min-height:580px; overflow:hidden;
-  display:flex; align-items:flex-end; justify-content:center; }
+.hero { position:relative; height:100svh; min-height:600px; overflow:hidden;
+  display:flex; align-items:flex-end; justify-content:flex-start; }
 .hero-imgwrap { position:absolute; inset:0; overflow:hidden; will-change:transform; }
-.hero img { width:100%; height:115%; object-fit:cover; object-position:center 22%; filter:brightness(.8) saturate(1.02); }
-.hero-grad { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(30,35,32,0.42) 0%, transparent 30%, transparent 44%, rgba(30,35,32,0.8) 84%, rgba(30,35,32,0.96) 100%); }
-.hero-content { position:relative; z-index:3; text-align:center; padding:0 28px 64px; max-width:1100px; }
-.hero .eyebrow { margin-bottom:22px; display:inline-block; }
-.hero h1 { font-size:clamp(44px,8.6vw,118px); font-weight:300; letter-spacing:-.04em; line-height:.96; margin-bottom:34px; }
+.hero img { width:100%; height:115%; object-fit:cover; object-position:center 25%; filter:brightness(.75) saturate(0.95); }
+.hero-grad { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(30,35,32,0.3) 0%, transparent 28%, transparent 42%, rgba(30,35,32,0.72) 78%, rgba(30,35,32,0.97) 100%); }
+.hero-grad-left { position:absolute; inset:0; background:linear-gradient(to right, rgba(30,35,32,0.45) 0%, transparent 55%); }
+.hero-content { position:relative; z-index:3; padding:0 clamp(24px,5vw,80px) clamp(60px,9vh,100px); max-width:900px; }
+.hero .eyebrow { margin-bottom:24px; display:block; }
+.hero h1 { font-size:clamp(44px,7.8vw,108px); font-weight:300; letter-spacing:-.04em; line-height:.96; margin-bottom:38px; }
 .hero h1 strong { font-weight:700; }
-.hero-sub { display:flex; flex-direction:column; align-items:center; gap:18px; }
-.hero-meta { font-size:12px; letter-spacing:.14em; color:rgba(var(--cream),0.6); }
-.scroll-cue { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); z-index:3; font-size:10px; letter-spacing:.2em; color:rgba(var(--cream),0.5); animation:bob 2.4s ease-in-out infinite; }
-@keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
-
-/* ── promise ── */
+.hero-sub { display:flex; flex-direction:row; align-items:center; gap:28px; flex-wrap:wrap; }
+.hero-meta { font-size:12px; letter-spacing:.14em; color:rgba(var(--cream),0.55); }
+.scroll-cue { position:absolute; left:clamp(24px,5vw,80px); bottom:28px; z-index:3; font-size:10px; letter-spacing:.22em; color:rgba(var(--cream),0.45); animation:bob 2.4s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
 .promise { position:relative; padding:clamp(100px,17vh,200px) 28px; text-align:center; overflow:hidden; }
-.promise .inner { position:relative; z-index:2; max-width:980px; margin:0 auto; }
-.promise p { font-size:clamp(25px,3.6vw,44px); font-weight:300; line-height:1.34; letter-spacing:-.015em; }
-.promise p span { color:rgba(var(--cream),0.42); }
+.promise .inner { position:relative; z-index:2; max-width:900px; margin:0 auto; }
+.promise p { font-size:clamp(24px,3.4vw,42px); font-weight:300; line-height:1.36; letter-spacing:-.015em; }
+.promise p span { color:rgba(var(--cream),0.38); }
 .promise .orb.o1 { width:520px; height:520px; top:-120px; left:-80px; animation-delay:0s; }
 .promise .orb.o2 { width:420px; height:420px; bottom:-140px; right:-60px; animation-delay:3.5s; }
-
-/* ── community band ── */
-.band { position:relative; height:86svh; min-height:520px; overflow:hidden; display:flex; align-items:flex-end; }
-.band-media { position:absolute; inset:0; overflow:hidden; }
-.band-media img { width:100%; height:118%; object-fit:cover; object-position:center 30%; filter:brightness(.82); will-change:transform; }
-.band-grad { position:absolute; inset:0; background:linear-gradient(to top, rgba(30,35,32,0.88) 0%, rgba(30,35,32,0.25) 45%, transparent 70%); }
-.band-content { position:relative; z-index:2; margin:0 44px 58px; max-width:760px; }
-.band .eyebrow { display:block; margin-bottom:16px; color:rgba(var(--cream),0.7); }
-.band h2 { font-size:clamp(34px,5.4vw,76px); font-weight:300; letter-spacing:-.035em; line-height:1; }
-.band h2 strong { font-weight:600; }
-
-/* ── product sections ── */
+.ed-break { position:relative; overflow:hidden; }
+.ed-break img { width:100%; height:100%; object-fit:cover; display:block; filter:brightness(.85) saturate(.9); will-change:transform; }
+.ed-break--tall { height:90svh; min-height:560px; }
+.ed-break--mid { height:72svh; min-height:440px; }
+.ed-break-caption { position:absolute; bottom:clamp(28px,5vh,56px); left:clamp(24px,5vw,72px); z-index:3; }
+.ed-break-caption .eyebrow { color:rgba(var(--cream),0.65); }
+.ed-break-caption h2 { font-size:clamp(28px,4.2vw,58px); font-weight:300; letter-spacing:-.035em; line-height:1.05; margin-top:14px; max-width:560px; }
+.ed-break-caption h2 strong { font-weight:600; }
+.ed-break-grad { position:absolute; inset:0; background:linear-gradient(to top, rgba(30,35,32,0.75) 0%, rgba(30,35,32,0.1) 38%, transparent 60%); pointer-events:none; }
 .product { position:relative; display:grid; grid-template-columns:1.05fr 1fr; align-items:stretch; gap:0; padding:34px; overflow:hidden; }
 .product.flip .pphoto { order:2; }
 .pphoto { position:relative; overflow:hidden; border-radius:22px; box-shadow:0 30px 70px -30px rgba(0,0,0,0.6);
   opacity:0; transform:scale(.99); transition:opacity 1.1s ease, transform 1.4s cubic-bezier(.2,.7,.2,1); will-change:transform,opacity; }
 .pphoto.in { opacity:1; transform:none; }
 .pphoto img { width:100%; height:118%; min-height:560px; object-fit:cover; object-position:center 16%; will-change:transform; }
-
 .pinfo { position:relative; display:flex; flex-direction:column; justify-content:center; padding:clamp(40px,6vw,96px); z-index:1; }
 .pinfo .orb { width:440px; height:440px; top:50%; left:50%; transform:translate(-50%,-50%); z-index:0; }
 .pinfo > *:not(.orb) { position:relative; z-index:1; }
-.pmeta { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
-.pnum { font-size:13px; font-weight:600; letter-spacing:.04em; color:var(--clay); }
-.pmeta .rule { width:26px; height:1px; background:rgba(154,142,134,0.5); }
-.pmeta .eyebrow { color:rgba(124,140,130,0.9); }
-.pname { font-size:clamp(44px,6vw,86px); font-weight:600; letter-spacing:-.035em; line-height:.96; margin-bottom:20px; }
-.pprice { display:flex; align-items:baseline; gap:14px; margin-bottom:30px; }
-.pprice .amt { font-size:27px; font-weight:300; }
-.pdesc { font-size:16px; font-weight:300; line-height:1.85; color:rgba(var(--cream),0.62); max-width:42ch; margin-bottom:38px; }
+.pmeta { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+.pnum { font-size:11px; letter-spacing:.2em; color:rgba(var(--cream),0.32); }
+.rule { flex:1; max-width:80px; height:1px; background:rgba(var(--cream),0.16); }
+.pname { font-size:clamp(38px,5.2vw,72px); font-weight:300; letter-spacing:-.04em; line-height:.96; margin-bottom:16px; }
+.pprice { margin-bottom:22px; }
+.amt { font-size:16px; font-weight:500; letter-spacing:.01em; color:rgba(var(--cream),0.75); }
+.pdesc { font-size:15px; font-weight:300; line-height:1.68; color:rgba(var(--cream),0.65); max-width:420px; margin-bottom:36px; }
 .pcta-row { display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
-.phold { font-size:13px; letter-spacing:.01em; color:rgba(124,140,130,0.75); }
-.phold strong { color:var(--bone); font-weight:600; }
-
-/* staggered reveal */
+.phold { font-size:12px; color:rgba(var(--cream),0.5); }
+.phold strong { color:rgba(var(--cream),0.8); }
 .reveal > *:not(.orb) { opacity:0; transform:translateY(14px); transition:opacity 1s cubic-bezier(.2,.7,.2,1), transform 1s cubic-bezier(.2,.7,.2,1); }
 .reveal.in > *:not(.orb) { opacity:1; transform:none; }
 .reveal.in > *:nth-child(2){transition-delay:.05s}
@@ -112,12 +92,40 @@ a { text-decoration:none; color:inherit; }
 .reveal.in > *:nth-child(4){transition-delay:.17s}
 .reveal.in > *:nth-child(5){transition-delay:.23s}
 .reveal.in > *:nth-child(6){transition-delay:.29s}
-
-/* gentle pop-in (no bounce) */
 .pop { transform:translateY(10px)!important; opacity:0; transition:opacity .8s ease .12s, transform .8s cubic-bezier(.2,.7,.2,1) .12s; }
 .in .pop, .pop.in { transform:none!important; opacity:1; }
-
-/* ── closing ── */
+.atmo-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:6px; }
+.atmo-cell { position:relative; overflow:hidden; }
+.atmo-cell img { width:100%; height:100%; object-fit:cover; filter:brightness(.85) saturate(.88); will-change:transform; transition:transform 8s ease; display:block; }
+.atmo-cell--tall { grid-row:span 2; }
+.atmo-label { position:absolute; bottom:22px; left:24px; z-index:2; font-size:10px; letter-spacing:.18em; color:rgba(var(--cream),0.55); text-transform:uppercase; }
+.after { padding:clamp(80px,12vh,160px) 0; }
+.after-eyebrow { text-align:center; margin-bottom:clamp(48px,8vh,80px); }
+.after-eyebrow .eyebrow { display:inline-block; margin-bottom:18px; }
+.after-eyebrow h2 { font-size:clamp(28px,4vw,54px); font-weight:300; letter-spacing:-.03em; color:rgba(var(--cream),0.7); }
+.after-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:0 6px; }
+.after-item { position:relative; overflow:hidden; }
+.after-item img { width:100%; aspect-ratio:3/4; object-fit:cover; filter:brightness(.82) saturate(.88); display:block; }
+.after-item-label { position:absolute; bottom:16px; left:16px; z-index:2; }
+.after-item-label span { font-size:10px; letter-spacing:.15em; color:rgba(var(--cream),0.6); text-transform:uppercase; }
+.after-item::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(30,35,32,0.65) 0%, transparent 50%); pointer-events:none; }
+.fabric { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:0; min-height:60svh; }
+.fabric-img { position:relative; overflow:hidden; height:100%; min-height:400px; }
+.fabric-img img { width:100%; height:100%; object-fit:cover; filter:brightness(.82) saturate(.9); }
+.fabric-text { padding:clamp(48px,8vw,120px) clamp(32px,6vw,88px); }
+.fabric-text .eyebrow { display:block; margin-bottom:28px; }
+.fabric-text h3 { font-size:clamp(28px,3.8vw,52px); font-weight:300; letter-spacing:-.03em; line-height:1.1; margin-bottom:28px; }
+.fabric-text h3 strong { font-weight:600; }
+.fabric-text p { font-size:15px; font-weight:300; line-height:1.72; color:rgba(var(--cream),0.6); max-width:400px; margin-bottom:38px; }
+.fabric-tags { display:flex; flex-wrap:wrap; gap:10px; }
+.fabric-tag { font-size:11px; letter-spacing:.12em; color:rgba(var(--cream),0.5); padding:8px 16px; border:1px solid rgba(var(--cream),0.15); border-radius:100px; text-transform:uppercase; }
+.ed-row { display:grid; gap:6px; }
+.ed-row--left-wide { grid-template-columns:1.55fr 1fr; }
+.ed-row--right-wide { grid-template-columns:1fr 1.55fr; }
+.ed-row .ed-cell { position:relative; overflow:hidden; }
+.ed-row .ed-cell img { width:100%; height:100%; object-fit:cover; filter:brightness(.85) saturate(.88); display:block; }
+.ed-row--left-wide .ed-cell:first-child { min-height:580px; }
+.ed-row--left-wide .ed-cell:last-child, .ed-row--right-wide .ed-cell:first-child { min-height:440px; }
 .closing { position:relative; height:88svh; min-height:520px; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center; background:var(--ink); }
 .closing .orb.o1 { width:560px; height:560px; top:-100px; left:8%; animation-delay:1s; }
 .closing .orb.o2 { width:460px; height:460px; bottom:-120px; right:6%; animation-delay:4.5s; }
@@ -126,16 +134,12 @@ a { text-decoration:none; color:inherit; }
 .closing h2 { font-size:clamp(46px,8.4vw,108px); font-weight:300; letter-spacing:-.045em; line-height:.94; margin-bottom:14px; }
 .closing h2 strong { font-weight:600; }
 .closing .year { font-size:13px; letter-spacing:.18em; color:rgba(124,140,130,0.75); margin-bottom:38px; }
-
-/* ── footer ── */
 .footer { padding:56px 44px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
 .footer-right { text-align:right; }
 .footer .lbl { font-size:11px; letter-spacing:.12em; color:rgba(124,140,130,0.55); margin-bottom:8px; }
 .footer .email { font-size:15px; color:rgba(var(--cream),0.6); transition:color .2s; }
 .footer .email:hover { color:var(--bone); }
 .footer .tag { font-size:11px; letter-spacing:.06em; color:rgba(124,140,130,0.4); margin-top:14px; }
-
-/* ── floating centered reserve ── */
 .float-reserve { position:fixed; left:50%; bottom:26px; z-index:45;
   transform:translateX(-50%) translateY(26px) scale(.92); opacity:0; pointer-events:none;
   display:inline-flex; align-items:center; gap:10px;
@@ -145,83 +149,81 @@ a { text-decoration:none; color:inherit; }
 .float-reserve.show { opacity:1; transform:translateX(-50%) translateY(0) scale(1); pointer-events:auto; }
 .float-reserve:hover { background:#fff; }
 .float-reserve svg { width:15px; height:15px; }
-
 @media(max-width:860px){
-  .topbar, .topbar.solid { padding:18px 22px; }
-  .band-content { margin:0 22px 40px; }
-  .product { grid-template-columns:1fr; padding:18px; gap:0; }
-  .product.flip .pphoto { order:0; }
-  .pphoto { margin-bottom:18px; }
-  .pphoto img { min-height:64svh; }
-  .pinfo { padding:34px 22px 52px; }
-  .promise { padding:96px 22px; }
-  .footer { padding:40px 22px; }
+  .topbar,.topbar.solid{padding:18px 22px;}
+  .product{grid-template-columns:1fr;padding:18px;gap:0;}
+  .product.flip .pphoto{order:0;}
+  .pphoto{margin-bottom:18px;}
+  .pphoto img{min-height:64svh;}
+  .pinfo{padding:34px 22px 52px;}
+  .promise{padding:96px 22px;}
+  .footer{padding:40px 22px;}
+  .atmo-grid{grid-template-columns:1fr;gap:4px;padding:4px;}
+  .atmo-cell--tall{grid-row:span 1;}
+  .after-strip{grid-template-columns:1fr 1fr;gap:4px;padding:0 4px;}
+  .fabric{grid-template-columns:1fr;}
+  .fabric-img{min-height:56svh;}
+  .ed-row--left-wide,.ed-row--right-wide{grid-template-columns:1fr;}
+  .ed-row--left-wide .ed-cell:first-child,.ed-row--left-wide .ed-cell:last-child,
+  .ed-row--right-wide .ed-cell:first-child{min-height:72svh;}
+  .hero h1{font-size:clamp(40px,11vw,80px);}
+  .hero-sub{flex-direction:column;align-items:flex-start;gap:16px;}
+  .ed-break--tall{height:70svh;}
+  .ed-break--mid{height:58svh;}
 }
 @media(prefers-reduced-motion:reduce){
-  *{animation:none!important; scroll-behavior:auto!important;}
-  .reveal > *, .pop, .pphoto, .pphoto img { opacity:1!important; transform:none!important; transition:none!important; }
-  .orb{ opacity:.6!important; }
+  *{animation:none!important;scroll-behavior:auto!important;}
+  .reveal>*,.pop,.pphoto,.pphoto img{opacity:1!important;transform:none!important;transition:none!important;}
 }
 </style>
 </head>
 <body>
-
-<!-- TOP BAR -->
 <div class="topbar" id="topbar">
   <div class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
   <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
 </div>
-
-<!-- HERO -->
 <section class="hero">
   <div class="hero-imgwrap" id="heroImg">
-    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/hero.jpg" alt="A couple after class, wrapped in the yogacloak wrap on a city sidewalk">
+    <img src="lifestyle-street.jpg" alt="Woman on city sidewalk, wrapped in the yogacloak, holding coffee">
   </div>
   <div class="hero-grad"></div>
+  <div class="hero-grad-left"></div>
   <div class="hero-content">
     <span class="eyebrow">For after class</span>
-    <h1>You're not ready for<br><strong>real clothes</strong> yet.</h1>
+    <h1>Made for the moment<br><strong>after heat.</strong></h1>
     <div class="hero-sub">
       <a href="yogacloak-reserve-page.html" class="btn">Reserve yours
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <span class="hero-meta">Recovery-wear · Coming 2027</span>
+      <span class="hero-meta">Recovery-wear &middot; Coming 2027</span>
     </div>
   </div>
   <div class="scroll-cue">Scroll</div>
 </section>
-
-<!-- PROMISE -->
 <section class="promise">
   <span class="orb o1"></span><span class="orb o2"></span>
   <div class="inner reveal">
-    <p>The layer you live in <span>between the studio and the rest of your life.</span></p>
+    <p>The layer you leave in. <span>From studio air to street air.</span></p>
   </div>
 </section>
-
-<!-- COMMUNITY BAND -->
-<section class="band">
-  <div class="band-media parallax">
-    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/community.jpg" alt="A group walking together after class, one wrapped in the yogacloak wrap">
-  </div>
-  <div class="band-grad"></div>
-  <div class="band-content reveal">
+<div class="ed-break ed-break--tall">
+  <img src="community-street.jpg" alt="Friends walking together after class, wrapped in yogacloaks" class="parallax">
+  <div class="ed-break-grad"></div>
+  <div class="ed-break-caption reveal">
     <span class="eyebrow">In the wild</span>
-    <h2>From the studio to the <strong>sidewalk.</strong></h2>
+    <h2>From the studio to<br><strong>the sidewalk.</strong></h2>
   </div>
-</section>
-
-<!-- THE CLOAK -->
+</div>
 <section class="product" id="cloak">
   <div class="pphoto parallax">
-    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/cloak.jpg" alt="The Cloak, hooded, worn walking from class">
+    <img src="cloak.jpg" alt="The Cloak, hooded, worn walking from class">
   </div>
   <div class="pinfo reveal">
     <span class="orb"></span>
     <div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
     <div class="pname">The Cloak</div>
     <div class="pprice"><span class="amt">$98</span></div>
-    <p class="pdesc">The one you pull on still warm from class and don't take off until you're through your own front door. Heavy, hooded, made to disappear into.</p>
+    <p class="pdesc">Dark, soft, quiet, ready. The one you pull on still warm from class and don't take off until you're through your own front door.</p>
     <div class="pcta-row">
       <a href="yogacloak-reserve-page.html?product=cloak" class="btn">Reserve the Cloak
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -230,18 +232,32 @@ a { text-decoration:none; color:inherit; }
     </div>
   </div>
 </section>
-
-<!-- THE WRAP -->
+<div class="ed-row ed-row--left-wide">
+  <div class="ed-cell">
+    <img src="two-women-stairs.jpg" alt="Two women heading to class with yoga mats" class="parallax">
+  </div>
+  <div class="ed-cell">
+    <img src="cloak-on-hook.jpg" alt="The Cloak hanging on a hook by the door" class="parallax">
+  </div>
+</div>
+<div class="ed-break ed-break--mid">
+  <img src="after-class-couple.jpg" alt="Couple after class on city street, both in yogacloaks" class="parallax">
+  <div class="ed-break-grad"></div>
+  <div class="ed-break-caption reveal">
+    <span class="eyebrow">For after class</span>
+    <h2>Not quite ready<br><strong>for real clothes yet.</strong></h2>
+  </div>
+</div>
 <section class="product flip" id="wrap">
   <div class="pphoto parallax">
-    <img src="https://raw.githubusercontent.com/flowinglikeabrooke/yogacloak-reserve/main/wrap.jpg" alt="The Wrap, worn past a smoothie shop on a city sidewalk">
+    <img src="wrap.jpg" alt="The Wrap, worn on a city sidewalk">
   </div>
   <div class="pinfo reveal">
     <span class="orb"></span>
     <div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
     <div class="pname">The Wrap</div>
     <div class="pprice"><span class="amt">$68</span></div>
-    <p class="pdesc">Lighter, looser, easy to knot and go. The block-and-a-half to the smoothie place, the subway, the slow walk back. Softness you can leave the house in.</p>
+    <p class="pdesc">Lighter, looser, easy to knot and go. The block-and-a-half to the car. The coffee run. The ride home. Wears in. Wears everywhere.</p>
     <div class="pcta-row">
       <a href="yogacloak-reserve-page.html?product=wrap" class="btn">Reserve the Wrap
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -250,12 +266,65 @@ a { text-decoration:none; color:inherit; }
     </div>
   </div>
 </section>
-
-<!-- CLOSING -->
+<section class="after">
+  <div class="after-eyebrow reveal">
+    <span class="eyebrow">The transition</span>
+    <h2>Hot room &rarr; cool air &rarr; open street.</h2>
+  </div>
+  <div class="after-strip">
+    <div class="after-item">
+      <img src="cloak-indoor.jpg" alt="Pulling on the cloak at the studio threshold">
+      <div class="after-item-label"><span>The studio</span></div>
+    </div>
+    <div class="after-item">
+      <img src="wrap-sidewalk.jpg" alt="Out into the air, wrap pulled close">
+      <div class="after-item-label"><span>The door</span></div>
+    </div>
+    <div class="after-item">
+      <img src="parking-desert-1.jpg" alt="Parking structure, cool concrete, mountain light">
+      <div class="after-item-label"><span>The lot</span></div>
+    </div>
+    <div class="after-item">
+      <img src="parking-desert-2.jpg" alt="Late desert light through concrete">
+      <div class="after-item-label"><span>The drive</span></div>
+    </div>
+  </div>
+</section>
+<div class="atmo-grid">
+  <div class="atmo-cell atmo-cell--tall">
+    <img src="hooded-cloak-duo.jpg" alt="Two women in hooded cloaks leaving the studio" class="parallax">
+    <div class="atmo-label">The Cloak</div>
+  </div>
+  <div class="atmo-cell">
+    <img src="fabric-weave.jpg" alt="Close-up of the woven fabric texture" class="parallax">
+    <div class="atmo-label">The fabric</div>
+  </div>
+  <div class="atmo-cell">
+    <img src="lifestyle-street.jpg" alt="Wrapped and walking, coffee in hand" class="parallax">
+    <div class="atmo-label">The moment</div>
+  </div>
+</div>
+<section class="fabric">
+  <div class="fabric-img">
+    <img src="fabric-weave.jpg" alt="Fabric texture close-up" class="parallax">
+  </div>
+  <div class="fabric-text reveal">
+    <span class="eyebrow">The material</span>
+    <h3>Dark, <strong>absorbent,</strong><br>built for heat.</h3>
+    <p>Soft against warm skin. Light enough to forget. Dark enough to go anywhere. Made for the transition after practice, not the practice itself.</p>
+    <div class="fabric-tags">
+      <span class="fabric-tag">Dark graphite</span>
+      <span class="fabric-tag">Lightweight</span>
+      <span class="fabric-tag">Absorbent</span>
+      <span class="fabric-tag">Soft hand</span>
+      <span class="fabric-tag">Minimal</span>
+    </div>
+  </div>
+</section>
 <section class="closing">
   <span class="orb o1"></span><span class="orb o2"></span>
   <div class="closing-inner reveal">
-    <span class="eyebrow">First run · Reserving now</span>
+    <span class="eyebrow">First run &middot; Reserving now</span>
     <h2>Reserve <strong>yours.</strong></h2>
     <div class="year">Coming 2027</div>
     <a href="yogacloak-reserve-page.html" class="btn pop">Reserve now
@@ -263,8 +332,6 @@ a { text-decoration:none; color:inherit; }
     </a>
   </div>
 </section>
-
-<!-- FOOTER -->
 <footer class="footer">
   <div class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></div>
   <div class="footer-right">
@@ -273,65 +340,56 @@ a { text-decoration:none; color:inherit; }
     <div class="tag">For after class</div>
   </div>
 </footer>
-
-<!-- FLOATING CENTERED RESERVE -->
 <a href="yogacloak-reserve-page.html" class="float-reserve" id="floatReserve">Reserve yours
   <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </a>
-
 <script>
-  const topbar = document.getElementById("topbar");
-  const floatR = document.getElementById("floatReserve");
-  const hero = document.querySelector(".hero");
-  const heroImg = document.getElementById("heroImg");
-  const closing = document.querySelector(".closing");
-
-  // top bar solid + floating reserve appears once past the hero
-  new IntersectionObserver(([e]) => {
-    const past = !e.isIntersecting;
-    topbar.classList.toggle("solid", past);
-    floatR.classList.toggle("show", past);
-  }, { rootMargin: "-72px 0px 0px 0px" }).observe(hero);
-
-  // hide floating reserve while the closing CTA is on screen (avoid two buttons)
-  new IntersectionObserver(([e]) => {
-    if (e.isIntersecting) floatR.classList.remove("show");
-    else if (window.scrollY > window.innerHeight) floatR.classList.add("show");
-  }, { threshold: 0.35 }).observe(closing);
-
-  // scroll reveals (sections + product photos) — trigger a touch early for smoothness
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
-  const ioPhoto = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); ioPhoto.unobserve(e.target); } });
-  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-  document.querySelectorAll(".pphoto").forEach(el => ioPhoto.observe(el));
-
-  // fluid parallax: hero zoom + every .parallax image drifts continuously with scroll
-  const frames = [...document.querySelectorAll(".parallax")];
-  let ticking = false;
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const vh = window.innerHeight;
-      const y = window.scrollY;
-      if (y < vh) heroImg.style.transform = "translateY(" + (y * 0.22) + "px) scale(" + (1 + y * 0.0001) + ")";
-      frames.forEach(frame => {
-        const r = frame.getBoundingClientRect();
-        if (r.bottom < -60 || r.top > vh + 60) return;
-        const progress = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
-        const img = frame.querySelector("img");
-        if (img) img.style.transform = "translateY(" + (-progress * r.height * 0.15) + "px)";
+const topbar=document.getElementById('topbar');
+const floatR=document.getElementById('floatReserve');
+const hero=document.querySelector('.hero');
+const heroImg=document.getElementById('heroImg');
+const closing=document.querySelector('.closing');
+const past=()=>window.scrollY>(hero?.offsetHeight??500)*.72;
+function checkClose(){
+  if(!closing)return;
+  const r=closing.getBoundingClientRect();
+  const visible=r.top<window.innerHeight*.92&&r.bottom>0;
+  floatR.classList.toggle('show',past()&&!visible);
+}
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+},{threshold:0.09});
+const ioPhoto=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ioPhoto.unobserve(e.target);}});
+},{threshold:0.04,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+document.querySelectorAll('.pphoto').forEach(el=>ioPhoto.observe(el));
+const frames=document.querySelectorAll('.parallax img,.ed-break img,.ed-cell img,.atmo-cell img,.after-item img,.fabric-img img');
+let ticking=false;
+function onScroll(){
+  topbar.classList.toggle('solid',window.scrollY>40);
+  checkClose();
+  if(!ticking){
+    requestAnimationFrame(()=>{
+      const vh=window.innerHeight;
+      const hr=hero?.getBoundingClientRect();
+      if(hr&&heroImg){
+        const progress=-hr.top/vh;
+        heroImg.style.transform='translateY('+Math.max(0,progress*7)+'%)';
+      }
+      frames.forEach(img=>{
+        const r=img.parentElement.getBoundingClientRect();
+        if(r.bottom<-200||r.top>vh+200)return;
+        const p=(vh*.5-(r.top+r.height/2))/(vh+r.height);
+        img.style.transform='translateY('+(p*5)+'%)';
       });
-      ticking = false;
+      ticking=false;
     });
+    ticking=true;
   }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-  onScroll();
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+onScroll();
 </script>
 </body>
 </html>
