@@ -51,6 +51,9 @@ a { text-decoration:none; color:inherit; }
 .hero-meta { font-size:12px; letter-spacing:.14em; color:rgba(var(--cream),0.55); }
 .scroll-cue { position:absolute; left:clamp(24px,5vw,80px); bottom:28px; z-index:3; font-size:10px; letter-spacing:.22em; color:rgba(var(--cream),0.45); animation:bob 2.4s ease-in-out infinite; }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+@keyframes drift1 { 0%,100%{ transform:translate(0,0) scale(1); opacity:.34; } 50%{ transform:translate(46px,-32px) scale(1.1); opacity:.58; } }
+@keyframes drift2 { 0%,100%{ transform:translate(0,0) scale(1.06); opacity:.3; } 50%{ transform:translate(-54px,28px) scale(1); opacity:.5; } }
+@keyframes drift3 { 0%,100%{ transform:translate(0,0) scale(1); opacity:.22; } 50%{ transform:translate(30px,40px) scale(1.16); opacity:.44; } }
 /* centered intro hero (photo-less) */
 .hero-intro { position:relative; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 24px; overflow:hidden; }
 .hero-intro-inner { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
@@ -163,8 +166,10 @@ a { text-decoration:none; color:inherit; }
 .ed-row--left-wide .ed-cell:first-child { min-height:580px; }
 .ed-row--left-wide .ed-cell:last-child, .ed-row--right-wide .ed-cell:first-child { min-height:440px; }
 .closing { position:relative; height:88svh; min-height:520px; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center; background:var(--ink); }
-.closing .orb.o1 { width:560px; height:560px; top:-100px; left:8%; animation-delay:1s; }
-.closing .orb.o2 { width:460px; height:460px; bottom:-120px; right:6%; animation-delay:4.5s; }
+.closing .orb { filter:blur(10px); mix-blend-mode:screen; }
+.closing .orb.o1 { width:640px; height:640px; top:-140px; left:3%; animation:drift1 27s ease-in-out infinite; }
+.closing .orb.o2 { width:540px; height:540px; bottom:-170px; right:1%; animation:drift2 34s ease-in-out infinite; animation-delay:-8s; }
+.closing .orb.o3 { width:460px; height:460px; top:34%; left:46%; animation:drift3 41s ease-in-out infinite; animation-delay:-15s; }
 .closing-inner { position:relative; z-index:3; padding:0 32px; }
 .closing .eyebrow { margin-bottom:22px; color:rgba(var(--cream),0.7); }
 .closing h2 { font-size:clamp(46px,8.4vw,108px); font-weight:300; letter-spacing:-.045em; line-height:.94; margin-bottom:14px; }
@@ -348,7 +353,7 @@ a { text-decoration:none; color:inherit; }
   </div>
 </section>
 <section class="closing">
-  <span class="orb o1"></span><span class="orb o2"></span>
+  <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
   <div class="closing-inner reveal">
     <span class="eyebrow">Reserving now</span>
     <h2>Reserve <strong>yours.</strong></h2>
