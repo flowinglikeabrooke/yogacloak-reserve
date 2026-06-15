@@ -112,6 +112,15 @@ a { text-decoration:none; color:inherit; }
 .pcta-row { display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
 .phold { font-size:12px; color:rgba(var(--cream),0.5); }
 .phold strong { color:rgba(var(--cream),0.8); }
+.pcta-row { margin-top:6px; }
+.pcard-photo { display:block; text-decoration:none; }
+.pcard-hover { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(20,24,21,0); transition:background .4s ease; }
+.pcard-hover-cta { display:inline-flex; align-items:center; gap:9px; color:var(--bone); font-size:14px; font-weight:600; letter-spacing:.04em; border:1px solid rgba(236,234,227,0.55); padding:13px 28px; border-radius:100px; opacity:0; transform:translateY(8px); transition:opacity .4s ease, transform .45s cubic-bezier(.2,.7,.2,1), background .25s ease, color .25s ease; }
+.pcard-hover-cta svg { width:15px; height:15px; }
+.pcard:hover .pcard-hover { background:rgba(20,24,21,0.55); }
+.pcard:hover .pcard-hover-cta { opacity:1; transform:none; }
+.pcard-hover-cta:hover { background:var(--bone); color:var(--ink); }
+@media (hover:none){ .pcard-hover { display:none; } }
 .reveal > *:not(.orb) { opacity:0; transform:translateY(14px); transition:opacity 1s cubic-bezier(.2,.7,.2,1), transform 1s cubic-bezier(.2,.7,.2,1); }
 .reveal.in > *:not(.orb) { opacity:1; transform:none; }
 .reveal.in > *:nth-child(2){transition-delay:.05s}
@@ -171,13 +180,13 @@ a { text-decoration:none; color:inherit; }
 .footer .tag { font-size:11px; letter-spacing:.06em; color:rgba(160,176,166,0.6); margin-top:14px; }
 .float-reserve { position:fixed; left:50%; bottom:26px; z-index:45;
   transform:translateX(-50%) translateY(26px) scale(.92); opacity:0; pointer-events:none;
-  display:inline-flex; align-items:center; gap:10px;
-  background:var(--bone); color:var(--ink); font-size:12px; font-weight:600;
-  padding:11px 24px; border-radius:100px; box-shadow:0 14px 34px -14px rgba(0,0,0,0.55);
+  display:inline-flex; align-items:center; gap:11px;
+  background:var(--bone); color:var(--ink); font-size:14px; font-weight:600; letter-spacing:.01em;
+  padding:16px 34px; border-radius:100px; box-shadow:0 18px 44px -14px rgba(0,0,0,0.6);
   transition:opacity .45s ease, transform .55s cubic-bezier(.34,1.4,.64,1), background .2s; }
 .float-reserve.show { opacity:1; transform:translateX(-50%) translateY(0) scale(1); pointer-events:auto; }
 .float-reserve:hover { background:#fff; }
-.float-reserve svg { width:13px; height:13px; }
+.float-reserve svg { width:15px; height:15px; }
 @media(max-width:860px){
   .topbar,.topbar.solid{padding:18px 22px;}
   .product{grid-template-columns:1fr;padding:18px;gap:0;}
@@ -279,35 +288,35 @@ a { text-decoration:none; color:inherit; }
 </section>
 <section class="product-pair">
   <div class="pcard reveal" id="cloak">
-    <div class="pcard-photo">
+    <a class="pcard-photo" href="yogacloak-reserve-page.html?product=cloak" aria-label="Reserve the Cloak">
       <img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape with pockets">
-    </div>
+      <span class="pcard-hover"><span class="pcard-hover-cta">Reserve now
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span></span>
+    </a>
     <div class="pcard-info">
       <div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
       <div class="pname">The Cloak</div>
       <div class="pprice"><span class="amt">$98</span></div>
       <p class="pdesc">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin. The layer you pull on still warm from class and keep on until you're through your own front door.</p>
       <div class="pcta-row">
-        <a href="yogacloak-reserve-page.html?product=cloak" class="btn">Reserve the Cloak
-          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
         <span class="phold pop"><strong>$25</strong> holds yours</span>
       </div>
     </div>
   </div>
   <div class="pcard reveal" id="wrap">
-    <div class="pcard-photo">
+    <a class="pcard-photo" href="yogacloak-reserve-page.html?product=wrap" aria-label="Reserve the Wrap">
       <img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape">
-    </div>
+      <span class="pcard-hover"><span class="pcard-hover-cta">Reserve now
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span></span>
+    </a>
     <div class="pcard-info">
       <div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
       <div class="pname">The Wrap</div>
       <div class="pprice"><span class="amt">$68</span></div>
       <p class="pdesc">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing. For the block-and-a-half to the car, the coffee run, the ride home. Wears in, wears everywhere.</p>
       <div class="pcta-row">
-        <a href="yogacloak-reserve-page.html?product=wrap" class="btn">Reserve the Wrap
-          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
         <span class="phold pop"><strong>$20</strong> holds yours</span>
       </div>
     </div>
@@ -328,7 +337,7 @@ a { text-decoration:none; color:inherit; }
   <div class="fabric-text reveal">
     <span class="eyebrow">The material</span>
     <h3>Dark, <strong>absorbent,</strong><br>built for heat.</h3>
-    <p>Soft against warm skin. Light enough to forget. Dark enough to go anywhere. Made for the transition after practice, not the practice itself.</p>
+    <p>Brushed recycled microfiber in matte graphite — soft the second it meets warm skin, and absorbent enough to take on whatever you walk out of class with. Light enough to forget you have it on, dark enough to wear straight from the mat to anywhere else. Built for the way home, not the workout.</p>
     <div class="fabric-tags">
       <span class="fabric-tag">Dark graphite</span>
       <span class="fabric-tag">Lightweight</span>
