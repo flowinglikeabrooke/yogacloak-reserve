@@ -1,449 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reserve — yogacloak</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/hanken-grotesk-600.woff2" as="font" type="font/woff2" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-<style>
-:root{--ink:#1E2320;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--bone:#ECEAE3;--cream:236,234,227}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{font-family:'Hanken Grotesk',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-body{background:var(--ink);color:var(--bone);overflow-x:hidden}
-.topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(236,234,227,0.08)}
-.wordmark{font-size:18px;letter-spacing:-.005em;line-height:1}.wordmark .thin{font-weight:400}.wordmark .bold{font-weight:600}
-.topbar a{font-size:12px;font-weight:600;color:var(--bone);text-decoration:none;transition:opacity .2s}.topbar a:hover{opacity:.6}
-.page-hero{position:relative;padding:120px 40px 60px;text-align:center;background:var(--ink)}
-.page-hero h1{font-size:clamp(36px,5vw,56px);font-weight:300;letter-spacing:-.035em;line-height:1.1;margin-bottom:12px}
-.page-hero .subtitle{font-size:14px;color:rgba(236,234,227,0.6);letter-spacing:.02em;line-height:1.6;max-width:600px;margin:0 auto 48px}
-.page-hero .label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(236,234,227,0.4);margin-bottom:32px}
-/* Both banner */
-.both-banner{max-width:1200px;margin:0 auto 32px;padding:0 40px}
-.both-banner-inner{background:linear-gradient(135deg,rgba(124,140,130,0.18) 0%,rgba(124,140,130,0.08) 100%);border:1px solid rgba(124,140,130,0.35);border-radius:16px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;transition:border-color .25s,background .25s}
-.both-banner-inner:hover{border-color:rgba(124,140,130,0.6);background:linear-gradient(135deg,rgba(124,140,130,0.26) 0%,rgba(124,140,130,0.12) 100%)}
-.both-badge{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:700;background:rgba(124,140,130,0.18);padding:5px 12px;border-radius:100px;border:1px solid rgba(124,140,130,0.3);white-space:nowrap}
-.both-banner-text{flex:1}
-.both-banner-text strong{font-size:15px;font-weight:600;letter-spacing:-.01em;display:block;margin-bottom:3px}
-.both-banner-text span{font-size:12px;color:rgba(236,234,227,0.55)}
-.both-banner-price{text-align:right;white-space:nowrap}
-.both-banner-price .both-total{font-size:18px;font-weight:600;letter-spacing:-.02em}
-.both-banner-price .both-deposit{font-size:11px;color:rgba(236,234,227,0.5);margin-top:2px}
-.both-banner-arrow{color:rgba(236,234,227,0.4);font-size:20px;line-height:1}
-/* Product grid */
-.browse-section{padding:0 40px 40px;max-width:1200px;margin:0 auto}
-.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);margin-bottom:48px}
-.pcard{position:relative;border-radius:18px;background:#141618;padding:clamp(28px,4vw,44px);display:flex;flex-direction:column;border:1px solid rgba(236,234,227,0.08);transition:border-color .3s,background .3s}
-.pcard:hover{border-color:rgba(236,234,227,0.18);background:#1a1d1f}
-.pcard-thumb{width:100%;aspect-ratio:3/4;border-radius:14px;background:#0a0c0e;margin-bottom:clamp(24px,3vw,32px);overflow:hidden}
-.pcard-thumb img{width:100%;height:100%;object-fit:contain;display:block}
-.pcard-meta{margin-bottom:20px}
-.pcard-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;display:block}
-.pcard-name{font-size:clamp(28px,3.5vw,36px);font-weight:300;letter-spacing:-.03em;margin:16px 0 12px;line-height:1.05}
-.pcard-availability{font-size:11px;letter-spacing:.1em;color:rgba(236,234,227,0.45);margin-bottom:24px;text-transform:uppercase}
-.pcard-price{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;margin-bottom:24px}
-.price-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(236,234,227,0.4)}
-.price-amt{font-size:20px;font-weight:500;letter-spacing:-.01em}
-.deposit-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(236,234,227,0.4)}
-.deposit-amt{font-size:16px;font-weight:500;letter-spacing:-.01em;color:rgba(236,234,227,0.75)}
-.pcard-btn{width:100%;background:var(--bone);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;padding:16px;border-radius:100px;border:none;cursor:pointer;transition:background .2s,transform .2s;margin-top:auto}
-.pcard-btn:hover{background:#fff;transform:translateY(-2px)}
-.disclaimer{text-align:center;font-size:11px;color:rgba(236,234,227,0.45);margin-top:40px;padding-top:32px;border-top:1px solid rgba(236,234,227,0.08);letter-spacing:.01em;line-height:1.6}
-/* Form section */
-.form-section{display:none;padding:0 40px;max-width:800px;margin:0 auto}
-.gather-form{background:#0a0c0e;border-radius:18px;padding:clamp(32px,5vw,48px);margin-bottom:48px}
-.form-title{font-size:clamp(24px,4vw,32px);font-weight:300;letter-spacing:-.03em;margin-bottom:6px}
-.form-subtitle{font-size:13px;color:rgba(236,234,227,0.5);margin-bottom:28px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
-.form-group{display:flex;flex-direction:column}
-.form-group.full{grid-column:1/-1}
-.form-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;font-weight:600}
-.form-input{font-family:inherit;font-size:14px;color:var(--bone);background:rgba(236,234,227,.06);border:1px solid rgba(236,234,227,.12);border-radius:10px;padding:12px 14px;outline:none;transition:border-color .2s,background .2s}
-.form-input::placeholder{color:rgba(236,234,227,.3)}
-.form-input:focus{border-color:var(--sage);background:rgba(124,140,130,.08)}
-.form-input:-webkit-autofill,.form-input:-webkit-autofill:hover,.form-input:-webkit-autofill:focus{-webkit-text-fill-color:var(--bone);-webkit-box-shadow:0 0 0 1000px rgba(30,35,32,1) inset;box-shadow:0 0 0 1000px rgba(30,35,32,1) inset;caret-color:var(--bone);border-color:rgba(236,234,227,.12);transition:background-color 5000s ease-in-out 0s}
-.form-note{font-size:11px;color:rgba(236,234,227,.5);margin-top:6px}
-/* Add-on upsell */
-.addon-section{margin:28px 0;border:1px solid rgba(124,140,130,0.3);border-radius:14px;overflow:hidden;transition:border-color .25s}
-.addon-section.checked{border-color:rgba(124,140,130,0.7);background:rgba(124,140,130,0.05)}
-.addon-header{display:flex;align-items:center;gap:16px;padding:20px 22px;cursor:pointer}
-.addon-thumb{width:64px;height:64px;border-radius:10px;background:#141618;overflow:hidden;flex-shrink:0}
-.addon-thumb img{width:100%;height:100%;object-fit:contain}
-.addon-info{flex:1;min-width:0}
-.addon-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:700;margin-bottom:4px}
-.addon-name{font-size:15px;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
-.addon-desc{font-size:11px;color:rgba(236,234,227,0.5);line-height:1.4}
-.addon-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.addon-price{font-size:13px;font-weight:500;color:rgba(236,234,227,0.75)}
-.addon-toggle{width:44px;height:26px;border-radius:100px;background:rgba(236,234,227,0.12);border:1.5px solid rgba(236,234,227,0.2);position:relative;transition:background .25s,border-color .25s;cursor:pointer;flex-shrink:0}
-.addon-toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:rgba(236,234,227,0.5);transition:transform .25s,background .25s}
-.addon-section.checked .addon-toggle{background:var(--sage);border-color:var(--sage)}
-.addon-section.checked .addon-toggle::after{transform:translateX(18px);background:#fff}
-.addon-body{display:none;padding:0 22px 20px}
-.addon-section.checked .addon-body{display:block}
-.addon-size-row{margin-top:4px}
-/* Deposit summary */
-.deposit-summary{background:rgba(236,234,227,.04);border:1px solid rgba(236,234,227,.1);border-radius:12px;padding:clamp(20px,3vw,28px);margin:28px 0}
-.deposit-line{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin:8px 0}
-.deposit-line .lbl{color:rgba(236,234,227,.65)}
-.deposit-line .amt{font-weight:500}
-.deposit-total{border-top:1px solid rgba(236,234,227,.12);padding-top:12px;margin-top:12px;font-size:14px;font-weight:600;display:flex;justify-content:space-between}
-.form-btn{width:100%;background:var(--bone);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;padding:16px;border-radius:100px;border:none;cursor:pointer;transition:background .2s,transform .2s;margin-top:20px}
-.form-btn:hover{background:#fff;transform:translateY(-2px)}
-.form-btn:active{transform:translateY(-1px)}
-.back-link{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--bone);text-decoration:none;margin-bottom:32px;transition:opacity .2s}
-.back-link:hover{opacity:.6}.back-link svg{width:14px;height:14px}
-@media(max-width:900px){
-  .topbar{padding:16px 22px}
-  .page-hero{padding:80px 22px 48px}
-  .both-banner{padding:0 22px}
-  .both-banner-inner{flex-wrap:wrap;gap:14px}
-  .browse-section{padding:0 22px 40px}
-  .product-grid{grid-template-columns:1fr;gap:28px}
-  .form-section{padding:0 22px}
-  .form-grid{grid-template-columns:1fr}
-}
-.reserved-badge{position:absolute;top:16px;right:16px;background:var(--sage);color:var(--ink);font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 12px;border-radius:100px;text-transform:uppercase}
-</style>
-</head>
-<body>
-<div class="topbar">
-  <a href="yogacloak-index.html" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
-  <div style="display:flex;gap:24px;align-items:center">
-    <a href="yogacloak-faq.html">FAQ</a>
-    <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a>
-  </div>
-</div>
-
-<section class="page-hero">
-  <h1>What are you taking home?</h1>
-  <p class="subtitle">A small deposit saves your spot in the first drop. Estimated ship window: November 2027.</p>
-  <span class="label">PICK YOURS</span>
-</section>
-
-<!-- "Reserve both" banner -->
-<div class="both-banner" id="bothBannerWrap">
-  <div class="both-banner-inner" id="bothBannerBtn">
-    <span class="both-badge">Most popular</span>
-    <div class="both-banner-text">
-      <strong>Reserve both — The Cloak &amp; The Wrap</strong>
-      <span>Two ways to leave class covered. Save your spot on the full set.</span>
-    </div>
-    <div class="both-banner-price">
-      <div class="both-total">$35 deposit</div>
-      <div class="both-deposit">holds both spots</div>
-    </div>
-    <div class="both-banner-arrow">&#8594;</div>
-  </div>
-</div>
-
-<section class="browse-section" id="browseSection">
-  <div class="product-grid">
-    <!-- Cloak card -->
-    <div class="pcard" data-product="cloak">
-      <div class="pcard-thumb">
-        <img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape" loading="lazy" decoding="async">
-      </div>
-      <div class="pcard-meta">
-        <span class="pcard-label">For the drive home</span>
-        <h2 class="pcard-name">The Cloak</h2>
-        <span class="pcard-availability">First drop: 100 pieces</span>
-      </div>
-      <div class="pcard-price" style="grid-template-columns:auto 1fr">
-          <span class="deposit-label">Deposit to reserve</span>
-          <span class="deposit-amt">$20</span>
-        </div>
-      <p style="font-size:12px;color:rgba(236,234,227,0.6);line-height:1.5;margin-bottom:20px">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin.</p>
-      <button class="pcard-btn" data-action="select-product" data-product="cloak">I'll Take the Cloak</button>
-    </div>
-    <!-- Wrap card -->
-    <div class="pcard" data-product="wrap">
-      <div class="pcard-thumb">
-        <img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape" loading="lazy" decoding="async">
-      </div>
-      <div class="pcard-meta">
-        <span class="pcard-label">For the walk home</span>
-        <h2 class="pcard-name">The Wrap</h2>
-        <span class="pcard-availability">First drop: 100 pieces</span>
-      </div>
-      <div class="pcard-price" style="grid-template-columns:auto 1fr">
-          <span class="deposit-label">Deposit to reserve</span>
-          <span class="deposit-amt">$15</span>
-        </div>
-      <p style="font-size:12px;color:rgba(236,234,227,0.6);line-height:1.5;margin-bottom:20px">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing.</p>
-      <button class="pcard-btn" data-action="select-product" data-product="wrap">I'll Take the Wrap</button>
-    </div>
-  </div>
-  <p class="disclaimer">Reservation deposit only. Applied toward your final order.</p>
-</section>
-
-<!-- Form section (shown after product selection) -->
-<section class="form-section" id="formSection" style="padding-top:100px">
-  <a href="#" class="back-link" id="formBackBtn">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Back
-  </a>
-  <div class="gather-form">
-    <h3 class="form-title" id="formTitle">Your reservation</h3>
-    <p class="form-subtitle" id="formSubtitle">Reserve your spot in the first drop.</p>
-
-    <form id="reserveForm">
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">First name</label>
-          <input type="text" id="inputFirst" class="form-input" placeholder="Jane" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Last name</label>
-          <input type="text" id="inputLast" class="form-input" placeholder="Smith" required>
-        </div>
-        <div class="form-group full">
-          <label class="form-label">Email</label>
-          <input type="email" id="inputEmail" class="form-input" placeholder="jane@example.com" required>
-          <p class="form-note">We'll send your confirmation and launch updates here.</p>
-        </div>
-        <!-- Cloak size (shown when cloak is selected) -->
-        <div class="form-group full" id="sizeGroup" style="display:none">
-          <label class="form-label">Cloak size</label>
-          <select class="form-input" id="sizeSelect">
-              <option value="">Select a size</option>
-              <option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>
-              <option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>
-            </select>
-          <p class="form-note">One size fits most. Runs oversized. Unisex cut.</p>
-        </div>
-      </div>
-
-      <!-- Add-on upsell: shown when only one product selected -->
-      <div class="addon-section" id="addonSection" style="display:none">
-        <div class="addon-header" id="addonToggleBtn">
-          <div class="addon-thumb">
-            <img id="addonImg" src="" alt="">
-          </div>
-          <div class="addon-info">
-            <div class="addon-eyebrow">Add on &amp; save your spot</div>
-            <div class="addon-name" id="addonName"></div>
-            <div class="addon-desc" id="addonDesc"></div>
-          </div>
-          <div class="addon-right">
-            <div class="addon-price" id="addonPrice"></div>
-            <div class="addon-toggle" id="addonToggle"></div>
-          </div>
-        </div>
-        <!-- Addon size field (shown for Cloak addon) -->
-        <div class="addon-body">
-          <div class="addon-size-row" id="addonSizeRow" style="display:none">
-            <label class="form-label" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;font-weight:600;display:block">Cloak size</label>
-            <select class="form-input" id="addonSizeSelect">
-                <option value="">Select a size</option>
-                <option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>
-                <option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>
-              </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Deposit summary -->
-      <div class="deposit-summary">
-        <div class="deposit-line" id="depositLineCloak" style="display:none">
-          <span class="lbl">The Cloak — $20 deposit</span>
-          <span class="amt">$20</span>
-        </div>
-        <div class="deposit-line" id="depositLineWrap" style="display:none">
-          <span class="lbl">The Wrap — $15 deposit</span>
-          <span class="amt">$15</span>
-        </div>
-        <div class="deposit-total">
-          <span>Total deposit today</span>
-          <span id="totalDeposit">$0</span>
-        </div>
-      </div>
-
-      <button type="submit" class="form-btn" id="submitBtn">Reserve your spot</button>
-      <p style="font-size:10px;color:rgba(236,234,227,.4);text-align:center;margin-top:16px;letter-spacing:.05em">Powered by Stripe. Non-refundable. Transferable.</p>
-    </form>
-  </div>
-</section>
-
-<script>
-// Product data
-const PRODUCTS = {
-  cloak: { name:'The Cloak', deposit:20, price:98, img:'cloak-card.jpg', desc:'Hooded, open-front, mid-thigh. 300 GSM recycled microfiber.' },
-  wrap:  { name:'The Wrap',  deposit:15, price:68, img:'wrap-card.jpg',  desc:'Oversized rectangular drape. 200 GSM, packs down to nothing.' }
-};
-
-let selectedProducts = []; // array of product keys, e.g. ['cloak'] or ['cloak','wrap']
-
-// "Reserve both" banner
-document.getElementById('bothBannerBtn').addEventListener('click', function() {
-  openForm(['cloak','wrap']);
-});
-
-// Individual product buttons
-document.querySelectorAll('[data-action="select-product"]').forEach(btn => {
-  btn.addEventListener('click', function() {
-    openForm([this.dataset.product]);
-  });
-});
-
-function openForm(products) {
-  selectedProducts = products;
-  const browseSection = document.getElementById('browseSection');
-  const bothBanner = document.getElementById('bothBannerWrap');
-  const formSection = document.getElementById('formSection');
-
-  renderForm();
-
-  browseSection.style.display = 'none';
-  bothBanner.style.display = 'none';
-  formSection.style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function renderForm() {
-  const hasCloak = selectedProducts.includes('cloak');
-  const hasWrap  = selectedProducts.includes('wrap');
-  const hasBoth  = hasCloak && hasWrap;
-
-  // Title + subtitle
-  const title = document.getElementById('formTitle');
-  const sub   = document.getElementById('formSubtitle');
-  if (hasBoth) {
-    title.textContent = 'The Cloak + The Wrap';
-    sub.textContent   = 'You\'re reserving both — the full set. Spot locked with a $35 deposit.';
-  } else if (hasCloak) {
-    title.textContent = 'The Cloak';
-    sub.textContent   = 'Reserve your spot for The Cloak with a $20 deposit.';
-  } else {
-    title.textContent = 'The Wrap';
-    sub.textContent   = 'Reserve your spot for The Wrap with a $15 deposit.';
-  }
-
-  // Cloak size field
-  document.getElementById('sizeGroup').style.display = hasCloak ? 'flex' : 'none';
-
-  // Add-on section (only shown if NOT already both)
-  const addonSection = document.getElementById('addonSection');
-  if (!hasBoth) {
-    const addonKey = hasCloak ? 'wrap' : 'cloak';
-    const addon = PRODUCTS[addonKey];
-    document.getElementById('addonImg').src  = addon.img;
-    document.getElementById('addonImg').alt  = addon.name;
-    document.getElementById('addonName').textContent = addon.name;
-    document.getElementById('addonDesc').textContent = addon.desc;
-    document.getElementById('addonPrice').textContent = '$' + addon.deposit + ' deposit';
-    // Cloak size row inside addon
-    document.getElementById('addonSizeRow').style.display = (addonKey === 'cloak') ? 'block' : 'none';
-    addonSection.style.display = 'block';
-    addonSection.classList.remove('checked');
-  } else {
-    addonSection.style.display = 'none';
-  }
-
-  updateSummary();
-}
-
-// Toggle the add-on
-document.getElementById('addonToggleBtn').addEventListener('click', function() {
-  const section = document.getElementById('addonSection');
-  section.classList.toggle('checked');
-  updateSummary();
-});
-
-function updateSummary() {
-  const hasCloak = selectedProducts.includes('cloak');
-  const hasWrap  = selectedProducts.includes('wrap');
-  const addonChecked = document.getElementById('addonSection').classList.contains('checked');
-  const addonKey = hasCloak ? 'wrap' : 'cloak';
-
-  let showCloak = hasCloak || (addonChecked && addonKey === 'cloak');
-  let showWrap  = hasWrap  || (addonChecked && addonKey === 'wrap');
-
-  document.getElementById('depositLineCloak').style.display = showCloak ? 'flex' : 'none';
-  document.getElementById('depositLineWrap').style.display  = showWrap  ? 'flex' : 'none';
-
-  let total = 0;
-  if (showCloak) total += 20;
-  if (showWrap)  total += 15;
-  document.getElementById('totalDeposit').textContent = '$' + total;
-
-  // Update submit button
-  const btn = document.getElementById('submitBtn');
-  if (showCloak && showWrap) {
-    btn.textContent = 'Reserve both — $35 deposit';
-  } else if (showCloak) {
-    btn.textContent = 'Reserve The Cloak — $20 deposit';
-  } else {
-    btn.textContent = 'Reserve The Wrap — $15 deposit';
-  }
-}
-
-// Back button
-document.getElementById('formBackBtn').addEventListener('click', function(e) {
-  e.preventDefault();
-  document.getElementById('formSection').style.display = 'none';
-  document.getElementById('browseSection').style.display = 'block';
-  document.getElementById('bothBannerWrap').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-// Form submit
-document.getElementById('reserveForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const hasCloak = selectedProducts.includes('cloak');
-  const hasWrap  = selectedProducts.includes('wrap');
-  const addonChecked = document.getElementById('addonSection').classList.contains('checked');
-  const addonKey = hasCloak ? 'wrap' : 'cloak';
-
-  const products = [...selectedProducts];
-  if (addonChecked && !products.includes(addonKey)) products.push(addonKey);
-
-  // Build size info
-  const cloakSize = document.getElementById('sizeSelect').value || document.getElementById('addonSizeSelect').value || '';
-
-  const payload = {
-    first_name: document.getElementById('inputFirst').value,
-    last_name:  document.getElementById('inputLast').value,
-    email:      document.getElementById('inputEmail').value,
-    products:   products,
-    size:       cloakSize
-  };
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to checkout…';
-
-  fetch('/api/reserve', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.checkout_url || data.url) {
-      window.location.href = data.checkout_url || data.url;
-    } else {
-      btn.disabled = false;
-      renderForm();
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve — yogacloak</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/hanken-grotesk-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#1E2320;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--bone:#ECEAE3;--cream:236,234,227}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{font-family:'Hanken Grotesk',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+    body{background:var(--ink);color:var(--bone);overflow-x:hidden}
+    .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(236,234,227,0.08)}
+    .wordmark{font-size:18px;letter-spacing:-.005em;line-height:1}.wordmark .thin{font-weight:400}.wordmark .bold{font-weight:600}
+    .topbar a{font-size:12px;font-weight:600;color:var(--bone);text-decoration:none;transition:opacity .2s}.topbar a:hover{opacity:.6}
+    .page-hero{position:relative;padding:120px 40px 60px;text-align:center;background:var(--ink)}
+    .page-hero h1{font-size:clamp(36px,5vw,56px);font-weight:300;letter-spacing:-.035em;line-height:1.1;margin-bottom:12px}
+    .page-hero .subtitle{font-size:14px;color:rgba(236,234,227,0.6);letter-spacing:.02em;line-height:1.6;max-width:600px;margin:0 auto 48px}
+    .page-hero .label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(236,234,227,0.4);margin-bottom:32px}
+    .both-banner{max-width:1200px;margin:0 auto 32px;padding:0 40px}
+    .both-banner-inner{background:linear-gradient(135deg,rgba(124,140,130,0.18) 0%,rgba(124,140,130,0.08) 100%);border:1px solid rgba(124,140,130,0.35);border-radius:16px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;transition:border-color .25s,background .25s}
+    .both-banner-inner:hover{border-color:rgba(124,140,130,0.6);background:linear-gradient(135deg,rgba(124,140,130,0.26) 0%,rgba(124,140,130,0.12) 100%)}
+    .both-badge{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:700;background:rgba(124,140,130,0.18);padding:5px 12px;border-radius:100px;border:1px solid rgba(124,140,130,0.3);white-space:nowrap}
+    .both-banner-text{flex:1}
+    .both-banner-text strong{font-size:15px;font-weight:600;letter-spacing:-.01em;display:block;margin-bottom:3px}
+    .both-banner-text span{font-size:12px;color:rgba(236,234,227,0.55)}
+    .both-banner-price{text-align:right;white-space:nowrap}
+    .both-banner-price .both-total{font-size:18px;font-weight:600;letter-spacing:-.02em}
+    .both-banner-price .both-deposit{font-size:11px;color:rgba(236,234,227,0.5);margin-top:2px}
+    .both-banner-arrow{color:rgba(236,234,227,0.4);font-size:20px;line-height:1}
+    .browse-section{padding:0 40px 40px;max-width:1200px;margin:0 auto}
+    .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);margin-bottom:48px}
+    .pcard{position:relative;border-radius:18px;background:#141618;padding:clamp(28px,4vw,44px);display:flex;flex-direction:column;border:1px solid rgba(236,234,227,0.08);transition:border-color .3s,background .3s}
+    .pcard:hover{border-color:rgba(236,234,227,0.18);background:#1a1d1f}
+    .pcard.soldout{opacity:.6;pointer-events:none}
+    .pcard-thumb{width:100%;aspect-ratio:3/4;border-radius:14px;background:#0a0c0e;margin-bottom:clamp(24px,3vw,32px);overflow:hidden}
+    .pcard-thumb img{width:100%;height:100%;object-fit:contain;display:block}
+    .pcard-meta{margin-bottom:20px}
+    .pcard-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;display:block}
+    .pcard-name{font-size:clamp(28px,3.5vw,36px);font-weight:300;letter-spacing:-.03em;margin:16px 0 12px;line-height:1.05}
+    .pcard-availability{font-size:11px;letter-spacing:.1em;color:rgba(236,234,227,0.45);margin-bottom:24px;text-transform:uppercase}
+    .pcard-availability.low{color:#c4845a}
+    .pcard-availability.soldout-label{color:#a06860}
+    .pcard-price{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;margin-bottom:24px}
+    .price-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(236,234,227,0.4)}
+    .price-amt{font-size:20px;font-weight:500;letter-spacing:-.01em}
+    .deposit-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(236,234,227,0.4)}
+    .deposit-amt{font-size:16px;font-weight:500;letter-spacing:-.01em;color:rgba(236,234,227,0.75)}
+    .pcard-btn{width:100%;background:var(--bone);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;padding:16px;border-radius:100px;border:none;cursor:pointer;transition:background .2s,transform .2s;margin-top:auto}
+    .pcard-btn:hover{background:#fff;transform:translateY(-2px)}
+    .pcard-btn.soldout-btn{background:rgba(236,234,227,0.15);color:rgba(236,234,227,0.4);cursor:not-allowed}
+    .disclaimer{text-align:center;font-size:11px;color:rgba(236,234,227,0.45);margin-top:40px;padding-top:32px;border-top:1px solid rgba(236,234,227,0.08);letter-spacing:.01em;line-height:1.6}
+    .form-section{display:none;padding:0 40px;max-width:800px;margin:0 auto}
+    .gather-form{background:#0a0c0e;border-radius:18px;padding:clamp(32px,5vw,48px);margin-bottom:48px}
+    .form-title{font-size:clamp(24px,4vw,32px);font-weight:300;letter-spacing:-.03em;margin-bottom:6px}
+    .form-subtitle{font-size:13px;color:rgba(236,234,227,0.5);margin-bottom:28px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+    .form-group{display:flex;flex-direction:column}
+    .form-group.full{grid-column:1/-1}
+    .form-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;font-weight:600}
+    .form-input{font-family:inherit;font-size:14px;color:var(--bone);background:rgba(236,234,227,.06);border:1px solid rgba(236,234,227,.12);border-radius:10px;padding:12px 14px;outline:none;transition:border-color .2s,background .2s}
+    .form-input::placeholder{color:rgba(236,234,227,.3)}
+    .form-input:focus{border-color:var(--sage);background:rgba(124,140,130,.08)}
+    .form-input:-webkit-autofill,.form-input:-webkit-autofill:hover,.form-input:-webkit-autofill:focus{-webkit-text-fill-color:var(--bone);-webkit-box-shadow:0 0 0 1000px rgba(30,35,32,1) inset;box-shadow:0 0 0 1000px rgba(30,35,32,1) inset;caret-color:var(--bone);border-color:rgba(236,234,227,.12);transition:background-color 5000s ease-in-out 0s}
+    .form-note{font-size:11px;color:rgba(236,234,227,.5);margin-top:6px}
+    .addon-section{margin:28px 0;border:1px solid rgba(124,140,130,0.3);border-radius:14px;overflow:hidden;transition:border-color .25s}
+    .addon-section.checked{border-color:rgba(124,140,130,0.7);background:rgba(124,140,130,0.05)}
+    .addon-header{display:flex;align-items:center;gap:16px;padding:20px 22px;cursor:pointer}
+    .addon-thumb{width:64px;height:64px;border-radius:10px;background:#141618;overflow:hidden;flex-shrink:0}
+    .addon-thumb img{width:100%;height:100%;object-fit:contain}
+    .addon-info{flex:1;min-width:0}
+    .addon-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:700;margin-bottom:4px}
+    .addon-name{font-size:15px;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
+    .addon-desc{font-size:11px;color:rgba(236,234,227,0.5);line-height:1.4}
+    .addon-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+    .addon-price{font-size:13px;font-weight:500;color:rgba(236,234,227,0.75)}
+    .addon-toggle{width:44px;height:26px;border-radius:100px;background:rgba(236,234,227,0.12);border:1.5px solid rgba(236,234,227,0.2);position:relative;transition:background .25s,border-color .25s;cursor:pointer;flex-shrink:0}
+    .addon-toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:rgba(236,234,227,0.5);transition:transform .25s,background .25s}
+    .addon-section.checked .addon-toggle{background:var(--sage);border-color:var(--sage)}
+    .addon-section.checked .addon-toggle::after{transform:translateX(18px);background:#fff}
+    .addon-body{display:none;padding:0 22px 20px}
+    .addon-section.checked .addon-body{display:block}
+    .addon-size-row{margin-top:4px}
+    .deposit-summary{background:rgba(236,234,227,.04);border:1px solid rgba(236,234,227,.1);border-radius:12px;padding:clamp(20px,3vw,28px);margin:28px 0}
+    .deposit-line{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin:8px 0}
+    .deposit-line .lbl{color:rgba(236,234,227,.65)}
+    .deposit-line .amt{font-weight:500}
+    .deposit-total{border-top:1px solid rgba(236,234,227,.12);padding-top:12px;margin-top:12px;font-size:14px;font-weight:600;display:flex;justify-content:space-between}
+    .form-btn{width:100%;background:var(--bone);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;padding:16px;border-radius:100px;border:none;cursor:pointer;transition:background .2s,transform .2s;margin-top:20px}
+    .form-btn:hover{background:#fff;transform:translateY(-2px)}
+    .form-btn:active{transform:translateY(-1px)}
+    .back-link{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--bone);text-decoration:none;margin-bottom:32px;transition:opacity .2s}
+    .back-link:hover{opacity:.6}.back-link svg{width:14px;height:14px}
+    .error-msg{background:rgba(160,104,96,0.15);border:1px solid rgba(160,104,96,0.4);border-radius:10px;padding:14px 18px;font-size:13px;color:#e0a090;margin-top:16px;display:none}
+    @media(max-width:900px){
+      .topbar{padding:16px 22px}
+      .page-hero{padding:80px 22px 48px}
+      .both-banner{padding:0 22px}
+      .both-banner-inner{flex-wrap:wrap;gap:14px}
+      .browse-section{padding:0 22px 40px}
+      .product-grid{grid-template-columns:1fr;gap:28px}
+      .form-section{padding:0 22px}
+      .form-grid{grid-template-columns:1fr}
     }
-  })
-  .catch(err => {
-    console.error(err);
-    btn.disabled = false;
-    renderForm();
-  });
-});
+    .reserved-badge{position:absolute;top:16px;right:16px;background:var(--sage);color:var(--ink);font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 12px;border-radius:100px;text-transform:uppercase}
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <a href="/" class="wordmark"><span class="thin">yoga</span>span><span class="bold">cloak</span>span></a>a>
+      <div style="display:flex;gap:24px;align-items:center">
+        <a href="/faq">FAQ</a>a>
+        <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a>a>
+      </div>div>
+    </div>div>
 
-// Handle ?product= URL param (deep link from main page)
-const params = new URLSearchParams(window.location.search);
-const preselect = params.get('product');
-if (preselect && PRODUCTS[preselect]) {
-  openForm([preselect]);
-}
-</script>
-</body>
-</html>
+    <section class="page-hero">
+      <h1>What are you taking home?</h1>
+    <p class="subtitle">A small deposit saves your spot in the first drop. Estimated ship window: November 2027.</p>p>
+    <span class="label">PICK YOURS</span>span>
+    </section>section>
+  
+  <div class="both-banner" id="bothBannerWrap">
+  <div class="both-banner-inner" id="bothBannerBtn">
+  <span class="both-badge">Most popular</span>span>
+  <div class="both-banner-text">
+  <strong>Reserve both — The Cloak &amp; The Wrap</strong>
+  <span>Two ways to leave class covered. Save your spot on the full set.</span>
+  </div>div>
+  <div class="both-banner-price">
+  <div class="both-total">$35 deposit</div>div>
+  <div class="both-deposit">holds both spots</div>div>
+  </div>div>
+  <div class="both-banner-arrow">&#8594;</div>div>
+  </div>div>
+  </div>div>
+  
+  <section class="browse-section" id="browseSection">
+  <div class="product-grid">
+  <div class="pcard" data-product="cloak" id="pcardCloak">
+  <div class="pcard-thumb">
+  <img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape" loading="lazy" decoding="async">
+  </div>div>
+  <div class="pcard-meta">
+  <span class="pcard-label">For the drive home</span>
+  <h2 class="pcard-name">The Cloak</h2>
+  <span class="pcard-availability" id="availCloak">First drop: 100 pieces</span>
+  </div>div>
+  <div class="pcard-price" style="grid-template-columns:auto 1fr">
+  <span class="deposit-label">Deposit to reserve</span>
+  <span class="deposit-amt">$20</span>
+  </div>div>
+  <p style="font-size:12px;color:rgba(236,234,227,0.6);line-height:1.5;margin-bottom:20px">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin.</p>p>
+  <button class="pcard-btn" id="btnCloak" data-action="select-product" data-product="cloak">I'll Take the Cloak</button>button>
+  </div>div>
+  <div class="pcard" data-product="wrap" id="pcardWrap">
+  <div class="pcard-thumb">
+  <img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape" loading="lazy" decoding="async">
+  </div>div>
+  <div class="pcard-meta">
+  <span class="pcard-label">For the walk home</span>
+  <h2 class="pcard-name">The Wrap</h2>
+  <span class="pcard-availability" id="availWrap">First drop: 100 pieces</span>
+  </div>div>
+  <div class="pcard-price" style="grid-template-columns:auto 1fr">
+  <span class="deposit-label">Deposit to reserve</span>
+  <span class="deposit-amt">$15</span>
+  </div>div>
+  <p style="font-size:12px;color:rgba(236,234,227,0.6);line-height:1.5;margin-bottom:20px">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing.</p>p>
+  <button class="pcard-btn" id="btnWrap" data-action="select-product" data-product="wrap">I'll Take the Wrap</button>button>
+  </div>div>
+  </div>div>
+  <p class="disclaimer">Reservation deposit only. Applied toward your final order.</p>p>
+  </section>section>
+  
+  <section class="form-section" id="formSection" style="padding-top:100px">
+  <a href="#" class="back-link" id="formBackBtn">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>svg>
+  Back
+  </a>a>
+  <div class="gather-form">
+  <h3 class="form-title" id="formTitle">Your reservation</h3>
+  <p class="form-subtitle" id="formSubtitle">Reserve your spot in the first drop.</p>p>
+  
+  <form id="reserveForm">
+  <div class="form-grid">
+  <div class="form-group">
+  <label class="form-label">First name</label>label>
+  <input type="text" id="inputFirst" class="form-input" placeholder="Jane" required>
+  </div>div>
+  <div class="form-group">
+  <label class="form-label">Last name</label>label>
+  <input type="text" id="inputLast" class="form-input" placeholder="Smith" required>
+  </div>div>
+  <div class="form-group full">
+  <label class="form-label">Email</label>label>
+  <input type="email" id="inputEmail" class="form-input" placeholder="jane@example.com" required>
+  <p class="form-note">We'll send your confirmation and launch updates here.</p>p>
+  </div>div>
+  <div class="form-group full" id="sizeGroup" style="display:none">
+  <label class="form-label">Cloak size</label>label>
+  <select class="form-input" id="sizeSelect">
+  <option value="">Select a size</option>option>
+  <option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>option>
+  <option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>option>
+  </select>select>
+  <p class="form-note">One size fits most. Runs oversized. Unisex cut.</p>p>
+  </div>div>
+  </div>div>
+  
+  <div class="addon-section" id="addonSection" style="display:none">
+  <div class="addon-header" id="addonToggleBtn">
+  <div class="addon-thumb">
+  <img id="addonImg" src="" alt="">
+  </div>div>
+  <div class="addon-info">
+  <div class="addon-eyebrow">Add on &amp; save your spot</div>div>
+  <div class="addon-name" id="addonName"></div>div>
+  <div class="addon-desc" id="addonDesc"></div>div>
+  </div>div>
+  <div class="addon-right">
+  <div class="addon-price" id="addonPrice"></div>div>
+  <div class="addon-toggle" id="addonToggle"></div>div>
+  </div>div>
+  </div>div>
+  <div class="addon-body">
+  <div class="addon-size-row" id="addonSizeRow" style="display:none">
+  <label class="form-label" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;font-weight:600;display:block">Cloak size</label>label>
+  <select class="form-input" id="addonSizeSelect">
+  <option value="">Select a size</option>option>
+  <option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>option>
+  <option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>option>
+  </select>select>
+  </div>div>
+  </div>div>
+  </div>div>
+  
+  <div class="deposit-summary">
+  <div class="deposit-line" id="depositLineCloak" style="display:none">
+  <span class="lbl">The Cloak — $20 deposit</span>
+  <span class="amt">$20</span>
+  </div>div>
+  <div class="deposit-line" id="depositLineWrap" style="display:none">
+  <span class="lbl">The Wrap — $15 deposit</span>
+  <span class="amt">$15</span>
+  </div>div>
+  <div class="deposit-total">
+  <span>Total deposit today</span>
+  <span id="totalDeposit">$0</span>
+  </div>div>
+  </div>div>
+  
+  <button type="submit" class="form-btn" id="submitBtn">Reserve your spot</button>button>
+  <div class="error-msg" id="errorMsg"></div>div>
+  <p style="font-size:10px;color:rgba(236,234,227,.4);text-align:center;margin-top:16px;letter-spacing:.05em">Powered by Stripe. Non-refundable. Transferable.</p>p>
+  </form>form>
+  </div>div>
+  </section>section>
+  
+  <script>
+    const TOTAL = 100;
+    const PRODUCTS = {
+        cloak: { name:'The Cloak', deposit:20, price:98, img:'cloak-card.jpg', desc:'Hooded, open-front, mid-thigh. 300 GSM recycled microfiber.' },
+        wrap:  { name:'The Wrap',  deposit:15, price:68, img:'wrap-card.jpg',  desc:'Oversized rectangular drape. 200 GSM, packs down to nothing.' }
+    };
+
+    let selectedProducts = [];
+    let availability = { cloak: TOTAL, wrap: TOTAL };
+
+    // ── Load live availability on page load ──────────────────────────────────────
+    async function loadAvailability() {
+        try {
+              const res = await fetch('/api/availability');
+              if (!res.ok) return;
+              const data = await res.json();
+              availability = { cloak: data.cloak ?? TOTAL, wrap: data.wrap ?? TOTAL };
+              updateAvailabilityUI();
+        } catch (e) {
+              // silently fail — defaults to 100
+        }
+    }
+
+    function updateAvailabilityUI() {
+        ['cloak', 'wrap'].forEach(key => {
+              const remaining = availability[key];
+              const label = document.getElementById('avail' + key.charAt(0).toUpperCase() + key.slice(1));
+              const btn = document.getElementById('btn' + key.charAt(0).toUpperCase() + key.slice(1));
+              const card = document.getElementById('pcard' + key.charAt(0).toUpperCase() + key.slice(1));
+
+              if (!label) return;
+
+              const taken = TOTAL - remaining;
+
+              if (remaining <= 0) {
+                      label.textContent = 'Sold out — first drop full';
+                      label.className = 'pcard-availability soldout-label';
+                      btn.textContent = 'Sold Out';
+                      btn.classList.add('soldout-btn');
+                      btn.disabled = true;
+                      card.classList.add('soldout');
+              } else if (remaining <= 20) {
+                      label.textContent = remaining + ' of ' + TOTAL + ' spots left — almost gone';
+                      label.className = 'pcard-availability low';
+              } else {
+                      label.textContent = taken + ' of ' + TOTAL + ' spots reserved';
+                      label.className = 'pcard-availability';
+              }
+        });
+    }
+
+    loadAvailability();
+
+    // ── Product selection ─────────────────────────────────────────────────────────
+    document.getElementById('bothBannerBtn').addEventListener('click', function() {
+        openForm(['cloak','wrap']);
+    });
+
+    document.querySelectorAll('[data-action="select-product"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+              if (this.disabled) return;
+              openForm([this.dataset.product]);
+        });
+    });
+
+    function openForm(products) {
+        selectedProducts = products;
+        renderForm();
+        document.getElementById('browseSection').style.display = 'none';
+        document.getElementById('bothBannerWrap').style.display = 'none';
+        document.getElementById('formSection').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderForm() {
+        const hasCloak = selectedProducts.includes('cloak');
+        const hasWrap = selectedProducts.includes('wrap');
+        const hasBoth = hasCloak && hasWrap;
+
+        const title = document.getElementById('formTitle');
+        const sub = document.getElementById('formSubtitle');
+        if (hasBoth) {
+              title.textContent = 'The Cloak + The Wrap';
+              sub.textContent = "You're reserving both — the full set. Spot locked with a $35 deposit.";
+        } else if (hasCloak) {
+              title.textContent = 'The Cloak';
+              sub.textContent = 'Reserve your spot for The Cloak with a $20 deposit.';
+        } else {
+              title.textContent = 'The Wrap';
+              sub.textContent = 'Reserve your spot for The Wrap with a $15 deposit.';
+        }
+
+        document.getElementById('sizeGroup').style.display = hasCloak ? 'flex' : 'none';
+
+        const addonSection = document.getElementById('addonSection');
+        if (!hasBoth) {
+              const addonKey = hasCloak ? 'wrap' : 'cloak';
+              const addonAvail = availability[addonKey];
+              if (addonAvail > 0) {
+                      const addon = PRODUCTS[addonKey];
+                      document.getElementById('addonImg').src = addon.img;
+                      document.getElementById('addonImg').alt = addon.name;
+                      document.getElementById('addonName').textContent = addon.name;
+                      document.getElementById('addonDesc').textContent = addon.desc;
+                      document.getElementById('addonPrice').textContent = '$' + addon.deposit + ' deposit';
+                      document.getElementById('addonSizeRow').style.display = (addonKey === 'cloak') ? 'block' : 'none';
+                      addonSection.style.display = 'block';
+                      addonSection.classList.remove('checked');
+              } else {
+                      addonSection.style.display = 'none';
+              }
+        } else {
+              addonSection.style.display = 'none';
+        }
+
+        document.getElementById('errorMsg').style.display = 'none';
+        updateSummary();
+    }
+
+    document.getElementById('addonToggleBtn').addEventListener('click', function() {
+        document.getElementById('addonSection').classList.toggle('checked');
+        updateSummary();
+    });
+
+    function updateSummary() {
+        const hasCloak = selectedProducts.includes('cloak');
+        const hasWrap = selectedProducts.includes('wrap');
+        const addonChecked = document.getElementById('addonSection').classList.contains('checked');
+        const addonKey = hasCloak ? 'wrap' : 'cloak';
+
+        const showCloak = hasCloak || (addonChecked && addonKey === 'cloak');
+        const showWrap = hasWrap || (addonChecked && addonKey === 'wrap');
+
+        document.getElementById('depositLineCloak').style.display = showCloak ? 'flex' : 'none';
+        document.getElementById('depositLineWrap').style.display = showWrap ? 'flex' : 'none';
+
+        let total = 0;
+        if (showCloak) total += 20;
+        if (showWrap) total += 15;
+        document.getElementById('totalDeposit').textContent = '$' + total;
+
+        const btn = document.getElementById('submitBtn');
+        if (showCloak && showWrap) {
+              btn.textContent = 'Reserve both — $35 deposit';
+        } else if (showCloak) {
+              btn.textContent = 'Reserve The Cloak — $20 deposit';
+        } else {
+              btn.textContent = 'Reserve The Wrap — $15 deposit';
+        }
+    }
+
+    document.getElementById('formBackBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('browseSection').style.display = 'block';
+        document.getElementById('bothBannerWrap').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ── Form submit → Stripe Checkout ────────────────────────────────────────────
+    document.getElementById('reserveForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const hasCloak = selectedProducts.includes('cloak');
+        const hasWrap = selectedProducts.includes('wrap');
+        const addonChecked = document.getElementById('addonSection').classList.contains('checked');
+        const addonKey = hasCloak ? 'wrap' : 'cloak';
+
+        const products = [...selectedProducts];
+        if (addonChecked && !products.includes(addonKey)) products.push(addonKey);
+
+        const needsSize = products.includes('cloak');
+        const cloakSize = document.getElementById('sizeSelect').value || document.getElementById('addonSizeSelect').value || '';
+
+        if (needsSize && !cloakSize) {
+              document.getElementById('sizeSelect').focus();
+              return;
+        }
+
+        const payload = {
+              first_name: document.getElementById('inputFirst').value.trim(),
+              last_name:  document.getElementById('inputLast').value.trim(),
+              email:      document.getElementById('inputEmail').value.trim(),
+              products:   products,
+              size:       cloakSize
+        };
+
+        const btn = document.getElementById('submitBtn');
+        const errEl = document.getElementById('errorMsg');
+        btn.disabled = true;
+        btn.textContent = 'Redirecting to checkout…';
+        errEl.style.display = 'none';
+
+        fetch('/api/reserve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(data => {
+              if (data.url || data.checkout_url) {
+                      window.location.href = data.url || data.checkout_url;
+              } else {
+                      btn.disabled = false;
+                      renderForm();
+                      errEl.textContent = data.error || 'Something went wrong. Please try again.';
+                      errEl.style.display = 'block';
+              }
+        })
+        .catch(err => {
+              console.error(err);
+              btn.disabled = false;
+              renderForm();
+              errEl.textContent = 'Connection error. Please try again.';
+              errEl.style.display = 'block';
+        });
+    });
+
+    // ── Handle ?product= deep link ────────────────────────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const preselect = params.get('product');
+    if (preselect && PRODUCTS[preselect]) {
+        // Wait for availability to load first, then open form
+        loadAvailability().then(() => {
+              if (availability[preselect] > 0) openForm([preselect]);
+        });
+    }
+      </script>
+  </body>
+</html>html>
+  </script></span></span></strong></h1>
+  </body>
+  </style></title>
+  </head>
