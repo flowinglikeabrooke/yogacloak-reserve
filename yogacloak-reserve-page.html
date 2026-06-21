@@ -133,8 +133,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
       <span>Two ways to leave class covered. Save your spot on the full set.</span>
     </div>
     <div class="both-banner-price">
-      <div class="both-total">$166</div>
-      <div class="both-deposit">$35 deposit total</div>
+      <div class="both-total">$35 deposit</div>
+      <div class="both-deposit">holds both spots</div>
     </div>
     <div class="both-banner-arrow">&#8594;</div>
   </div>
@@ -152,12 +152,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
         <h2 class="pcard-name">The Cloak</h2>
         <span class="pcard-availability">First drop: 100 pieces</span>
       </div>
-      <div class="pcard-price">
-        <span class="price-label">Price</span>
-        <span class="price-amt">$98</span>
-        <span class="deposit-label">Deposit</span>
-        <span class="deposit-amt">$20</span>
-      </div>
+      <div class="pcard-price" style="grid-template-columns:auto 1fr">
+          <span class="deposit-label">Deposit to reserve</span>
+          <span class="deposit-amt">$20</span>
+        </div>
       <p style="font-size:12px;color:rgba(236,234,227,0.6);line-height:1.5;margin-bottom:20px">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin.</p>
       <button class="pcard-btn" data-action="select-product" data-product="cloak">I'll Take the Cloak</button>
     </div>
@@ -171,12 +169,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
         <h2 class="pcard-name">The Wrap</h2>
         <span class="pcard-availability">First drop: 100 pieces</span>
       </div>
-      <div class="pcard-price">
-        <span class="price-label">Price</span>
-        <span class="price-amt">$68</span>
-        <span class="deposit-label">Deposit</span>
-        <span class="deposit-amt">$15</span>
-      </div>
+      <div class="pcard-price" style="grid-template-columns:auto 1fr">
+          <span class="deposit-label">Deposit to reserve</span>
+          <span class="deposit-amt">$15</span>
+        </div>
       <p style="font-size:12px;color:rgba(236,234,227,0.6);line-height:1.5;margin-bottom:20px">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing.</p>
       <button class="pcard-btn" data-action="select-product" data-product="wrap">I'll Take the Wrap</button>
     </div>
@@ -213,13 +209,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
         <div class="form-group full" id="sizeGroup" style="display:none">
           <label class="form-label">Cloak size</label>
           <select class="form-input" id="sizeSelect">
-            <option value="">Select a size</option>
-            <option value="xs">XS</option>
-            <option value="s">S</option>
-            <option value="m">M</option>
-            <option value="l">L</option>
-            <option value="xl">XL</option>
-          </select>
+              <option value="">Select a size</option>
+              <option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>
+              <option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>
+            </select>
           <p class="form-note">One size fits most. Runs oversized. Unisex cut.</p>
         </div>
       </div>
@@ -245,13 +238,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
           <div class="addon-size-row" id="addonSizeRow" style="display:none">
             <label class="form-label" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(236,234,227,0.5);margin-bottom:8px;font-weight:600;display:block">Cloak size</label>
             <select class="form-input" id="addonSizeSelect">
-              <option value="">Select a size</option>
-              <option value="xs">XS</option>
-              <option value="s">S</option>
-              <option value="m">M</option>
-              <option value="l">L</option>
-              <option value="xl">XL</option>
-            </select>
+                <option value="">Select a size</option>
+                <option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>
+                <option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>
+              </select>
           </div>
         </div>
       </div>
@@ -272,7 +262,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
         </div>
       </div>
 
-      <button type="submit" class="form-btn" id="submitBtn">Pay deposit &amp; reserve</button>
+      <button type="submit" class="form-btn" id="submitBtn">Reserve your spot</button>
       <p style="font-size:10px;color:rgba(236,234,227,.4);text-align:center;margin-top:16px;letter-spacing:.05em">Powered by Stripe. Non-refundable. Transferable.</p>
     </form>
   </div>
@@ -383,11 +373,11 @@ function updateSummary() {
   // Update submit button
   const btn = document.getElementById('submitBtn');
   if (showCloak && showWrap) {
-    btn.textContent = 'Pay $35 deposit — reserve both';
+    btn.textContent = 'Reserve both — $35 deposit';
   } else if (showCloak) {
-    btn.textContent = 'Pay $20 deposit — reserve The Cloak';
+    btn.textContent = 'Reserve The Cloak — $20 deposit';
   } else {
-    btn.textContent = 'Pay $15 deposit — reserve The Wrap';
+    btn.textContent = 'Reserve The Wrap — $15 deposit';
   }
 }
 
