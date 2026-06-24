@@ -34,8 +34,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .both-banner-arrow{color:rgba(236,234,227,0.4);font-size:20px;line-height:1}
 .browse-section{padding:0 40px 40px;max-width:1200px;margin:0 auto}
 .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);margin-bottom:48px}
-.pcard{position:relative;border-radius:18px;background:#141618;padding:clamp(28px,4vw,44px);display:flex;flex-direction:column;transition:background .3s}
-.pcard:hover{background:#1a1d1f}
+.pcard{position:relative;border-radius:18px;background:#252a27;padding:clamp(28px,4vw,44px);display:flex;flex-direction:column;transition:background .3s,transform .3s,box-shadow .3s;box-shadow:0 4px 24px rgba(0,0,0,0.25)}
+.pcard:hover{background:#2c322e;transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
 .pcard.soldout{opacity:.6;pointer-events:none}
 .pcard-thumb{position:relative;width:100%;aspect-ratio:3/4;border-radius:14px;background:transparent;margin-bottom:clamp(24px,3vw,32px);overflow:hidden;cursor:pointer}
 .pcard-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
