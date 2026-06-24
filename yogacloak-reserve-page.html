@@ -115,6 +115,32 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .pcard-hover-cta{transform:translateY(0)}
 }
 .reserved-badge{position:absolute;top:16px;right:16px;background:var(--sage);color:var(--ink);font-size:10px;font-weight:600;letter-spacing:.1em;padding:6px 12px;border-radius:100px;text-transform:uppercase}
+.site-footer{border-top:1px solid rgba(236,234,227,0.08);margin-top:60px;padding:48px 40px 60px;background:#0a0c0e}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-trust{text-align:center;margin-bottom:40px}
+.footer-trust-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(236,234,227,0.4);margin-bottom:18px;display:block}
+.payment-badges{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.payment-badge{width:42px;height:28px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:9px;letter-spacing:0;background:#fff;color:#1A1F71}
+.payment-badge.visa{background:#1A1F71;color:#fff;font-style:italic;letter-spacing:.5px}
+.payment-badge.mc{background:#fff;position:relative;overflow:hidden}
+.payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
+.payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
+.payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
+.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
+.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
+.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.footer-legal{font-size:11px;color:rgba(236,234,227,0.4);line-height:1.7;text-align:center;max-width:780px;margin:0 auto;letter-spacing:.01em}
+.footer-legal p{margin-bottom:10px}
+.footer-legal a{color:rgba(236,234,227,0.6);text-decoration:underline;text-decoration-color:rgba(236,234,227,0.2);text-underline-offset:2px;transition:color .2s,text-decoration-color .2s}
+.footer-legal a:hover{color:var(--bone);text-decoration-color:rgba(236,234,227,0.6)}
+.footer-divider{width:40px;height:1px;background:rgba(236,234,227,0.1);margin:24px auto}
+.footer-meta{font-size:10px;color:rgba(236,234,227,0.3);letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.footer-credit{font-size:11px;color:rgba(236,234,227,0.35);text-align:center;margin-top:18px;letter-spacing:.02em;font-style:italic}
+.footer-credit .footer-heart{color:#2b312d;font-style:normal;display:inline-block;transform:translateY(1px);animation:heartbeat 2.5s ease-in-out infinite}
+.footer-credit a{color:rgba(236,234,227,0.55);text-decoration:none;font-weight:500;font-style:normal;transition:color .25s}
+.footer-credit a:hover{color:var(--bone)}
+@keyframes heartbeat{0%,100%{transform:translateY(1px) scale(1)}15%{transform:translateY(1px) scale(1.15)}30%{transform:translateY(1px) scale(1)}45%{transform:translateY(1px) scale(1.1)}60%{transform:translateY(1px) scale(1)}}
 </style>
 </head>
 <body>
@@ -499,5 +525,31 @@ if (availability[preselect] > 0) openForm([preselect]);
 });
 }
 </script>
+<footer class="site-footer">
+<div class="footer-inner">
+<div class="footer-trust">
+<span class="footer-trust-label">Supported payment methods</span>
+<div class="payment-badges">
+<span class="payment-badge visa">VISA</span>
+<span class="payment-badge mc"></span>
+<span class="payment-badge amex">AMEX</span>
+<span class="payment-badge link">Link</span>
+<span class="payment-badge applepay">Pay</span>
+<span class="payment-badge klarna">K.</span>
+<span class="payment-badge cashapp">$</span>
+</div>
+</div>
+<div class="footer-legal">
+<p>All payments are securely processed by Stripe. yogacloak does not store your card details. By placing a reservation, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
+<p><strong style="color:rgba(236,234,227,0.6);font-weight:600">Deposit terms:</strong> Reservation deposits are <strong style="color:rgba(236,234,227,0.6);font-weight:600">non-refundable</strong> but fully <strong style="color:rgba(236,234,227,0.6);font-weight:600">transferable</strong>. The deposit amount will be applied toward your final order total. Final balance is due before shipment.</p>
+<p><strong style="color:rgba(236,234,227,0.6);font-weight:600">Shipping:</strong> Estimated ship window is November 2027. Ship dates are estimates only and are not guaranteed. yogacloak is not liable for shipping delays caused by carriers, customs, or other third parties beyond our control.</p>
+<p>Reservation does not constitute a final purchase contract. yogacloak reserves the right to cancel reservations and refund deposits at our sole discretion. All product images are representative; final product may vary slightly in appearance and specifications.</p>
+<div class="footer-divider"></div>
+<div class="footer-meta">© 2026 yogacloak · All rights reserved</div>
+<div class="footer-credit">made with <span class="footer-heart">♥</span> by <a href="https://www.instagram.com/flowinglikeabrooke?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">@flowinglikeabrooke</a></div>
+</div>
+</div>
+</footer>
+
 </body>
 </html>
