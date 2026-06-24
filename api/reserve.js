@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.RESERVE_STRIPE_SECRET_KEY, {
 });
 
 const PRICES = {
-        cloak: process.env.STRIPE_PRICE_CLOAK,
+        cloak: process.env.RESERVE_STRIPE_PRICE_CLOAK,
         wrap: process.env.RESERVE_STRIPE_PRICE_WRAP,
 };
 
