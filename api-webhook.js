@@ -16,7 +16,7 @@ import Stripe from "stripe";
 import { decrementAvailability } from "./lib-availability.js";
 import { updateSheetStatus } from "./lib-sheets.js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.RESERVE_STRIPE_SECRET_KEY, {
   apiVersion: "2024-04-10",
 });
 
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     event = stripe.webhooks.constructEvent(
       rawBody,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.RESERVE_STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
     console.error("Webhook signature verification failed:", err.message);

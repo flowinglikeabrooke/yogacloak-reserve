@@ -2,13 +2,13 @@ import Stripe from "stripe";
 import { logToSheet } from "./lib-sheets.js";
 import { getAvailability } from "./lib-availability.js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.RESERVE_STRIPE_SECRET_KEY, {
     apiVersion: "2024-04-10",
 });
 
 const PRICES = {
-    cloak: process.env.STRIPE_PRICE_CLOAK,
-    wrap: process.env.STRIPE_PRICE_WRAP,
+    cloak: process.env.RESERVE_STRIPE_PRICE_CLOAK,
+    wrap: process.env.RESERVE_STRIPE_PRICE_WRAP,
 };
 
 export default async function handler(req, res) {
