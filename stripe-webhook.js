@@ -80,6 +80,27 @@ async function createRecord(tableId, fields) {
   return data.records[0];
 }
 
+async function stripeRequest(path, options = {}) {
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeKey) throw new Error('Missing STRIPE_SECRET_KEY');
+
+  const response = await fetch(`https://api.stripe.com/v1/${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${stripeKey}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...(options.headers || {})
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Stripe request failed: ${response.status} ${errorText}`);
+  }
+
+  return response.json();
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -98,6 +119,10 @@ export default async function handler(req, res) {
       const metadata = session.metadata || {};
       const amountPaid = session.amount_total ? session.amount_total / 100 : Number(metadata.deposit_total || 0);
       const paidDate = new Date().toISOString().slice(0, 10);
+      const paymentIntent = session.payment_intent
+        ? await stripeRequest(`payment_intents/${session.payment_intent}`)
+        : null;
+      const savedPaymentMethod = paymentIntent?.payment_method || '';
 
       await updateRecord(TABLES.contacts, metadata.contact_record_id, {
         'Contact Type': 'Reserved',
@@ -114,6 +139,9 @@ export default async function handler(req, res) {
           stripe_checkout_session_id: session.id,
           stripe_payment_intent_id: session.payment_intent || '',
           stripe_customer_id: session.customer || '',
+          stripe_payment_method_id: savedPaymentMethod,
+          future_charge_authorized: metadata.future_charge_authorized === 'true',
+          final_balance_total: Number(metadata.final_balance_total || 0),
           paid_at: new Date().toISOString(),
           shipping: session.shipping_details || null
         })

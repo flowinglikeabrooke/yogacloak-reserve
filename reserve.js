@@ -171,11 +171,21 @@ async function createCheckoutSession(payload) {
   const siteUrl = (process.env.SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '');
   const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
   const params = new URLSearchParams();
+  const finalBalance = payload.products.reduce((sum, product) => sum + PRODUCT_CONFIG[product].retail, 0) - payload.depositTotal;
 
   params.append('mode', 'payment');
+  params.append('customer_creation', 'always');
   params.append('customer_email', payload.email);
   params.append('success_url', `${baseUrl}/yogacloak-reserve-page.html?success=1&session_id={CHECKOUT_SESSION_ID}`);
   params.append('cancel_url', `${baseUrl}/yogacloak-reserve-page.html?cancelled=1`);
+  params.append('payment_method_types[0]', 'card');
+  params.append('payment_intent_data[setup_future_usage]', 'off_session');
+  params.append('consent_collection[terms_of_service]', 'required');
+  params.append('consent_collection[payment_method_reuse_agreement][position]', 'auto');
+  params.append(
+    'custom_text[submit][message]',
+    `You authorize yogacloak to save this payment method and automatically charge the remaining product balance of $${finalBalance} before shipment. We will email you before the final charge.`
+  );
   params.append('phone_number_collection[enabled]', 'true');
   params.append('shipping_address_collection[allowed_countries][0]', 'US');
   params.append('line_items[0][quantity]', '1');
@@ -191,7 +201,9 @@ async function createCheckoutSession(payload) {
     email: payload.email,
     products: payload.products.join(','),
     cloak_size: payload.size || '',
-    deposit_total: String(payload.depositTotal)
+    deposit_total: String(payload.depositTotal),
+    final_balance_total: String(finalBalance),
+    future_charge_authorized: 'true'
   };
 
   Object.entries(metadata).forEach(([key, value]) => {
