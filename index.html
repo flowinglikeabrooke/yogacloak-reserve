@@ -28,7 +28,7 @@ a{text-decoration:none;color:inherit}
 .btn svg{width:15px;height:15px}
 .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:24px 44px;transition:background .35s,padding .35s,backdrop-filter .35s;text-shadow:0 1px 12px rgba(0,0,0,0.35)}
 .topbar.solid{background:rgba(30,35,32,0.92);backdrop-filter:blur(14px);padding:18px 44px;text-shadow:none;border-bottom:1px solid rgba(var(--cream),0.06)}
-.wordmark{font-size:24px;letter-spacing:-.01em;line-height:1}.wordmark .thin{font-weight:400}.wordmark .bold{font-weight:700}
+.wordmark{font-size:26px;letter-spacing:-.01em;line-height:1}.wordmark .thin{font-weight:400}.wordmark .bold{font-weight:700}
 .topbar .reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .2s;letter-spacing:.02em}
 .topbar .reserve-link:hover{opacity:.7}
 .topbar-actions{display:flex;align-items:center;gap:18px}
@@ -203,7 +203,7 @@ a{text-decoration:none;color:inherit}
 @media(max-width:860px){
 .topbar,.topbar.solid{padding:14px 20px}
 .topbar.solid{padding:12px 20px}
-.wordmark{font-size:21px}
+.wordmark{font-size:23px}
 .topbar .reserve-link{font-size:11.5px}
 .topbar-actions{gap:14px}
 .topbar-contact{font-size:10.5px;padding:8px 16px;letter-spacing:.05em}
@@ -267,7 +267,7 @@ a{text-decoration:none;color:inherit}
 }
 @media(max-width:480px){
 .topbar,.topbar.solid{padding:14px 18px}
-.wordmark{font-size:16px}
+.wordmark{font-size:21px}
 .hero-photo-content{padding:90px 18px 50px}
 .hero-wordmark{font-size:clamp(48px,16vw,80px)}
 .hero-tagline{font-size:14px}
@@ -366,7 +366,7 @@ a{text-decoration:none;color:inherit}
 <span class="amt">$98</span>
 <span class="amt-label">final price</span>
 </div>
-<p class="pdesc">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin. The layer you pull on still warm from class and keep on until you're through your own front door.</p>
+<p class="pdesc">Hooded and open-front, falling to mid-thigh. Soft against warm skin, deeply absorbent, matte graphite. The layer you pull on still warm from class and keep on until you're through your own front door.</p>
 <div class="pcta-row">
 <span class="phold pop"><strong>$20</strong> holds yours</span>
 </div>
@@ -389,7 +389,7 @@ a{text-decoration:none;color:inherit}
 <span class="amt">$68</span>
 <span class="amt-label">final price</span>
 </div>
-<p class="pdesc">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing. For the block-and-a-half to the car, the coffee run, the ride home. Wears in, wears everywhere.</p>
+<p class="pdesc">An oversized rectangular drape — knot it, sling it, throw it over one shoulder. Lighter than the Cloak and packs down to nothing. For the block-and-a-half to the car, the coffee run, the ride home. Wears in, wears everywhere.</p>
 <div class="pcta-row">
 <span class="phold pop"><strong>$15</strong> holds yours</span>
 </div>
@@ -413,7 +413,7 @@ a{text-decoration:none;color:inherit}
 <div class="fabric-text reveal">
 <span class="eyebrow">The material</span>
 <h3><em>Dark,</em> <strong>absorbent,</strong><br>built for heat.</h3>
-<p>Brushed recycled microfiber in matte graphite — soft the second it meets warm skin, and absorbent enough to take on whatever you walk out of class with. Light enough to forget you have it on, dark enough to wear straight from the mat to anywhere else. Built for the way home, not the workout.</p>
+<p>Soft, technical fabric in matte graphite — built to meet warm skin without protest, absorbent enough to take on whatever you walk out of class with. Light enough to forget you have it on, dark enough to wear straight from the mat to anywhere else. Made for the way home, not the workout.</p>
 <div class="fabric-tags">
 <span class="fabric-tag">Dark graphite</span>
 <span class="fabric-tag">Lightweight</span>
@@ -519,7 +519,7 @@ if(openBtn)openBtn.addEventListener('click',open);
 if(closeBtn)closeBtn.addEventListener('click',close);
 ov.addEventListener('click',function(e){if(e.target===ov)close()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
-if(form){form.addEventListener('submit',function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')})}
+if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'Homepage'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
 })();
 </script>
 </body>

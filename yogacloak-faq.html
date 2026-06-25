@@ -19,7 +19,7 @@ a{color:inherit;text-decoration:none}
 
 /* Topbar */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.92);backdrop-filter:blur(14px)}
-.wordmark{font-size:24px;letter-spacing:-.01em;line-height:1}
+.wordmark{font-size:26px;letter-spacing:-.01em;line-height:1}
 .wordmark .thin{font-weight:400}
 .wordmark .bold{font-weight:700}
 .topbar a.reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .25s;letter-spacing:.02em}
@@ -140,7 +140,7 @@ a{color:inherit;text-decoration:none}
 /* Mobile */
 @media(max-width:860px){
 .topbar{padding:14px 20px}
-.wordmark{font-size:21px}
+.wordmark{font-size:23px}
 .topbar-actions{gap:14px}
 .topbar a.reserve-link{font-size:11.5px}
 .topbar-contact{font-size:10.5px;padding:8px 16px;letter-spacing:.05em}
@@ -171,7 +171,7 @@ a{color:inherit;text-decoration:none}
 }
 @media(max-width:480px){
 .topbar{padding:12px 18px}
-.wordmark{font-size:16px}
+.wordmark{font-size:21px}
 .faq-hero{padding:96px 18px 60px}
 .faq-hero h1{font-size:32px;line-height:1.15}
 .faq-hero .subtitle{font-size:13.5px}
@@ -303,7 +303,7 @@ a{color:inherit;text-decoration:none}
 <span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 </div>
 <div class="faq-a"><div class="faq-a-inner">
-<p>Brushed <em>recycled microfiber.</em> The Cloak runs around 300 GSM — heavier, more structured, deeply absorbent. The Wrap is closer to 200 GSM — lighter, packable, the one that throws into a tote.</p>
+<p>Soft, technical fabric — built for absorbency and quiet comfort after a hot practice. The Cloak is the heavier, more structured layer. The Wrap is lighter and packable, the one that throws into a tote.</p>
 <p>Both are matte graphite, designed to look quiet against everything you already wear.</p>
 </div></div>
 </div>
@@ -497,7 +497,7 @@ if(openBtn)openBtn.addEventListener('click',open);
 if(closeBtn)closeBtn.addEventListener('click',close);
 ov.addEventListener('click',function(e){if(e.target===ov)close()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
-if(form){form.addEventListener('submit',function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')})}
+if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'FAQ Page'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
 })();
 </script>
 </body>
