@@ -3,222 +3,440 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>yogacloak — questions</title>
-<meta name="description" content="Everything about the first run — the pieces, the deposit, and what reserving means. yogacloak, for after class. Coming 2027.">
+<title>FAQ — yogacloak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-700.woff2" as="font" type="font/woff2" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-:root{
-  --ink:#1E2320; --ink-2:#252b27; --sage:#7C8C82; --clay:#9A8E86;
-  --fog:#C4C9C5; --bone:#ECEAE3; --cream:236,234,227;
+:root{--ink:#1E2320;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--bone:#fbf8f0;--cream:251,248,240}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{background:var(--ink);color:var(--bone);overflow-x:hidden}
+.wordmark,.faq-hero h1,.faq-hero .subtitle,.chapter-name,.faq-q,.closing-cta h2,.closing-cta p{font-family:'Hanken Grotesk',sans-serif}
+a{color:inherit;text-decoration:none}
+
+/* Topbar */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.92);backdrop-filter:blur(14px)}
+.wordmark{font-size:18px;letter-spacing:-.005em;line-height:1}
+.wordmark .thin{font-weight:400}
+.wordmark .bold{font-weight:700}
+.topbar a.reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .25s;letter-spacing:.02em}
+.topbar a.reserve-link:hover{opacity:.65}
+
+/* Hero */
+.faq-hero{padding:160px 40px 100px;text-align:center;background:var(--ink);position:relative;overflow:hidden}
+.faq-hero h1{font-size:clamp(40px,5.8vw,72px);font-weight:500;letter-spacing:-.035em;line-height:1.1;margin-bottom:24px;max-width:900px;margin-left:auto;margin-right:auto}
+.faq-hero h1 em{font-style:italic;font-weight:400;color:rgba(var(--cream),0.65)}
+.faq-hero h1 .accent{font-weight:700;letter-spacing:-.045em}
+.faq-hero .subtitle{font-size:15px;color:rgba(var(--cream),0.55);letter-spacing:.005em;line-height:1.75;max-width:540px;margin:0 auto;font-style:italic;font-weight:300}
+
+/* Chapter sections */
+.chapter{max-width:780px;margin:0 auto;padding:0 40px 80px}
+.chapter-header{text-align:center;padding:60px 0 50px;margin-bottom:8px}
+.chapter-eyebrow{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:rgba(var(--cream),0.32);font-weight:600;display:block;margin-bottom:14px;font-family:Helvetica,sans-serif}
+.chapter-name{font-size:clamp(24px,3.2vw,32px);font-weight:400;letter-spacing:-.025em;font-style:italic;color:rgba(var(--cream),0.78);line-height:1.2}
+.chapter-name em{font-style:normal;font-weight:600;color:var(--bone);letter-spacing:-.03em}
+
+/* FAQ items — softer treatment */
+.faq-item{padding:4px 0;transition:opacity .3s ease}
+.faq-q{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:24px 8px;cursor:pointer;font-size:clamp(15px,1.5vw,17px);font-weight:400;letter-spacing:-.005em;line-height:1.5;color:rgba(var(--cream),0.85);transition:color .3s ease,padding .3s ease;-webkit-tap-highlight-color:transparent;border-radius:12px}
+.faq-q:hover{color:var(--bone);background:rgba(var(--cream),0.02)}
+.faq-q-icon{flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:rgba(var(--cream),0.32);transition:transform .5s cubic-bezier(.4,0,.2,1),color .3s;margin-top:2px}
+.faq-q-icon svg{width:14px;height:14px;stroke-width:1.5}
+.faq-item.open .faq-q{color:var(--bone)}
+.faq-item.open .faq-q-icon{transform:rotate(180deg);color:rgba(var(--cream),0.7)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.4,0,.2,1),opacity .4s ease;opacity:0}
+.faq-a-inner{padding:4px 8px 28px;max-width:640px;color:rgba(var(--cream),0.62);font-size:14.5px;line-height:1.8;font-family:Helvetica,sans-serif;letter-spacing:.005em;font-weight:300}
+.faq-a-inner p{margin-bottom:14px}
+.faq-a-inner p:last-child{margin-bottom:0}
+.faq-a-inner em{font-style:italic;color:rgba(var(--cream),0.82);font-weight:400}
+.faq-a-inner strong{font-weight:500;color:var(--bone)}
+.faq-a-inner a{color:var(--bone);border-bottom:1px solid rgba(var(--cream),0.25);transition:border-color .25s;padding-bottom:1px}
+.faq-a-inner a:hover{border-color:var(--bone)}
+.faq-item.open .faq-a{max-height:800px;opacity:1}
+
+/* Subtle separator between items */
+.faq-item + .faq-item{position:relative}
+.faq-item + .faq-item::before{content:'';position:absolute;top:0;left:8px;right:8px;height:1px;background:rgba(var(--cream),0.04)}
+
+/* Chapter divider — soft ornamental */
+.chapter-divider{display:flex;align-items:center;justify-content:center;gap:18px;padding:30px 40px;opacity:.5}
+.chapter-divider-line{flex:1;max-width:60px;height:1px;background:rgba(var(--cream),0.15)}
+.chapter-divider-dot{width:4px;height:4px;border-radius:50%;background:rgba(var(--cream),0.25)}
+
+/* Closing CTA — softer, more inviting */
+.closing-cta{position:relative;padding:120px 40px 130px;text-align:center;background:var(--ink);margin-top:60px}
+.closing-cta::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:1px;background:rgba(var(--cream),0.12)}
+.closing-cta .eyebrow{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:rgba(var(--cream),0.4);margin-bottom:22px;display:inline-block;font-weight:600;font-family:Helvetica,sans-serif}
+.closing-cta h2{font-size:clamp(34px,4.8vw,60px);font-weight:500;letter-spacing:-.035em;line-height:1.05;margin-bottom:22px;max-width:700px;margin-left:auto;margin-right:auto}
+.closing-cta h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.68)}
+.closing-cta h2 strong{font-weight:700;letter-spacing:-.045em}
+.closing-cta p{font-size:15px;color:rgba(var(--cream),0.55);max-width:460px;margin:0 auto 36px;line-height:1.75;font-style:italic;font-weight:300}
+.cta-row{display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--bone);color:var(--ink);font-family:Helvetica,sans-serif;font-size:13px;font-weight:600;letter-spacing:.02em;padding:17px 34px;border-radius:100px;transition:background .25s,transform .25s,box-shadow .25s;box-shadow:0 10px 30px -12px rgba(0,0,0,0.5);-webkit-tap-highlight-color:transparent}
+.btn:hover{background:#fefdf8;transform:translateY(-2px);box-shadow:0 16px 38px -14px rgba(0,0,0,0.55)}
+.btn svg{width:14px;height:14px}
+.btn-quiet{background:transparent;color:rgba(var(--cream),0.7);border:none;box-shadow:none;font-style:italic;font-weight:400;padding:17px 24px;font-family:'Hanken Grotesk',sans-serif}
+.btn-quiet:hover{background:transparent;color:var(--bone);transform:none;box-shadow:none}
+
+/* Footer */
+.site-footer{border-top:1px solid rgba(var(--cream),0.06);padding:48px 40px 60px;background:#151618}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-trust{text-align:center;margin-bottom:40px}
+.footer-trust-label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.4);margin-bottom:18px;display:block;font-weight:600}
+.payment-badges{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.payment-badge{width:42px;height:28px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:9px;letter-spacing:0;background:#fff;color:#1A1F71}
+.payment-badge.visa{background:#1A1F71;color:#fff;font-style:italic;letter-spacing:.5px}
+.payment-badge.mc{background:#fff;position:relative;overflow:hidden}
+.payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
+.payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
+.payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
+.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
+.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
+.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.footer-legal{font-size:11px;color:rgba(var(--cream),0.4);line-height:1.7;text-align:center;max-width:780px;margin:0 auto;letter-spacing:.01em}
+.footer-legal p{margin-bottom:10px}
+.footer-legal a{color:rgba(var(--cream),0.6);text-decoration:underline;text-decoration-color:rgba(var(--cream),0.2);text-underline-offset:2px;transition:color .25s,text-decoration-color .25s}
+.footer-legal a:hover{color:var(--bone);text-decoration-color:rgba(var(--cream),0.6)}
+.footer-divider{width:40px;height:1px;background:rgba(var(--cream),0.1);margin:24px auto}
+.footer-meta{font-size:10px;color:rgba(var(--cream),0.3);letter-spacing:.18em;text-transform:uppercase;text-align:center;font-weight:600}
+.footer-meta a{color:rgba(var(--cream),0.5)}
+.footer-credit{font-size:11px;color:rgba(var(--cream),0.35);text-align:center;margin-top:18px;letter-spacing:.02em;font-style:italic}
+.footer-credit .footer-heart{color:#2b312d;font-style:normal;display:inline-block;transform:translateY(1px);animation:heartbeat 2.5s ease-in-out infinite}
+.footer-credit a{color:rgba(var(--cream),0.55);text-decoration:none;font-weight:500;font-style:normal;transition:color .25s}
+.footer-credit a:hover{color:var(--bone)}
+@keyframes heartbeat{0%,100%{transform:translateY(1px) scale(1)}15%{transform:translateY(1px) scale(1.15)}30%{transform:translateY(1px) scale(1)}45%{transform:translateY(1px) scale(1.1)}60%{transform:translateY(1px) scale(1)}}
+
+/* Mobile */
+@media(max-width:860px){
+.topbar{padding:14px 22px}
+.wordmark{font-size:17px}
+.faq-hero{padding:110px 22px 70px}
+.faq-hero h1{font-size:clamp(32px,7vw,46px);letter-spacing:-.03em;line-height:1.15;margin-bottom:20px}
+.faq-hero .subtitle{font-size:14px;line-height:1.7}
+.chapter{padding:0 22px 60px}
+.chapter-header{padding:50px 0 38px}
+.chapter-name{font-size:22px}
+.chapter-eyebrow{font-size:8.5px;letter-spacing:.36em;margin-bottom:12px}
+.faq-q{padding:20px 6px;font-size:15px;gap:18px;line-height:1.5}
+.faq-q-icon{width:24px;height:24px}
+.faq-a-inner{padding:2px 6px 24px;font-size:14px;line-height:1.75}
+.faq-a-inner p{margin-bottom:12px}
+.chapter-divider{padding:24px 22px}
+.closing-cta{padding:80px 22px 90px;margin-top:40px}
+.closing-cta h2{font-size:clamp(30px,7vw,44px);margin-bottom:18px}
+.closing-cta p{font-size:14px;margin-bottom:28px;line-height:1.7}
+.btn{padding:15px 28px;font-size:12.5px}
+.btn-quiet{padding:14px 18px}
+.cta-row{flex-direction:column;gap:8px}
+.site-footer{padding:36px 22px 50px}
+.footer-trust{margin-bottom:32px}
+.payment-badges{gap:8px}
+.payment-badge{width:38px;height:26px}
+.footer-legal{font-size:10.5px;line-height:1.65}
+.footer-credit{font-size:10.5px;margin-top:14px}
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-html{font-family:'Hanken Grotesk',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
-body{background:var(--ink);color:var(--bone);overflow-x:hidden;}
-a{color:inherit;text-decoration:none;}
-
-.orb{position:absolute;border-radius:50%;pointer-events:none;z-index:0;
-  background:radial-gradient(circle, rgba(var(--cream),0.16), rgba(var(--cream),0.05) 45%, transparent 70%);
-  animation:breathe 11s ease-in-out infinite;will-change:transform,opacity;}
-@keyframes breathe{0%,100%{transform:scale(1);opacity:.45;}50%{transform:scale(1.22);opacity:.9;}}
-@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
-
-.eyebrow{font-size:11px;letter-spacing:.16em;color:rgba(var(--cream),0.6);text-transform:uppercase;}
-.wordmark{font-size:21px;letter-spacing:-.005em;line-height:1;}
-.wordmark .thin{font-weight:400;}
-.wordmark .bold{font-weight:600;}
-
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:11px;
-  background:var(--bone);color:var(--ink);font-size:13px;font-weight:600;letter-spacing:.01em;
-  padding:16px 34px;border-radius:100px;transition:background .2s, transform .2s, box-shadow .2s;
-  box-shadow:0 10px 30px -12px rgba(0,0,0,0.5);}
-.btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 16px 38px -14px rgba(0,0,0,0.55);}
-.btn svg{width:15px;height:15px;}
-
-/* topbar */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:40;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:24px 44px;transition:background .35s, padding .35s, backdrop-filter .35s;
-  background:rgba(30,35,32,0.72);backdrop-filter:blur(14px);}
-.topbar .reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .2s;}
-.topbar .reserve-link:hover{opacity:.7;}
-
-/* intro */
-.faq-hero{position:relative;overflow:hidden;min-height:60svh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;
-  padding:clamp(140px,20vh,220px) 24px clamp(60px,10vh,110px);background:var(--ink);}
-.faq-hero .orb.o1{width:540px;height:540px;top:-80px;left:2%;animation-delay:.4s;}
-.faq-hero .orb.o2{width:460px;height:460px;bottom:-150px;right:2%;animation-delay:3s;}
-.faq-hero-in{position:relative;z-index:2;max-width:680px;}
-.faq-hero .eyebrow{display:block;margin-bottom:22px;}
-.faq-hero h1{font-size:clamp(40px,7vw,78px);font-weight:300;letter-spacing:-.04em;line-height:1.0;margin-bottom:22px;}
-.faq-hero h1 strong{font-weight:600;}
-.faq-hero p{font-size:clamp(15px,1.7vw,18px);font-weight:300;line-height:1.7;color:rgba(var(--cream),0.6);max-width:460px;margin:0 auto;}
-
-/* faq body */
-.faq-wrap{max-width:760px;margin:0 auto;padding:clamp(40px,8vh,90px) clamp(24px,5vw,40px) clamp(70px,12vh,140px);}
-.faq-group{margin-bottom:clamp(40px,6vh,72px);}
-.faq-group:last-child{margin-bottom:0;}
-.faq-group-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(124,140,130,0.9);
-  padding-bottom:18px;margin-bottom:6px;border-bottom:1px solid rgba(var(--cream),0.10);}
-
-.faq-item{border-bottom:1px solid rgba(var(--cream),0.10);}
-.faq-q{width:100%;background:none;border:none;cursor:pointer;text-align:left;color:var(--bone);
-  font-family:inherit;font-size:clamp(17px,2.1vw,21px);font-weight:400;letter-spacing:-.01em;line-height:1.4;
-  padding:26px 44px 26px 0;position:relative;transition:color .2s;}
-.faq-q:hover{color:#fff;}
-.faq-q .ic{position:absolute;right:4px;top:50%;width:16px;height:16px;transform:translateY(-50%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
-.faq-q .ic::before,.faq-q .ic::after{content:"";position:absolute;background:rgba(var(--cream),0.7);border-radius:2px;}
-.faq-q .ic::before{left:0;top:7px;width:16px;height:2px;}
-.faq-q .ic::after{left:7px;top:0;width:2px;height:16px;transition:transform .35s cubic-bezier(.4,0,.2,1);}
-.faq-item.open .faq-q .ic{transform:translateY(-50%) rotate(180deg);}
-.faq-item.open .faq-q .ic::after{transform:scaleY(0);}
-.faq-a{overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.4,0,.2,1);}
-.faq-a-in{padding:0 44px 28px 0;font-size:15px;font-weight:300;line-height:1.75;color:rgba(var(--cream),0.62);}
-.faq-a-in strong{font-weight:500;color:rgba(var(--cream),0.85);}
-
-/* closing cta */
-.faq-cta{position:relative;overflow:hidden;text-align:center;padding:clamp(120px,20vh,220px) 24px;min-height:82svh;display:flex;align-items:center;justify-content:center;background:var(--ink-2);}
-.faq-cta-bg{position:absolute;inset:0;z-index:0;}
-.faq-cta-bg img{width:100%;height:100%;object-fit:cover;object-position:center;}
-.faq-cta-scrim{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse 70% 60% at center, rgba(20,24,21,.55), rgba(20,24,21,.18) 75%), linear-gradient(to bottom, rgba(20,24,21,.34) 0%, rgba(20,24,21,.30) 45%, rgba(20,24,21,.66) 100%);}
-.faq-cta .orb.o1{width:480px;height:480px;top:-120px;left:8%;animation-delay:1s;}
-.faq-cta .orb.o2{width:400px;height:400px;bottom:-130px;right:8%;animation-delay:4s;}
-.faq-cta-in{position:relative;z-index:2;}
-.faq-cta .eyebrow{display:block;margin-bottom:20px;color:rgba(var(--cream),0.65);}
-.faq-cta h2{font-size:clamp(34px,5.5vw,62px);font-weight:300;letter-spacing:-.04em;line-height:1.02;margin-bottom:30px;}
-.faq-cta h2 strong{font-weight:600;}
-.faq-cta .still{margin-top:30px;font-size:14px;font-weight:300;color:rgba(var(--cream),0.5);}
-.faq-cta .still a{color:rgba(var(--cream),0.8);border-bottom:1px solid rgba(var(--cream),0.25);padding-bottom:1px;transition:color .2s;}
-.faq-cta .still a:hover{color:var(--bone);}
-
-/* footer */
-.footer{padding:56px 44px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;background:var(--ink);}
-.footer-right{text-align:right;}
-.footer .lbl{display:block;font-size:11px;letter-spacing:.12em;color:rgba(160,176,166,0.85);margin-bottom:8px;}
-.footer .email{font-size:17px;color:rgba(var(--cream),0.92);transition:color .2s;}
-.footer .email:hover{color:var(--bone);}
-.footer .tag{font-size:11px;letter-spacing:.06em;color:rgba(160,176,166,0.6);margin-top:14px;}
-.footer a.home-link{transition:opacity .2s;}
-.footer a.home-link:hover{opacity:.7;}
-
-@media(max-width:640px){
-  .topbar{padding:18px 22px;}
-  .faq-wrap{padding-left:22px;padding-right:22px;}
-  .footer{padding:40px 22px;}
+@media(max-width:480px){
+.topbar{padding:12px 18px}
+.wordmark{font-size:16px}
+.faq-hero{padding:96px 18px 60px}
+.faq-hero h1{font-size:32px;line-height:1.15}
+.faq-hero .subtitle{font-size:13.5px}
+.chapter{padding:0 18px 50px}
+.chapter-header{padding:42px 0 32px}
+.chapter-name{font-size:20px}
+.faq-q{padding:18px 4px;font-size:14.5px;gap:14px}
+.faq-a-inner{font-size:13.5px;padding:2px 4px 22px}
+.closing-cta{padding:70px 18px 80px}
+.closing-cta h2{font-size:28px}
+.closing-cta p{font-size:13.5px}
+.site-footer{padding:32px 18px 44px}
+.payment-badge{width:36px;height:24px;font-size:8px}
+.payment-badge.cashapp{font-size:12px}
+.payment-badge.klarna{font-size:10px}
+.payment-badge.amex{font-size:7px}
+.footer-meta{font-size:9.5px;letter-spacing:.14em}
 }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <a href="yogacloak-index.html" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
-  <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
+<a href="/" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
+<a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
 </div>
 
 <section class="faq-hero">
-  <span class="orb o1"></span>
-  <span class="orb o2"></span>
-  <div class="faq-hero-in">
-    <span class="eyebrow">The first run</span>
-    <h1>Questions,<br><strong>answered.</strong></h1>
-    <p>Everything worth knowing before you reserve — the pieces, the deposit, and what happens between now and 2027.</p>
-  </div>
+<h1>The <em>before</em> <span class="accent">you ask.</span></h1>
+<p class="subtitle">Quiet answers to the things we get asked most — about the brand, the reservation, the cloth itself.</p>
 </section>
 
-<div class="faq-wrap">
-
-  <div class="faq-group">
-    <div class="faq-group-label">The basics</div>
-    <div class="faq-item">
-      <button class="faq-q">What is yogacloak?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">A small line of recovery-wear made for the moment after class — the layer you pull on still warm and keep on until you're through your own front door. Two pieces to start: <strong>the Cloak</strong> and <strong>the Wrap</strong>. Quiet, dark, built for heat.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">When does it launch?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">The first run lands in <strong>2027</strong>. We're making it in limited numbers, so reserving now is the way to be sure you get one — and the way to hear first when it's ready.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">Where do you ship?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">We'll open with shipping across the US and grow from there. Reserve now and you'll be the first to know the day we reach you.</div></div>
-    </div>
-  </div>
-
-  <div class="faq-group">
-    <div class="faq-group-label">Reserving &amp; deposits</div>
-    <div class="faq-item">
-      <button class="faq-q">What does reserving actually do?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">It holds your piece from the first run and locks your place in line. A small deposit now, no full charge until it ships — so you're set, with nothing else to think about until 2027.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">How much is the deposit?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in"><strong>$25</strong> holds the Cloak (<strong>$98</strong> total). <strong>$20</strong> holds the Wrap (<strong>$68</strong> total). Whatever you put down comes straight off your final price — it's not an extra fee, just an early piece of it.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">Is my deposit refundable?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">Completely. Change your mind any time before we ship and we'll refund it in full, no questions asked.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">When am I charged the rest?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">Only when your piece is ready to ship in 2027. We'll email you first, with the balance due then — never a surprise charge.</div></div>
-    </div>
-  </div>
-
-  <div class="faq-group">
-    <div class="faq-group-label">The pieces &amp; care</div>
-    <div class="faq-item">
-      <button class="faq-q">Cloak or Wrap — what's the difference?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in"><strong>The Cloak</strong> is the fuller layer: hooded and open-front, falling to mid-thigh with two hidden snaps, around 300 GSM. For the drive home. <strong>The Wrap</strong> is lighter — an oversized rectangular drape with a single snap, around 200 GSM, packs down to nothing. For the walk home.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">What's it made of?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">Brushed recycled microfiber in matte graphite — deeply absorbent, soft the second it touches skin, and dark enough to go anywhere. Roughly 300 GSM for the Cloak, 200 for the Wrap.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">What size are they?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">Both are one size, cut oversized to drape rather than fit. They're meant to fall the same whether you're coming off a hot class or a slow cool-down.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">How do I care for it?<span class="ic"></span></button>
-      <div class="faq-a"><div class="faq-a-in">Machine wash cold, hang or lay flat to dry. Skip the softener — the fabric is soft on its own and stays more absorbent without it.</div></div>
-    </div>
-  </div>
-
+<!-- The brand -->
+<div class="chapter">
+<div class="chapter-header">
+<span class="chapter-eyebrow">One</span>
+<h2 class="chapter-name">on the <em>brand</em></h2>
 </div>
 
-<section class="faq-cta">
-  <div class="faq-cta-bg"><img src="drive-home.jpg" alt="A man in the Cloak walking to his car at sunset, the drive home"></div>
-  <div class="faq-cta-scrim"></div>
-  <div class="faq-cta-in">
-    <span class="eyebrow">Reserving now</span>
-    <h2>Reserve <strong>yours.</strong></h2>
-    <a href="yogacloak-reserve-page.html" class="btn">Reserve now
-      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-    <p class="still">Still curious? <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a></p>
-  </div>
+<div class="faq-item">
+<div class="faq-q">What is yogacloak?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>yogacloak is the layer for <em>after</em> class — not during. Hot yoga leaves you damp, flushed, and underdressed for whatever comes next. The Cloak and the Wrap are built for that exact in-between: from the studio doorway to your car, your coffee, your own front door.</p>
+<p>Soft, absorbent, dark, and quiet. Made to be pulled on still warm.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">Who's behind it?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>A small team based in Scottsdale, Arizona — building slowly, in small drops, with intention. Every piece is sampled, worn, washed, worn again before it ships.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">When does it launch?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>The first drop ships <strong>November 2027.</strong> Reservations open now to lock in your spot — only 100 of each piece in the first run.</p>
+</div></div>
+</div>
+</div>
+
+<div class="chapter-divider"><span class="chapter-divider-line"></span><span class="chapter-divider-dot"></span><span class="chapter-divider-line"></span></div>
+
+<!-- Reserving -->
+<div class="chapter">
+<div class="chapter-header">
+<span class="chapter-eyebrow">Two</span>
+<h2 class="chapter-name">on <em>reserving</em></h2>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">How does the reservation work?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>A small deposit holds your spot in the first drop. When we open for the full launch, your deposit gets applied toward the final price — you only pay the remainder.</p>
+<p><strong>The Cloak</strong> — $20 deposit, $98 final.<br>
+<strong>The Wrap</strong> — $15 deposit, $68 final.<br>
+<strong>Both</strong> — $35 deposit, $166 final.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">Is the deposit refundable?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>The deposit is <strong>non-refundable</strong> but fully <strong>transferable</strong> — you can pass your spot to a friend at any point before we ship.</p>
+<p>If we end up unable to fulfill your reservation for any reason on our end, you'll get a full refund automatically.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">When will I be charged the rest?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>About 30 days before shipping. You'll get an email with the final amount, your size selection confirmation, and shipping details. No surprises.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">Can I change or cancel my reservation?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>You can change your size, shipping address, or transfer your reservation to someone else any time before the final-balance email. Just email us at <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a>.</p>
+<p>Because the deposit is non-refundable, we can't cancel and refund — but we can always help you transfer it.</p>
+</div></div>
+</div>
+</div>
+
+<div class="chapter-divider"><span class="chapter-divider-line"></span><span class="chapter-divider-dot"></span><span class="chapter-divider-line"></span></div>
+
+<!-- The cloth -->
+<div class="chapter">
+<div class="chapter-header">
+<span class="chapter-eyebrow">Three</span>
+<h2 class="chapter-name">on the <em>cloth</em></h2>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">What's it made of?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Brushed <em>recycled microfiber.</em> The Cloak runs around 300 GSM — heavier, more structured, deeply absorbent. The Wrap is closer to 200 GSM — lighter, packable, the one that throws into a tote.</p>
+<p>Both are matte graphite, designed to look quiet against everything you already wear.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">What sizes does The Cloak come in?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Two sizes, both unisex and intentionally oversized.</p>
+<p><strong>S/M</strong> fits XS–M, roughly 5'2" to 5'8".<br>
+<strong>L/XL</strong> fits L–XL, roughly 5'7" to 6'2".</p>
+<p>If you're between sizes, size down — it's already cut generously.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">Does the Wrap come in sizes?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>The Wrap is <em>one size.</em> A generously cut rectangular drape — you knot it, sling it, or throw it over a shoulder. Works on anyone.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">How do I care for it?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Machine wash cold with like colors. Tumble dry low or hang dry. No fabric softener — it coats the fibers and kills the absorbency.</p>
+<p>The fabric gets softer with every wash. Built to last.</p>
+</div></div>
+</div>
+</div>
+
+<div class="chapter-divider"><span class="chapter-divider-line"></span><span class="chapter-divider-dot"></span><span class="chapter-divider-line"></span></div>
+
+<!-- Shipping -->
+<div class="chapter">
+<div class="chapter-header">
+<span class="chapter-eyebrow">Four</span>
+<h2 class="chapter-name">on <em>shipping</em></h2>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">Where do you ship?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>First drop ships within the <strong>United States.</strong> International is coming — drop your email at reservation if you'd like us to let you know when.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">When will my order ship?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>The first drop ships <strong>November 2027.</strong> You'll get the final-balance email about 30 days prior, then a tracking number when it goes out.</p>
+<p>Ship dates are estimates only — small drops sometimes shift by a few weeks.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">What about returns?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Unworn, unwashed pieces with tags can be returned within <strong>30 days</strong> of delivery for a full refund (less the original deposit). We cover return shipping on the first drop.</p>
+<p>If something arrives damaged or wrong, just email us — we'll make it right.</p>
+</div></div>
+</div>
+</div>
+
+<div class="chapter-divider"><span class="chapter-divider-line"></span><span class="chapter-divider-dot"></span><span class="chapter-divider-line"></span></div>
+
+<!-- Reaching us -->
+<div class="chapter">
+<div class="chapter-header">
+<span class="chapter-eyebrow">Five</span>
+<h2 class="chapter-name"><em>reaching</em> us</h2>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">How do I get in touch?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Easiest way is email — <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a>. A real person reads every message. We usually reply within 24 hours, sometimes faster.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">Where can I follow along?
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Build updates, sample shots, and behind-the-scenes go up on Instagram <a href="https://www.instagram.com/yogacloak" target="_blank" rel="noopener">@yogacloak</a>. The most accurate timeline lives there.</p>
+</div></div>
+</div>
+
+<div class="faq-item">
+<div class="faq-q">My question isn't here.
+<span class="faq-q-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="faq-a"><div class="faq-a-inner">
+<p>Email us — <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a>. If it's helpful for others, we'll add it to this page.</p>
+</div></div>
+</div>
+</div>
+
+<section class="closing-cta">
+<span class="eyebrow">Still in?</span>
+<h2><em>Reserve</em> <strong>yours.</strong></h2>
+<p>A small deposit holds your spot. The first drop is November 2027.</p>
+<div class="cta-row">
+<a href="yogacloak-reserve-page.html" class="btn">Reserve now
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+<a href="mailto:hello@yogacloak.com" class="btn btn-quiet">or just say hi</a>
+</div>
 </section>
 
-<footer class="footer">
-  <a href="yogacloak-index.html" class="wordmark home-link"><span class="thin">yoga</span><span class="bold">cloak</span></a>
-  <div class="footer-right">
-    <div class="lbl">Say hello</div>
-    <a href="mailto:hello@yogacloak.com" class="email">hello@yogacloak.com</a>
-    <div class="tag">For after class</div>
-  </div>
+<footer class="site-footer">
+<div class="footer-inner">
+<div class="footer-trust">
+<span class="footer-trust-label">Supported payment methods</span>
+<div class="payment-badges">
+<span class="payment-badge visa">VISA</span>
+<span class="payment-badge mc"></span>
+<span class="payment-badge amex">AMEX</span>
+<span class="payment-badge link">Link</span>
+<span class="payment-badge applepay">Pay</span>
+<span class="payment-badge klarna">K.</span>
+<span class="payment-badge cashapp">$</span>
+</div>
+</div>
+<div class="footer-legal">
+<p>All payments are securely processed by Stripe. yogacloak does not store your card details. By placing a reservation, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
+<p>Reservation does not constitute a final purchase contract. yogacloak reserves the right to cancel reservations and refund deposits at our sole discretion. All product images are representative; final product may vary slightly in appearance and specifications.</p>
+<div class="footer-divider"></div>
+<div class="footer-meta">© 2026 yogacloak · All rights reserved · <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a></div>
+<div class="footer-credit">made with <span class="footer-heart">♥</span> by <a href="https://www.instagram.com/flowinglikeabrooke?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">@flowinglikeabrooke</a></div>
+</div>
+</div>
 </footer>
 
 <script>
 document.querySelectorAll('.faq-item').forEach(function(item){
-  var q=item.querySelector('.faq-q'), a=item.querySelector('.faq-a');
-  q.addEventListener('click',function(){
-    var open=item.classList.contains('open');
-    if(open){ item.classList.remove('open'); a.style.maxHeight=null; }
-    else{ item.classList.add('open'); a.style.maxHeight=a.scrollHeight+'px'; }
+  var q = item.querySelector('.faq-q');
+  q.addEventListener('click', function(){
+    var wasOpen = item.classList.contains('open');
+    var chapter = item.closest('.chapter');
+    if (chapter) {
+      chapter.querySelectorAll('.faq-item.open').forEach(function(other){
+        if (other !== item) other.classList.remove('open');
+      });
+    }
+    item.classList.toggle('open', !wasOpen);
   });
-});
-window.addEventListener('resize',function(){
-  document.querySelectorAll('.faq-item.open .faq-a').forEach(function(a){ a.style.maxHeight=a.scrollHeight+'px'; });
 });
 </script>
 </body>
