@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reserve — yogacloak</title>
+<title>Reserve · yogacloak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -18,10 +18,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(251,248,240,0.08)}
 .wordmark{font-size:18px;letter-spacing:-.005em;line-height:1}.wordmark .thin{font-weight:400}.wordmark .bold{font-weight:700}
 .topbar a{font-size:12px;font-weight:600;color:var(--bone);text-decoration:none;transition:opacity .2s}.topbar a:hover{opacity:.6}
-.page-hero{position:relative;padding:120px 40px 60px;text-align:center;background:var(--ink)}
-.page-hero h1{font-size:clamp(40px,6vw,72px);font-weight:400;letter-spacing:-.04em;line-height:1.02;margin-bottom:20px}
-.page-hero h1 .hero-line-1{display:block;font-style:italic;font-weight:300;color:rgba(251,248,240,0.55);font-size:0.55em;letter-spacing:-.01em;margin-bottom:8px;line-height:1.2}
-.page-hero h1 .hero-line-2{display:block;font-weight:700;letter-spacing:-.045em}
+.page-hero{position:relative;padding:140px 40px 70px;text-align:center;background:var(--ink)}
+.page-hero h1{font-size:clamp(38px,5.2vw,64px);font-weight:500;letter-spacing:-.035em;line-height:1.1;margin-bottom:22px;max-width:900px;margin-left:auto;margin-right:auto}
+.page-hero h1 em{font-style:italic;font-weight:400;color:rgba(251,248,240,0.7)}
+.page-hero h1 .accent{font-weight:700;letter-spacing:-.045em}
 .page-hero .subtitle{font-size:14px;color:rgba(251,248,240,0.55);letter-spacing:.01em;line-height:1.7;max-width:520px;margin:0 auto;font-style:italic}
 .page-hero .label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,248,240,0.35);margin-top:40px;display:inline-block;font-weight:600}
 .both-banner{max-width:1200px;margin:0 auto 32px;padding:0 40px}
@@ -158,11 +158,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 </div>
 
 <section class="page-hero">
-<h1>
-<span class="hero-line-1">What are you</span>
-<span class="hero-line-2">taking home?</span>
-</h1>
-<p class="subtitle">A small deposit saves your spot in the first drop. Estimated ship window — November 2027.</p>
+<h1>What are <em>you</em> <span class="accent">taking home?</span></h1>
+<p class="subtitle">A small deposit saves your spot in the first drop.<br>Estimated ship window: November 2027.</p>
 <span class="label" id="pickYoursLabel">PICK YOURS</span>
 </section>
 
@@ -170,7 +167,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <div class="both-banner-inner" id="bothBannerBtn">
 <span class="both-badge">Most popular</span>
 <div class="both-banner-text">
-<strong>Reserve both — The Cloak &amp; The Wrap</strong>
+<strong>Reserve both: The Cloak &amp; The Wrap</strong>
 <span>Two ways to leave class covered. Save your spot on the full set.</span>
 </div>
 <div class="both-banner-price">
@@ -185,7 +182,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <div class="product-grid">
 <div class="pcard" data-product="cloak" id="pcardCloak">
 <div class="pcard-thumb" id="thumbCloak" data-action="select-product" data-product="cloak">
-<img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape" loading="lazy" decoding="async">
+<img src="cloak-card.jpg" alt="The Cloak, hooded open-front drape" loading="lazy" decoding="async">
 <div class="pcard-hover-overlay">
 <span class="pcard-hover-cta" id="ctaCloak">I'll Take the Cloak</span>
 </div>
@@ -193,17 +190,17 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <div class="pcard-meta">
 <span class="pcard-label">For the drive home</span>
 <h2 class="pcard-name"><span class="article">The</span><span class="name">Cloak</span></h2>
-<span class="pcard-availability" id="availCloak">First drop — 100 pieces</span>
+<span class="pcard-availability" id="availCloak">First drop: 100 pieces</span>
 </div>
 <div class="pcard-price">
 <span class="deposit-amt">$20</span>
 <span class="deposit-label">deposit to reserve</span>
 </div>
-<p class="pcard-desc">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin.</p>
+<p class="pcard-desc">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber. Deeply absorbent, matte graphite, soft the second it touches skin.</p>
 </div>
 <div class="pcard" data-product="wrap" id="pcardWrap">
 <div class="pcard-thumb" id="thumbWrap" data-action="select-product" data-product="wrap">
-<img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape" loading="lazy" decoding="async">
+<img src="wrap-card.jpg" alt="The Wrap, oversized rectangular drape" loading="lazy" decoding="async">
 <div class="pcard-hover-overlay">
 <span class="pcard-hover-cta" id="ctaWrap">I'll Take the Wrap</span>
 </div>
@@ -211,13 +208,13 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <div class="pcard-meta">
 <span class="pcard-label">For the walk home</span>
 <h2 class="pcard-name"><span class="article">The</span><span class="name">Wrap</span></h2>
-<span class="pcard-availability" id="availWrap">First drop — 100 pieces</span>
+<span class="pcard-availability" id="availWrap">First drop: 100 pieces</span>
 </div>
 <div class="pcard-price">
 <span class="deposit-amt">$15</span>
 <span class="deposit-label">deposit to reserve</span>
 </div>
-<p class="pcard-desc">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing.</p>
+<p class="pcard-desc">An oversized rectangular drape with a single hidden snap. Knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing.</p>
 </div>
 </div>
 <p class="disclaimer">Reservation deposit only. Applied toward your final order.</p>
@@ -251,8 +248,8 @@ Back
 <label class="form-label">Cloak size</label>
 <select class="form-input" id="sizeSelect">
 <option value="">Select a size</option>
-<option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>
-<option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>
+<option value="s/m">S/M: fits XS-M, ~5'2"–5'8"</option>
+<option value="l/xl">L/XL: fits L-XL, ~5'7"–6'2"</option>
 </select>
 <p class="form-note">One size fits most. Runs oversized. Unisex cut.</p>
 </div>
@@ -278,8 +275,8 @@ Back
 <label class="form-label" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(251,248,240,0.5);margin-bottom:8px;font-weight:600;display:block">Cloak size</label>
 <select class="form-input" id="addonSizeSelect">
 <option value="">Select a size</option>
-<option value="s/m">S/M — fits XS–M, ~5'2"–5'8"</option>
-<option value="l/xl">L/XL — fits L–XL, ~5'7"–6'2"</option>
+<option value="s/m">S/M: fits XS-M, ~5'2"–5'8"</option>
+<option value="l/xl">L/XL: fits L-XL, ~5'7"–6'2"</option>
 </select>
 </div>
 </div>
@@ -287,11 +284,11 @@ Back
 
 <div class="deposit-summary">
 <div class="deposit-line" id="depositLineCloak" style="display:none">
-<span class="lbl">The Cloak — $20 deposit</span>
+<span class="lbl">The Cloak: $20 deposit</span>
 <span class="amt">$20</span>
 </div>
 <div class="deposit-line" id="depositLineWrap" style="display:none">
-<span class="lbl">The Wrap — $15 deposit</span>
+<span class="lbl">The Wrap: $15 deposit</span>
 <span class="amt">$15</span>
 </div>
 <div class="deposit-total">
@@ -341,14 +338,14 @@ if (!label) return;
 const taken = TOTAL - remaining;
 
 if (remaining <= 0) {
-label.textContent = 'Sold out — first drop full';
+label.textContent = 'Sold out. First drop full';
 label.className = 'pcard-availability soldout-label';
 card.classList.add('soldout');
 thumb.classList.add('soldout-thumb');
 thumb.removeAttribute('data-action');
 if (cta) cta.textContent = 'Sold Out';
 } else if (remaining <= 20) {
-label.textContent = remaining + ' of ' + TOTAL + ' spots left — almost gone';
+label.textContent = remaining + ' of ' + TOTAL + ' spots left, almost gone';
 label.className = 'pcard-availability low';
 } else {
 label.textContent = taken + ' of ' + TOTAL + ' spots reserved';
@@ -390,7 +387,7 @@ const title = document.getElementById('formTitle');
 const sub = document.getElementById('formSubtitle');
 if (hasBoth) {
 title.innerHTML = '<span class="article">The</span><span class="name">Cloak</span> <span style="font-weight:300;color:rgba(251,248,240,0.4)">+</span> <span class="article">The</span><span class="name">Wrap</span>';
-sub.textContent = "You're reserving both — the full set. Spot locked with a $35 deposit.";
+sub.textContent = "You're reserving both: the full set. Spot locked with a $35 deposit.";
 } else if (hasCloak) {
 title.innerHTML = '<span class="article">The</span><span class="name">Cloak</span>';
 sub.textContent = 'Reserve your spot for The Cloak with a $20 deposit.';
@@ -450,11 +447,11 @@ document.getElementById('totalDeposit').textContent = '$' + total;
 
 const btn = document.getElementById('submitBtn');
 if (showCloak && showWrap) {
-btn.textContent = 'Reserve both — $35 deposit';
+btn.textContent = 'Reserve both: $35 deposit';
 } else if (showCloak) {
-btn.textContent = 'Reserve The Cloak — $20 deposit';
+btn.textContent = 'Reserve The Cloak: $20 deposit';
 } else {
-btn.textContent = 'Reserve The Wrap — $15 deposit';
+btn.textContent = 'Reserve The Wrap: $15 deposit';
 }
 }
 
