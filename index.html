@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yogacloak — for after class</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-700.woff2" as="font" type="font/woff2" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1E2320;--ink-2:#252b27;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--bone:#fbf8f0;--cream:251,248,240}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{background:var(--ink);color:var(--bone);overflow-x:hidden}
+img{display:block}
+a{text-decoration:none;color:inherit}
+.wordmark,.hero-wordmark,.hero-tagline,.hero-coming,.scroll-cue,.promise p,.ed-break-caption h2,.pname,.fabric-text h3,.closing h2,.cta-band h2{font-family:'Hanken Grotesk',sans-serif}
+.orb{position:absolute;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(var(--cream),0.16),rgba(var(--cream),0.05) 45%,transparent 70%);animation:breathe 11s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.22);opacity:.9}}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1);opacity:.34}50%{transform:translate(46px,-32px) scale(1.1);opacity:.58}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1.06);opacity:.3}50%{transform:translate(-54px,28px) scale(1);opacity:.5}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1);opacity:.22}50%{transform:translate(30px,40px) scale(1.16);opacity:.44}}
+.eyebrow{font-size:9px;letter-spacing:.32em;color:rgba(var(--cream),0.45);text-transform:uppercase;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:11px;background:var(--bone);color:var(--ink);font-size:13px;font-weight:600;letter-spacing:.02em;padding:16px 34px;border-radius:100px;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 10px 30px -12px rgba(0,0,0,0.5)}
+.btn:hover{background:#fefdf8;transform:translateY(-2px);box-shadow:0 16px 38px -14px rgba(0,0,0,0.55)}
+.btn svg{width:15px;height:15px}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:24px 44px;transition:background .35s,padding .35s,backdrop-filter .35s;text-shadow:0 1px 12px rgba(0,0,0,0.35)}
+.topbar.solid{background:rgba(30,35,32,0.92);backdrop-filter:blur(14px);padding:18px 44px;text-shadow:none;border-bottom:1px solid rgba(var(--cream),0.06)}
+.wordmark{font-size:24px;letter-spacing:-.01em;line-height:1}.wordmark .thin{font-weight:400}.wordmark .bold{font-weight:700}
+.topbar .reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .2s;letter-spacing:.02em}
+.topbar .reserve-link:hover{opacity:.7}
+.topbar-actions{display:flex;align-items:center;gap:18px}
+.topbar-contact{font-family:Helvetica,sans-serif;background:transparent;border:1px solid rgba(251,248,240,0.25);color:var(--bone);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 20px;border-radius:100px;cursor:pointer;transition:background .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
+.topbar-contact:hover{background:rgba(251,248,240,0.06);border-color:rgba(251,248,240,0.5)}
+.contact-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,12,14,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease}
+.contact-overlay.show{opacity:1;visibility:visible}
+.contact-modal{position:relative;width:100%;max-width:480px;background:var(--bone);color:var(--ink);border-radius:24px;padding:clamp(32px,5vw,44px);box-shadow:0 40px 90px -30px rgba(0,0,0,0.6);transform:translateY(16px) scale(.98);transition:transform .5s cubic-bezier(.2,.7,.2,1);font-family:Helvetica,sans-serif}
+.contact-overlay.show .contact-modal{transform:none}
+.contact-close{position:absolute;top:14px;right:16px;width:36px;height:36px;border:none;background:transparent;cursor:pointer;color:rgba(30,35,32,.4);font-size:26px;line-height:1;transition:color .25s;-webkit-tap-highlight-color:transparent}
+.contact-close:hover{color:var(--ink)}
+.contact-eyebrow{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);font-weight:600;display:inline-block;margin-bottom:12px}
+.contact-modal h3{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(26px,4vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.05;margin-bottom:10px}
+.contact-modal h3 em{font-style:italic;font-weight:300;color:rgba(30,35,32,0.55)}
+.contact-modal h3 strong{font-weight:700;letter-spacing:-.04em}
+.contact-modal p{font-size:13px;line-height:1.6;color:rgba(30,35,32,.62);margin-bottom:24px;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
+.contact-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.contact-field label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(30,35,32,.55);font-weight:600}
+.contact-field input,.contact-field textarea{font-family:inherit;font-size:15px;color:var(--ink);background:rgba(30,35,32,.04);border:1.5px solid rgba(30,35,32,.12);border-radius:12px;padding:13px 16px;outline:none;transition:border-color .25s,background .25s;resize:vertical;line-height:1.5}
+.contact-field textarea{min-height:110px;font-family:inherit}
+.contact-field input::placeholder,.contact-field textarea::placeholder{color:rgba(30,35,32,.32)}
+.contact-field input:focus,.contact-field textarea:focus{border-color:var(--sage);background:rgba(124,140,130,.06)}
+.contact-btn{width:100%;background:var(--ink);color:var(--bone);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;border:none;border-radius:100px;padding:16px;cursor:pointer;transition:background .25s,transform .25s;margin-top:10px;-webkit-tap-highlight-color:transparent}
+.contact-btn:hover{background:#2c332e;transform:translateY(-1px)}
+.contact-thanks{display:none;text-align:center;padding:20px 0}
+.contact-thanks h3{margin:0 0 12px}
+.contact-thanks p{margin:0;font-style:italic}
+.contact-modal.done .contact-form-wrap{display:none}
+.contact-modal.done .contact-thanks{display:block}
+.hero-photo{position:relative;min-height:100svh;overflow:hidden}
+.hero-photo-bg{position:absolute;inset:0;z-index:1}
+.hero-photo-bg img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.hero-photo-scrim{position:absolute;inset:0;z-index:2;background:linear-gradient(to bottom,rgba(20,24,21,.34) 0%,rgba(20,24,21,.10) 30%,rgba(20,24,21,.55) 72%,rgba(20,24,21,.88) 100%)}
+.hero-photo-content{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:120px 24px clamp(54px,10vh,96px);text-shadow:0 2px 28px rgba(0,0,0,.5)}
+.hero-wordmark{font-size:clamp(46px,8.5vw,112px);line-height:.88;letter-spacing:-.04em;margin-bottom:22px}
+.hero-wordmark .thin{font-weight:300}.hero-wordmark .bold{font-weight:700}
+.hero-tagline{font-size:clamp(15px,2vw,22px);letter-spacing:.03em;color:rgba(var(--cream),0.88);margin-bottom:14px;font-style:italic;font-weight:300}
+.hero-coming{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.6);margin-bottom:32px;font-weight:600}
+.scroll-cue{position:absolute;left:clamp(24px,5vw,80px);bottom:28px;z-index:3;font-size:9px;letter-spacing:.32em;color:rgba(var(--cream),0.45);animation:bob 2.4s ease-in-out infinite;text-transform:uppercase;font-weight:600}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+.section-hero{padding:clamp(80px,12vh,140px) 40px 50px;text-align:center}
+.section-hero h2{font-size:clamp(38px,5.2vw,64px);font-weight:500;letter-spacing:-.035em;line-height:1.1;margin-bottom:18px;max-width:900px;margin-left:auto;margin-right:auto;font-family:'Hanken Grotesk',sans-serif}
+.section-hero h2 em{font-style:italic;font-weight:400;color:rgba(var(--cream),0.7)}
+.section-hero h2 .accent{font-weight:700;letter-spacing:-.045em}
+.section-hero .sub{font-size:14px;color:rgba(var(--cream),0.55);letter-spacing:.01em;line-height:1.7;max-width:520px;margin:0 auto;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
+.section-hero .label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.35);margin-top:32px;display:inline-block;font-weight:600}
+.product-pair{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);padding:20px clamp(24px,5vw,72px) clamp(60px,10vw,120px);max-width:1400px;margin:0 auto}
+.pcard{position:relative;display:flex;flex-direction:column;border-radius:18px;background:var(--ink);padding:clamp(20px,3vw,28px);transition:background .4s ease,transform .4s ease,box-shadow .4s ease}
+.pcard:hover{background:#2a3029;transform:translateY(-6px);box-shadow:0 16px 48px rgba(0,0,0,0.5)}
+.pcard-photo{position:relative;display:block;overflow:hidden;border-radius:14px;background:transparent;box-shadow:0 30px 70px -30px rgba(0,0,0,0.6);aspect-ratio:4/5;margin-bottom:28px;cursor:pointer}
+.pcard-photo img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.pcard-photo:hover img{transform:scale(1.03)}
+.pcard-hover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,12,14,0.92) 0%,rgba(10,12,14,0.5) 50%,rgba(10,12,14,0) 100%);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s ease;pointer-events:none}
+.pcard-photo:hover .pcard-hover-overlay{opacity:1}
+.pcard-hover-cta{background:var(--bone);color:var(--ink);font-family:Helvetica,sans-serif;font-size:13px;font-weight:600;letter-spacing:.02em;padding:14px 28px;border-radius:100px;border:none;transform:translateY(8px);transition:transform .35s ease;white-space:nowrap;display:inline-flex;align-items:center;gap:9px}
+.pcard-hover-cta svg{width:15px;height:15px}
+.pcard-photo:hover .pcard-hover-cta{transform:translateY(0)}
+.pcard-info{display:flex;flex-direction:column;padding:0 clamp(8px,2vw,16px)}
+.pmeta{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.pnum{font-size:10px;letter-spacing:.28em;color:rgba(var(--cream),0.4);font-weight:600}
+.rule{flex:1;max-width:60px;height:1px;background:rgba(var(--cream),0.14)}
+.pname{font-size:clamp(32px,4.5vw,48px);font-weight:500;letter-spacing:-.035em;margin-bottom:14px;line-height:1}
+.pname .article{font-style:italic;font-weight:300;color:rgba(var(--cream),0.55);font-size:0.6em;letter-spacing:-.01em;margin-right:6px;vertical-align:0.1em}
+.pname .name{font-weight:700;letter-spacing:-.045em}
+.pprice{margin-bottom:22px;display:flex;align-items:baseline;gap:14px;padding-bottom:22px;border-bottom:1px solid rgba(var(--cream),0.06)}
+.amt{font-size:24px;font-weight:700;letter-spacing:-.025em;color:var(--bone)}
+.amt-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--cream),0.4);font-weight:600}
+.pdesc{font-size:13px;font-weight:400;line-height:1.65;color:rgba(var(--cream),0.55);margin-bottom:28px;letter-spacing:.005em}
+.pcta-row{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:auto}
+.phold{font-size:12px;color:rgba(var(--cream),0.5);font-style:italic}
+.phold strong{color:rgba(var(--cream),0.85);font-weight:600;font-style:normal}
+.ed-break{position:relative;overflow:hidden}
+.ed-break img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85) saturate(.9)}
+.ed-break--tall{height:90svh;min-height:560px}
+.ed-break--mid{height:72svh;min-height:440px}
+.ed-break-caption{position:absolute;bottom:clamp(28px,5vh,56px);left:clamp(24px,5vw,72px);z-index:3}
+.ed-break-caption .eyebrow{color:rgba(var(--cream),0.65)}
+.ed-break-caption h2{font-size:clamp(32px,5vw,64px);font-weight:500;letter-spacing:-.035em;line-height:1.02;margin-top:14px;max-width:560px}
+.ed-break-caption h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
+.ed-break-caption h2 strong{font-weight:700;letter-spacing:-.045em}
+.ed-break-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,35,32,0.75) 0%,rgba(30,35,32,0.1) 38%,transparent 60%);pointer-events:none}
+.fabric{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(36px,5vw,80px);padding:clamp(84px,15vh,180px) clamp(40px,6vw,96px);max-width:1400px;margin:0 auto}
+.fabric-img{position:relative;overflow:hidden;border-radius:18px;aspect-ratio:4/5;box-shadow:0 30px 70px -30px rgba(0,0,0,0.55)}
+.fabric-img img{width:100%;height:100%;object-fit:cover;object-position:center 35%;filter:brightness(.94) saturate(.96)}
+.fabric-text .eyebrow{display:block;margin-bottom:28px}
+.fabric-text h3{font-size:clamp(32px,4.4vw,56px);font-weight:500;letter-spacing:-.035em;line-height:1.05;margin-bottom:28px}
+.fabric-text h3 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
+.fabric-text h3 strong{font-weight:700;letter-spacing:-.045em}
+.fabric-text p{font-size:14px;font-weight:400;line-height:1.72;color:rgba(var(--cream),0.55);max-width:400px;margin-bottom:36px;font-family:Helvetica,sans-serif}
+.fabric-tags{display:flex;flex-wrap:wrap;gap:10px}
+.fabric-tag{font-size:10px;letter-spacing:.16em;color:rgba(var(--cream),0.5);padding:9px 16px;border:1px solid rgba(var(--cream),0.12);border-radius:100px;text-transform:uppercase;font-weight:600}
+.closing{position:relative;height:88svh;min-height:520px;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--ink)}
+.closing .orb{filter:blur(10px);mix-blend-mode:screen}
+.closing .orb.o1{width:640px;height:640px;top:-140px;left:3%;animation:drift1 27s ease-in-out infinite}
+.closing .orb.o2{width:540px;height:540px;bottom:-170px;right:1%;animation:drift2 34s ease-in-out infinite;animation-delay:-8s}
+.closing .orb.o3{width:460px;height:460px;top:34%;left:46%;animation:drift3 41s ease-in-out infinite;animation-delay:-15s}
+.closing-inner{position:relative;z-index:3;padding:0 32px}
+.closing .eyebrow{margin-bottom:24px;color:rgba(var(--cream),0.65)}
+.closing h2{font-size:clamp(50px,9vw,116px);font-weight:500;letter-spacing:-.045em;line-height:.94;margin-bottom:16px}
+.closing h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
+.closing h2 strong{font-weight:700;letter-spacing:-.05em}
+.closing .year{font-size:11px;letter-spacing:.3em;color:rgba(124,140,130,0.75);margin-bottom:40px;text-transform:uppercase;font-weight:600}
+.cta-band{position:relative;padding:clamp(60px,10vh,100px) clamp(24px,5vw,72px);text-align:center;background:var(--ink);overflow:hidden}
+.cta-band .eyebrow{margin-bottom:20px;display:inline-block}
+.cta-band h2{font-size:clamp(32px,4.5vw,56px);font-weight:500;letter-spacing:-.035em;margin-bottom:18px;line-height:1.1}
+.cta-band h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
+.cta-band h2 strong{font-weight:700;letter-spacing:-.045em}
+.cta-band p{font-size:14px;color:rgba(var(--cream),0.55);max-width:600px;margin:0 auto 32px;line-height:1.7;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
+.float-reserve{position:fixed;left:50%;bottom:26px;z-index:45;transform:translateX(-50%) translateY(26px) scale(.92);opacity:0;pointer-events:none;display:inline-flex;align-items:center;gap:11px;background:var(--bone);color:var(--ink);font-size:14px;font-weight:600;letter-spacing:.02em;padding:16px 34px;border-radius:100px;box-shadow:0 18px 44px -14px rgba(0,0,0,0.6);transition:opacity .45s ease,transform .55s cubic-bezier(.34,1.4,.64,1),background .2s;font-family:Helvetica,sans-serif}
+.float-reserve.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:auto}
+.float-reserve:hover{background:#fefdf8}
+.float-reserve svg{width:15px;height:15px}
+.loop-ov{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(20,24,21,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s ease}
+.loop-ov.show{opacity:1;visibility:visible}
+.loop-card{position:relative;width:100%;max-width:420px;background:var(--bone);color:var(--ink);border-radius:28px;padding:clamp(30px,5vw,44px);box-shadow:0 40px 90px -30px rgba(0,0,0,.6);transform:translateY(16px) scale(.98);transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.loop-ov.show .loop-card{transform:none}
+.loop-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;background:transparent;cursor:pointer;color:rgba(30,35,32,.42);font-size:24px;line-height:1;transition:color .2s}
+.loop-close:hover{color:var(--ink)}
+.loop-eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);font-weight:600}
+.loop-card h3{font-size:clamp(26px,5vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.04;margin:14px 0 10px;font-family:'Hanken Grotesk',sans-serif}
+.loop-card h3 em{font-style:italic;font-weight:400;color:rgba(30,35,32,0.55)}
+.loop-card h3 strong{font-weight:700;letter-spacing:-.04em}
+.loop-card p{font-size:13px;line-height:1.5;color:rgba(30,35,32,.64);margin-bottom:22px;font-style:italic}
+.loop-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.loop-field label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(30,35,32,.55);font-weight:600}
+.loop-field input{font-family:inherit;font-size:16px;color:var(--ink);background:rgba(30,35,32,.04);border:1.5px solid rgba(30,35,32,.14);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .2s,background .2s}
+.loop-field input::placeholder{color:rgba(30,35,32,.34)}
+.loop-field input:focus{border-color:var(--sage);background:rgba(124,140,130,.07)}
+.loop-btn{width:100%;background:var(--ink);color:var(--bone);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;border:none;border-radius:100px;padding:16px;cursor:pointer;transition:background .2s,transform .2s}
+.loop-btn:hover{background:#2c332e;transform:translateY(-1px)}
+.loop-fine{font-size:11px;color:rgba(30,35,32,.45);text-align:center;margin-top:14px;line-height:1.5;font-style:italic}
+.loop-thanks{display:none;text-align:center;padding:6px 0 2px}
+.loop-thanks h3{margin:0 0 8px}
+.loop-thanks p{margin:0}
+.loop-card.done .loop-form{display:none}
+.loop-card.done .loop-thanks{display:block}
+.site-footer{border-top:1px solid rgba(var(--cream),0.08);margin-top:0;padding:48px 40px 60px;background:#151618}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-trust{text-align:center;margin-bottom:40px}
+.footer-trust-label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.4);margin-bottom:18px;display:block;font-weight:600}
+.payment-badges{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.payment-badge{width:42px;height:28px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:9px;letter-spacing:0;background:#fff;color:#1A1F71}
+.payment-badge.visa{background:#1A1F71;color:#fff;font-style:italic;letter-spacing:.5px}
+.payment-badge.mc{background:#fff;position:relative;overflow:hidden}
+.payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
+.payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
+.payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
+.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
+.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
+.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.footer-legal{font-size:11px;color:rgba(var(--cream),0.4);line-height:1.7;text-align:center;max-width:780px;margin:0 auto;letter-spacing:.01em}
+.footer-legal p{margin-bottom:10px}
+.footer-legal a{color:rgba(var(--cream),0.6);text-decoration:underline;text-decoration-color:rgba(var(--cream),0.2);text-underline-offset:2px;transition:color .2s,text-decoration-color .2s}
+.footer-legal a:hover{color:var(--bone);text-decoration-color:rgba(var(--cream),0.6)}
+.footer-divider{width:40px;height:1px;background:rgba(var(--cream),0.1);margin:24px auto}
+.footer-meta{font-size:10px;color:rgba(var(--cream),0.3);letter-spacing:.18em;text-transform:uppercase;text-align:center;font-weight:600}
+.footer-credit{font-size:11px;color:rgba(var(--cream),0.35);text-align:center;margin-top:18px;letter-spacing:.02em;font-style:italic}
+.footer-credit .footer-heart{color:#2b312d;font-style:normal;display:inline-block;transform:translateY(1px);animation:heartbeat 2.5s ease-in-out infinite}
+.footer-credit a{color:rgba(var(--cream),0.55);text-decoration:none;font-weight:500;font-style:normal;transition:color .25s}
+.footer-credit a:hover{color:var(--bone)}
+@keyframes heartbeat{0%,100%{transform:translateY(1px) scale(1)}15%{transform:translateY(1px) scale(1.15)}30%{transform:translateY(1px) scale(1)}45%{transform:translateY(1px) scale(1.1)}60%{transform:translateY(1px) scale(1)}}
+.reveal>*:not(.orb){opacity:0;transform:translateY(14px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+.reveal.in>*:not(.orb){opacity:1;transform:none}
+.reveal.in>*:nth-child(2){transition-delay:.05s}
+.reveal.in>*:nth-child(3){transition-delay:.11s}
+.reveal.in>*:nth-child(4){transition-delay:.17s}
+.reveal.in>*:nth-child(5){transition-delay:.23s}
+.reveal.in>*:nth-child(6){transition-delay:.29s}
+.pop{transform:translateY(10px)!important;opacity:0;transition:opacity .8s ease .12s,transform .8s cubic-bezier(.2,.7,.2,1) .12s}
+.in .pop,.pop.in{transform:none!important;opacity:1}
+@media(max-width:860px){
+.topbar,.topbar.solid{padding:14px 20px}
+.topbar.solid{padding:12px 20px}
+.wordmark{font-size:21px}
+.topbar .reserve-link{font-size:11.5px}
+.topbar-actions{gap:14px}
+.topbar-contact{font-size:10.5px;padding:8px 16px;letter-spacing:.05em}
+.hero-photo-content{padding:100px 24px 60px}
+.hero-wordmark{font-size:clamp(56px,18vw,96px);margin-bottom:18px}
+.hero-tagline{font-size:15px;margin-bottom:12px}
+.hero-coming{font-size:9.5px;margin-bottom:28px;letter-spacing:.3em}
+.btn{padding:15px 28px;font-size:13px;-webkit-tap-highlight-color:transparent}
+.scroll-cue{left:22px;bottom:22px;font-size:8.5px}
+.section-hero{padding:70px 22px 30px}
+.section-hero h2{font-size:clamp(30px,7vw,44px);letter-spacing:-.03em;line-height:1.15;margin-bottom:16px}
+.section-hero .sub{font-size:13px;line-height:1.65}
+.section-hero .label{margin-top:26px;font-size:8.5px;letter-spacing:.28em}
+.product-pair{grid-template-columns:1fr;gap:24px;padding:10px 22px 50px}
+.pcard{padding:18px;border-radius:16px}
+.pcard-photo{margin-bottom:22px;aspect-ratio:4/5;border-radius:12px}
+.pcard-info{padding:0 6px}
+.pmeta{margin-bottom:14px;gap:12px}
+.pnum{font-size:9.5px;letter-spacing:.24em}
+.rule{max-width:48px}
+.eyebrow{font-size:8.5px;letter-spacing:.28em}
+.pname{font-size:38px;margin-bottom:12px}
+.pprice{margin-bottom:18px;padding-bottom:18px;gap:12px}
+.amt{font-size:22px}
+.amt-label{font-size:8.5px}
+.pdesc{font-size:13px;line-height:1.65;margin-bottom:22px}
+.phold{font-size:11.5px}
+.ed-break--tall{height:64svh;min-height:440px}
+.ed-break--mid{height:54svh;min-height:380px}
+.ed-break-caption{bottom:32px;left:22px;right:22px}
+.ed-break-caption h2{font-size:clamp(28px,7vw,42px);line-height:1.05;margin-top:10px;max-width:100%}
+.fabric{grid-template-columns:1fr;padding:60px 22px;gap:30px}
+.fabric-text{order:1}
+.fabric-img{order:2;aspect-ratio:4/5;border-radius:14px}
+.fabric-text h3{font-size:clamp(28px,7vw,42px);margin-bottom:22px;line-height:1.08}
+.fabric-text p{font-size:13.5px;line-height:1.7;margin-bottom:28px}
+.fabric-tag{font-size:9.5px;padding:8px 14px;letter-spacing:.14em}
+.fabric-tags{gap:8px}
+.cta-band{padding:60px 22px}
+.cta-band h2{font-size:clamp(28px,7vw,40px);line-height:1.15;margin-bottom:14px}
+.cta-band p{font-size:13px;margin-bottom:24px;line-height:1.65}
+.closing{height:75svh;min-height:440px}
+.closing-inner{padding:0 22px}
+.closing h2{font-size:clamp(54px,16vw,90px);margin-bottom:14px}
+.closing .year{font-size:10px;letter-spacing:.28em;margin-bottom:30px}
+.site-footer{padding:40px 22px 50px}
+.footer-trust{margin-bottom:32px}
+.footer-trust-label{font-size:9px;margin-bottom:14px}
+.payment-badges{gap:8px}
+.payment-badge{width:38px;height:26px}
+.footer-legal{font-size:10.5px;line-height:1.65}
+.footer-credit{font-size:10.5px;margin-top:14px}
+.float-reserve{padding:13px 26px;font-size:13px;bottom:18px;-webkit-tap-highlight-color:transparent}
+.pcard-hover-overlay{opacity:1;background:linear-gradient(to top,rgba(10,12,14,0.6) 0%,rgba(10,12,14,0.15) 40%,rgba(10,12,14,0) 70%)}
+.pcard-hover-cta{transform:translateY(0);padding:12px 22px;font-size:12.5px}
+.loop-card{border-radius:22px;padding:32px 26px}
+.loop-card h3{font-size:26px}
+.loop-card p{font-size:13px}
+.loop-field input{font-size:16px;padding:13px 15px;border-radius:12px}
+.loop-btn{padding:16px;-webkit-tap-highlight-color:transparent}
+}
+@media(max-width:480px){
+.topbar,.topbar.solid{padding:14px 18px}
+.wordmark{font-size:16px}
+.hero-photo-content{padding:90px 18px 50px}
+.hero-wordmark{font-size:clamp(48px,16vw,80px)}
+.hero-tagline{font-size:14px}
+.section-hero{padding:60px 18px 24px}
+.section-hero h2{font-size:30px;letter-spacing:-.025em}
+.product-pair{padding:6px 18px 44px;gap:20px}
+.pcard{padding:14px;border-radius:14px}
+.pname{font-size:34px}
+.amt{font-size:20px}
+.fabric{padding:50px 18px;gap:26px}
+.fabric-text h3{font-size:28px}
+.cta-band{padding:50px 18px}
+.cta-band h2{font-size:28px}
+.closing h2{font-size:52px}
+.site-footer{padding:34px 18px 44px}
+.payment-badge{width:36px;height:24px;font-size:8px}
+.payment-badge.cashapp{font-size:12px}
+.payment-badge.klarna{font-size:10px}
+.payment-badge.amex{font-size:7px}
+.footer-meta{font-size:9.5px;letter-spacing:.14em}
+.ed-break--tall{height:58svh;min-height:380px}
+.ed-break-caption h2{font-size:30px}
+}
+@media(prefers-reduced-motion:reduce){
+*{animation:none!important;scroll-behavior:auto!important}
+.reveal>*,.pop{opacity:1!important;transform:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="loop-ov" id="loopOv" aria-hidden="true">
+<div class="loop-card" id="loopCard" role="dialog" aria-modal="true" aria-label="Be the first to know">
+<button class="loop-close" id="loopClose" aria-label="Close">&times;</button>
+<div class="loop-form">
+<h3>Be the <em>first</em> <strong>to know.</strong></h3>
+<p>for after class — coming 2027</p>
+<div class="loop-field">
+<label for="loopPhone">Phone</label>
+<input id="loopPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel">
+</div>
+<button class="loop-btn" id="loopSubmit">Keep me posted</button>
+<p class="loop-fine">One text when we launch. No spam, ever.</p>
+</div>
+<div class="loop-thanks">
+<h3>You're <strong>on the list.</strong></h3>
+<p>We'll be in touch when the first run opens.</p>
+</div>
+</div>
+</div>
+
+<div class="topbar" id="topbar">
+<a href="/" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
+<div class="topbar-actions">
+<a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
+<button class="topbar-contact" id="contactOpenBtn">Contact</button>
+</div>
+</div>
+
+<section class="hero-photo">
+<div class="hero-photo-bg">
+<img src="hero-duo.jpg" alt="Two friends heading home from class wrapped in the Cloak, beside the Cloak hanging on a hook" fetchpriority="high" decoding="async">
+</div>
+<div class="hero-photo-scrim"></div>
+<div class="hero-photo-content">
+<span class="wordmark hero-wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></span>
+<span class="hero-tagline">for after class</span>
+<span class="hero-coming">Coming 2027</span>
+<a href="yogacloak-reserve-page.html" class="btn">Reserve now
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+</div>
+<div class="scroll-cue">Scroll</div>
+</section>
+
+<section class="section-hero">
+<h2>What are <em>you</em> <span class="accent">wearing home?</span></h2>
+<p class="sub">Two ways to leave class covered.<br>A small deposit saves your spot in the first drop.</p>
+<span class="label">PICK YOURS</span>
+</section>
+
+<section class="product-pair">
+<div class="pcard reveal" id="cloak">
+<a class="pcard-photo" href="yogacloak-reserve-page.html?product=cloak" aria-label="Reserve the Cloak">
+<img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape with pockets" loading="lazy" decoding="async">
+<div class="pcard-hover-overlay">
+<span class="pcard-hover-cta">I'll Take the Cloak
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</span>
+</div>
+</a>
+<div class="pcard-info">
+<div class="pmeta"><span class="pnum">01</span><span class="rule"></span><span class="eyebrow">For the drive home</span></div>
+<h3 class="pname"><span class="article">The</span><span class="name">Cloak</span></h3>
+<div class="pprice">
+<span class="amt">$98</span>
+<span class="amt-label">final price</span>
+</div>
+<p class="pdesc">Hooded and open-front, falling to mid-thigh with two hidden snaps. About 300 GSM of brushed recycled microfiber — deeply absorbent, matte graphite, soft the second it touches skin. The layer you pull on still warm from class and keep on until you're through your own front door.</p>
+<div class="pcta-row">
+<span class="phold pop"><strong>$20</strong> holds yours</span>
+</div>
+</div>
+</div>
+
+<div class="pcard reveal" id="wrap">
+<a class="pcard-photo" href="yogacloak-reserve-page.html?product=wrap" aria-label="Reserve the Wrap">
+<img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape" loading="lazy" decoding="async">
+<div class="pcard-hover-overlay">
+<span class="pcard-hover-cta">I'll Take the Wrap
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</span>
+</div>
+</a>
+<div class="pcard-info">
+<div class="pmeta"><span class="pnum">02</span><span class="rule"></span><span class="eyebrow">For the walk home</span></div>
+<h3 class="pname"><span class="article">The</span><span class="name">Wrap</span></h3>
+<div class="pprice">
+<span class="amt">$68</span>
+<span class="amt-label">final price</span>
+</div>
+<p class="pdesc">An oversized rectangular drape with a single hidden snap — knot it, sling it, throw it over one shoulder. Around 200 GSM, lighter than the Cloak and packs down to nothing. For the block-and-a-half to the car, the coffee run, the ride home. Wears in, wears everywhere.</p>
+<div class="pcta-row">
+<span class="phold pop"><strong>$15</strong> holds yours</span>
+</div>
+</div>
+</div>
+</section>
+
+<div class="ed-break ed-break--tall">
+<img src="studio-to-street.jpg" alt="Four friends walking the sidewalk after class, one wrapped in the Wrap" loading="lazy" decoding="async" style="object-position: center 28%">
+<div class="ed-break-grad"></div>
+<div class="ed-break-caption reveal">
+<span class="eyebrow">The Wrap</span>
+<h2>From the <em>studio</em> to<br><strong>the sidewalk.</strong></h2>
+</div>
+</div>
+
+<section class="fabric">
+<div class="fabric-img">
+<img src="material.jpg" alt="The Cloak draped over a collarbone, sweat still on the skin" loading="lazy" decoding="async">
+</div>
+<div class="fabric-text reveal">
+<span class="eyebrow">The material</span>
+<h3><em>Dark,</em> <strong>absorbent,</strong><br>built for heat.</h3>
+<p>Brushed recycled microfiber in matte graphite — soft the second it meets warm skin, and absorbent enough to take on whatever you walk out of class with. Light enough to forget you have it on, dark enough to wear straight from the mat to anywhere else. Built for the way home, not the workout.</p>
+<div class="fabric-tags">
+<span class="fabric-tag">Dark graphite</span>
+<span class="fabric-tag">Lightweight</span>
+<span class="fabric-tag">Absorbent</span>
+<span class="fabric-tag">Soft hand</span>
+<span class="fabric-tag">Minimal</span>
+</div>
+</div>
+</section>
+
+<section class="cta-band">
+<span class="orb o1" style="width:400px;height:400px;top:-80px;left:2%;opacity:.25"></span>
+<span class="orb o2" style="width:350px;height:350px;bottom:-100px;right:3%;opacity:.2;animation:drift2 34s ease-in-out infinite;animation-delay:-8s"></span>
+<div style="position:relative;z-index:2">
+<span class="eyebrow">Join first access</span>
+<h2>Be the <strong>first</strong> <em>to know</em> when we launch.</h2>
+<p>Reserve now for early access and the clearest path to securing yours when we open.</p>
+<button id="ctaBtnOpen" class="btn">Keep me posted
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+</div>
+</section>
+
+<section class="closing">
+<span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+<div class="closing-inner reveal">
+<span class="eyebrow">Reserving now</span>
+<h2><em>Reserve</em> <strong>yours.</strong></h2>
+<div class="year">Coming 2027</div>
+<a href="yogacloak-reserve-page.html" class="btn pop">Reserve now
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+</div>
+</section>
+
+<footer class="site-footer">
+<div class="footer-inner">
+<div class="footer-trust">
+<span class="footer-trust-label">Supported payment methods</span>
+<div class="payment-badges">
+<span class="payment-badge visa">VISA</span>
+<span class="payment-badge mc"></span>
+<span class="payment-badge amex">AMEX</span>
+<span class="payment-badge link">Link</span>
+<span class="payment-badge applepay">Pay</span>
+<span class="payment-badge klarna">K.</span>
+<span class="payment-badge cashapp">$</span>
+</div>
+</div>
+<div class="footer-legal">
+<p>All payments are securely processed by Stripe. yogacloak does not store your card details. By placing a reservation, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
+<p>Reservation does not constitute a final purchase contract. yogacloak reserves the right to cancel reservations and refund deposits at our sole discretion. All product images are representative; final product may vary slightly in appearance and specifications.</p>
+<div class="footer-divider"></div>
+<div class="footer-meta">© 2026 yogacloak · All rights reserved · <a href="yogacloak-faq.html" style="color:rgba(251,248,240,0.5)">FAQ</a> · <a href="mailto:hello@yogacloak.com" style="color:rgba(251,248,240,0.5)">hello@yogacloak.com</a></div>
+<div class="footer-credit">made with <span class="footer-heart">♥</span> by <a href="https://www.instagram.com/flowinglikeabrooke?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">@flowinglikeabrooke</a></div>
+</div>
+</div>
+</footer>
+
+<a href="yogacloak-reserve-page.html" class="float-reserve" id="floatReserve">Reserve yours
+<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
+
+<script src="/main.js"></script>
+<script>
+document.getElementById('ctaBtnOpen').addEventListener('click',function(){
+document.getElementById('loopOv').classList.add('show');
+document.getElementById('loopOv').setAttribute('aria-hidden','false');
+setTimeout(function(){try{document.getElementById('loopPhone').focus()}catch(e){}},320);
+});
+</script>
+<div class="contact-overlay" id="contactOverlay" aria-hidden="true">
+<div class="contact-modal" role="dialog" aria-modal="true" aria-label="Contact us">
+<button class="contact-close" id="contactClose" aria-label="Close">&times;</button>
+<div class="contact-form-wrap">
+<span class="contact-eyebrow">Say hello</span>
+<h3>Drop us <em>a note.</em></h3>
+<p>A real person reads every message. Usually back within 24 hours.</p>
+<form id="contactForm">
+<div class="contact-field"><label for="contactName">Name</label><input id="contactName" type="text" required autocomplete="name"></div>
+<div class="contact-field"><label for="contactEmail">Email</label><input id="contactEmail" type="email" required autocomplete="email"></div>
+<div class="contact-field"><label for="contactMessage">Message</label><textarea id="contactMessage" required placeholder="What's on your mind?"></textarea></div>
+<button type="submit" class="contact-btn">Send</button>
+</form>
+</div>
+<div class="contact-thanks">
+<h3>Got <em>it.</em></h3>
+<p>We'll be in touch shortly.</p>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+var ov=document.getElementById('contactOverlay');
+var openBtn=document.getElementById('contactOpenBtn');
+var closeBtn=document.getElementById('contactClose');
+var form=document.getElementById('contactForm');
+var modal=ov.querySelector('.contact-modal');
+function open(){ov.classList.add('show');ov.setAttribute('aria-hidden','false');setTimeout(function(){try{document.getElementById('contactName').focus()}catch(e){}},300)}
+function close(){ov.classList.remove('show');ov.setAttribute('aria-hidden','true');setTimeout(function(){modal.classList.remove('done');if(form)form.reset()},400)}
+if(openBtn)openBtn.addEventListener('click',open);
+if(closeBtn)closeBtn.addEventListener('click',close);
+ov.addEventListener('click',function(e){if(e.target===ov)close()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
+if(form){form.addEventListener('submit',function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')})}
+})();
+</script>
+</body>
+</html>

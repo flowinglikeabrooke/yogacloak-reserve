@@ -19,11 +19,38 @@ a{color:inherit;text-decoration:none}
 
 /* Topbar */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.92);backdrop-filter:blur(14px)}
-.wordmark{font-size:18px;letter-spacing:-.005em;line-height:1}
+.wordmark{font-size:24px;letter-spacing:-.01em;line-height:1}
 .wordmark .thin{font-weight:400}
 .wordmark .bold{font-weight:700}
 .topbar a.reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .25s;letter-spacing:.02em}
 .topbar a.reserve-link:hover{opacity:.65}
+.topbar-actions{display:flex;align-items:center;gap:18px}
+.topbar-contact{font-family:Helvetica,sans-serif;background:transparent;border:1px solid rgba(var(--cream),0.25);color:var(--bone);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 20px;border-radius:100px;cursor:pointer;transition:background .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
+.topbar-contact:hover{background:rgba(var(--cream),0.06);border-color:rgba(var(--cream),0.5)}
+.contact-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,12,14,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease}
+.contact-overlay.show{opacity:1;visibility:visible}
+.contact-modal{position:relative;width:100%;max-width:480px;background:var(--bone);color:var(--ink);border-radius:24px;padding:clamp(32px,5vw,44px);box-shadow:0 40px 90px -30px rgba(0,0,0,0.6);transform:translateY(16px) scale(.98);transition:transform .5s cubic-bezier(.2,.7,.2,1);font-family:Helvetica,sans-serif}
+.contact-overlay.show .contact-modal{transform:none}
+.contact-close{position:absolute;top:14px;right:16px;width:36px;height:36px;border:none;background:transparent;cursor:pointer;color:rgba(30,35,32,.4);font-size:26px;line-height:1;transition:color .25s;-webkit-tap-highlight-color:transparent}
+.contact-close:hover{color:var(--ink)}
+.contact-eyebrow{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);font-weight:600;display:inline-block;margin-bottom:12px}
+.contact-modal h3{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(26px,4vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.05;margin-bottom:10px;color:var(--ink)}
+.contact-modal h3 em{font-style:italic;font-weight:300;color:rgba(30,35,32,0.55)}
+.contact-modal h3 strong{font-weight:700;letter-spacing:-.04em}
+.contact-modal p{font-size:13px;line-height:1.6;color:rgba(30,35,32,.62);margin-bottom:24px;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
+.contact-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.contact-field label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(30,35,32,.55);font-weight:600}
+.contact-field input,.contact-field textarea{font-family:inherit;font-size:15px;color:var(--ink);background:rgba(30,35,32,.04);border:1.5px solid rgba(30,35,32,.12);border-radius:12px;padding:13px 16px;outline:none;transition:border-color .25s,background .25s;resize:vertical;line-height:1.5}
+.contact-field textarea{min-height:110px;font-family:inherit}
+.contact-field input::placeholder,.contact-field textarea::placeholder{color:rgba(30,35,32,.32)}
+.contact-field input:focus,.contact-field textarea:focus{border-color:var(--sage);background:rgba(124,140,130,.06)}
+.contact-btn{width:100%;background:var(--ink);color:var(--bone);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;border:none;border-radius:100px;padding:16px;cursor:pointer;transition:background .25s,transform .25s;margin-top:10px;-webkit-tap-highlight-color:transparent}
+.contact-btn:hover{background:#2c332e;transform:translateY(-1px)}
+.contact-thanks{display:none;text-align:center;padding:20px 0}
+.contact-thanks h3{margin:0 0 12px}
+.contact-thanks p{margin:0;font-style:italic}
+.contact-modal.done .contact-form-wrap{display:none}
+.contact-modal.done .contact-thanks{display:block}
 
 /* Hero */
 .faq-hero{padding:160px 40px 100px;text-align:center;background:var(--ink);position:relative;overflow:hidden}
@@ -112,8 +139,11 @@ a{color:inherit;text-decoration:none}
 
 /* Mobile */
 @media(max-width:860px){
-.topbar{padding:14px 22px}
-.wordmark{font-size:17px}
+.topbar{padding:14px 20px}
+.wordmark{font-size:21px}
+.topbar-actions{gap:14px}
+.topbar a.reserve-link{font-size:11.5px}
+.topbar-contact{font-size:10.5px;padding:8px 16px;letter-spacing:.05em}
 .faq-hero{padding:110px 22px 70px}
 .faq-hero h1{font-size:clamp(32px,7vw,46px);letter-spacing:-.03em;line-height:1.15;margin-bottom:20px}
 .faq-hero .subtitle{font-size:14px;line-height:1.7}
@@ -166,7 +196,10 @@ a{color:inherit;text-decoration:none}
 
 <div class="topbar">
 <a href="/" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
+<div class="topbar-actions">
 <a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
+<button class="topbar-contact" id="contactOpenBtn">Contact</button>
+</div>
 </div>
 
 <section class="faq-hero">
@@ -438,6 +471,43 @@ document.querySelectorAll('.faq-item').forEach(function(item){
     item.classList.toggle('open', !wasOpen);
   });
 });
+</script>
+<div class="contact-overlay" id="contactOverlay" aria-hidden="true">
+<div class="contact-modal" role="dialog" aria-modal="true" aria-label="Contact us">
+<button class="contact-close" id="contactClose" aria-label="Close">&times;</button>
+<div class="contact-form-wrap">
+<span class="contact-eyebrow">Say hello</span>
+<h3>Drop us <em>a note.</em></h3>
+<p>A real person reads every message. Usually back within 24 hours.</p>
+<form id="contactForm">
+<div class="contact-field"><label for="contactName">Name</label><input id="contactName" type="text" required autocomplete="name"></div>
+<div class="contact-field"><label for="contactEmail">Email</label><input id="contactEmail" type="email" required autocomplete="email"></div>
+<div class="contact-field"><label for="contactMessage">Message</label><textarea id="contactMessage" required placeholder="What's on your mind?"></textarea></div>
+<button type="submit" class="contact-btn">Send</button>
+</form>
+</div>
+<div class="contact-thanks">
+<h3>Got <em>it.</em></h3>
+<p>We'll be in touch shortly.</p>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+var ov=document.getElementById('contactOverlay');
+var openBtn=document.getElementById('contactOpenBtn');
+var closeBtn=document.getElementById('contactClose');
+var form=document.getElementById('contactForm');
+var modal=ov.querySelector('.contact-modal');
+function open(){ov.classList.add('show');ov.setAttribute('aria-hidden','false');setTimeout(function(){try{document.getElementById('contactName').focus()}catch(e){}},300)}
+function close(){ov.classList.remove('show');ov.setAttribute('aria-hidden','true');setTimeout(function(){modal.classList.remove('done');if(form)form.reset()},400)}
+if(openBtn)openBtn.addEventListener('click',open);
+if(closeBtn)closeBtn.addEventListener('click',close);
+ov.addEventListener('click',function(e){if(e.target===ov)close()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
+if(form){form.addEventListener('submit',function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')})}
+})();
 </script>
 </body>
 </html>
