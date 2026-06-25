@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service — yogacloak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-700.woff2" as="font" type="font/woff2" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1E2320;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--bone:#fbf8f0;--cream:251,248,240}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{background:var(--ink);color:var(--bone);overflow-x:hidden}
+.wordmark,.legal-hero h1,.legal-hero .subtitle,.legal-section-title{font-family:'Hanken Grotesk',sans-serif}
+a{color:inherit;text-decoration:none}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:rgba(30,35,32,0.92);backdrop-filter:blur(14px)}
+.wordmark{font-size:24px;letter-spacing:-.01em;line-height:1}
+.wordmark .thin{font-weight:400}
+.wordmark .bold{font-weight:700}
+.topbar a.reserve-link{font-size:12px;font-weight:600;color:var(--bone);transition:opacity .25s;letter-spacing:.02em}
+.topbar a.reserve-link:hover{opacity:.65}
+.topbar-actions{display:flex;align-items:center;gap:18px}
+.topbar-contact{font-family:Helvetica,sans-serif;background:transparent;border:1px solid rgba(var(--cream),0.25);color:var(--bone);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 20px;border-radius:100px;cursor:pointer;transition:background .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
+.topbar-contact:hover{background:rgba(var(--cream),0.06);border-color:rgba(var(--cream),0.5)}
+
+.legal-hero{padding:160px 40px 80px;text-align:center;background:var(--ink)}
+.legal-hero h1{font-size:clamp(40px,5.8vw,72px);font-weight:500;letter-spacing:-.035em;line-height:1.1;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto}
+.legal-hero h1 em{font-style:italic;font-weight:400;color:rgba(var(--cream),0.65)}
+.legal-hero h1 .accent{font-weight:700;letter-spacing:-.045em}
+.legal-hero .subtitle{font-size:15px;color:rgba(var(--cream),0.55);letter-spacing:.005em;line-height:1.75;max-width:540px;margin:0 auto;font-style:italic;font-weight:300}
+.legal-hero .updated{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.35);margin-top:28px;display:inline-block;font-weight:600;font-family:Helvetica,sans-serif}
+
+.legal-body{max-width:780px;margin:0 auto;padding:0 40px 80px}
+.legal-intro{padding:40px 0 50px;font-size:15px;line-height:1.85;color:rgba(var(--cream),0.7);font-style:italic;font-family:'Hanken Grotesk',sans-serif;font-weight:300;letter-spacing:.005em}
+.legal-section{padding:30px 0 40px}
+.legal-section-title{font-size:clamp(22px,2.6vw,28px);font-weight:500;letter-spacing:-.025em;line-height:1.2;margin-bottom:22px;color:var(--bone)}
+.legal-section-title em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
+.legal-section-title strong{font-weight:700;letter-spacing:-.03em}
+.legal-section p{font-size:14.5px;line-height:1.8;color:rgba(var(--cream),0.65);margin-bottom:16px;font-weight:300;letter-spacing:.005em}
+.legal-section p:last-child{margin-bottom:0}
+.legal-section em{font-style:italic;color:rgba(var(--cream),0.85);font-weight:400}
+.legal-section strong{font-weight:500;color:var(--bone)}
+.legal-section ul{margin:8px 0 16px 4px;list-style:none}
+.legal-section ul li{font-size:14.5px;line-height:1.8;color:rgba(var(--cream),0.65);margin-bottom:8px;padding-left:22px;position:relative;font-weight:300;letter-spacing:.005em}
+.legal-section ul li::before{content:'';position:absolute;left:0;top:14px;width:8px;height:1px;background:rgba(var(--cream),0.35)}
+.legal-section a{color:var(--bone);border-bottom:1px solid rgba(var(--cream),0.3);transition:border-color .2s;padding-bottom:1px}
+.legal-section a:hover{border-color:var(--bone)}
+.legal-section .all-caps{text-transform:uppercase;letter-spacing:.02em;font-size:13.5px;font-weight:500;color:rgba(var(--cream),0.78)}
+
+.site-footer{border-top:1px solid rgba(var(--cream),0.06);padding:48px 40px 60px;background:#151618}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-trust{text-align:center;margin-bottom:40px}
+.footer-trust-label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.4);margin-bottom:18px;display:block;font-weight:600}
+.payment-badges{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.payment-badge{width:42px;height:28px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:9px;background:#fff;color:#1A1F71}
+.payment-badge.visa{background:#1A1F71;color:#fff;font-style:italic;letter-spacing:.5px}
+.payment-badge.mc{background:#fff;position:relative;overflow:hidden}
+.payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
+.payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
+.payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
+.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
+.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
+.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.footer-legal{font-size:11px;color:rgba(var(--cream),0.4);line-height:1.7;text-align:center;max-width:780px;margin:0 auto;letter-spacing:.01em}
+.footer-legal p{margin-bottom:10px}
+.footer-legal a{color:rgba(var(--cream),0.6);text-decoration:underline;text-decoration-color:rgba(var(--cream),0.2);text-underline-offset:2px;transition:color .25s}
+.footer-legal a:hover{color:var(--bone)}
+.footer-divider{width:40px;height:1px;background:rgba(var(--cream),0.1);margin:24px auto}
+.footer-meta{font-size:10px;color:rgba(var(--cream),0.3);letter-spacing:.18em;text-transform:uppercase;text-align:center;font-weight:600}
+.footer-meta a{color:rgba(var(--cream),0.5)}
+.footer-credit{font-size:11px;color:rgba(var(--cream),0.35);text-align:center;margin-top:18px;letter-spacing:.02em;font-style:italic}
+.footer-credit .footer-heart{color:#2b312d;font-style:normal;display:inline-block;transform:translateY(1px);animation:heartbeat 2.5s ease-in-out infinite}
+.footer-credit a{color:rgba(var(--cream),0.55);text-decoration:none;font-weight:500;font-style:normal;transition:color .25s}
+.footer-credit a:hover{color:var(--bone)}
+@keyframes heartbeat{0%,100%{transform:translateY(1px) scale(1)}15%{transform:translateY(1px) scale(1.15)}30%{transform:translateY(1px) scale(1)}45%{transform:translateY(1px) scale(1.1)}60%{transform:translateY(1px) scale(1)}}
+
+.contact-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,12,14,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease}
+.contact-overlay.show{opacity:1;visibility:visible}
+.contact-modal{position:relative;width:100%;max-width:480px;background:var(--bone);color:var(--ink);border-radius:24px;padding:clamp(32px,5vw,44px);box-shadow:0 40px 90px -30px rgba(0,0,0,0.6);transform:translateY(16px) scale(.98);transition:transform .5s cubic-bezier(.2,.7,.2,1);font-family:Helvetica,sans-serif}
+.contact-overlay.show .contact-modal{transform:none}
+.contact-close{position:absolute;top:14px;right:16px;width:36px;height:36px;border:none;background:transparent;cursor:pointer;color:rgba(30,35,32,.4);font-size:26px;line-height:1;transition:color .25s;-webkit-tap-highlight-color:transparent}
+.contact-close:hover{color:var(--ink)}
+.contact-eyebrow{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--sage);font-weight:600;display:inline-block;margin-bottom:12px}
+.contact-modal h3{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(26px,4vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.05;margin-bottom:10px;color:var(--ink)}
+.contact-modal h3 em{font-style:italic;font-weight:300;color:rgba(30,35,32,0.55)}
+.contact-modal h3 strong{font-weight:700;letter-spacing:-.04em}
+.contact-modal p{font-size:13px;line-height:1.6;color:rgba(30,35,32,.62);margin-bottom:24px;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
+.contact-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.contact-field label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(30,35,32,.55);font-weight:600}
+.contact-field input,.contact-field textarea{font-family:inherit;font-size:15px;color:var(--ink);background:rgba(30,35,32,.04);border:1.5px solid rgba(30,35,32,.12);border-radius:12px;padding:13px 16px;outline:none;transition:border-color .25s,background .25s;resize:vertical;line-height:1.5}
+.contact-field textarea{min-height:110px;font-family:inherit}
+.contact-field input:focus,.contact-field textarea:focus{border-color:var(--sage);background:rgba(124,140,130,.06)}
+.contact-btn{width:100%;background:var(--ink);color:var(--bone);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;border:none;border-radius:100px;padding:16px;cursor:pointer;transition:background .25s,transform .25s;margin-top:10px;-webkit-tap-highlight-color:transparent}
+.contact-btn:hover{background:#2c332e;transform:translateY(-1px)}
+.contact-thanks{display:none;text-align:center;padding:20px 0}
+.contact-thanks h3{margin:0 0 12px}
+.contact-thanks p{margin:0;font-style:italic}
+.contact-modal.done .contact-form-wrap{display:none}
+.contact-modal.done .contact-thanks{display:block}
+
+@media(max-width:860px){
+.topbar{padding:14px 20px}
+.wordmark{font-size:21px}
+.topbar-actions{gap:14px}
+.topbar a.reserve-link{font-size:11.5px}
+.topbar-contact{font-size:10.5px;padding:8px 16px;letter-spacing:.05em}
+.legal-hero{padding:110px 22px 60px}
+.legal-hero h1{font-size:clamp(30px,7vw,42px);line-height:1.15}
+.legal-hero .subtitle{font-size:14px}
+.legal-body{padding:0 22px 60px}
+.legal-intro{padding:32px 0 40px;font-size:14px}
+.legal-section{padding:24px 0 32px}
+.legal-section-title{font-size:22px;margin-bottom:18px}
+.legal-section p,.legal-section ul li{font-size:13.5px;line-height:1.75}
+.site-footer{padding:36px 22px 50px}
+.payment-badge{width:38px;height:26px}
+.footer-legal{font-size:10.5px}
+}
+@media(max-width:480px){
+.topbar{padding:12px 18px}
+.wordmark{font-size:20px}
+.legal-hero{padding:96px 18px 50px}
+.legal-hero h1{font-size:28px}
+.legal-body{padding:0 18px 50px}
+.legal-section-title{font-size:20px}
+.legal-section p,.legal-section ul li{font-size:13px}
+.site-footer{padding:32px 18px 44px}
+.payment-badge{width:36px;height:24px;font-size:8px}
+.payment-badge.cashapp{font-size:12px}
+.payment-badge.klarna{font-size:10px}
+.payment-badge.amex{font-size:7px}
+.footer-meta{font-size:9.5px;letter-spacing:.14em}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<a href="/" class="wordmark"><span class="thin">yoga</span><span class="bold">cloak</span></a>
+<div class="topbar-actions">
+<a href="yogacloak-reserve-page.html" class="reserve-link">Reserve</a>
+<button class="topbar-contact" id="contactOpenBtn">Contact</button>
+</div>
+</div>
+
+<section class="legal-hero">
+<h1><em>Terms</em> of <span class="accent">Service</span></h1>
+<p class="subtitle">The terms and conditions that govern your use of yogacloak.com and any reservation or purchase you make with us.</p>
+<span class="updated">Effective June 24, 2026</span>
+</section>
+
+<div class="legal-body">
+
+<div class="legal-intro">
+These Terms of Service ("Terms") constitute a legally binding agreement between you ("you" or "User") and yogacloak ("we," "us," or "our") governing your access to and use of yogacloak.com (the "Site"), our products, and any related services. By accessing the Site, placing a reservation, or making a purchase, you agree to be bound by these Terms. If you do not agree, do not use the Site or services.
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">1. <em>Eligibility</em> and account</h2>
+<p>You must be at least 18 years old (or the age of majority in your jurisdiction) to place a reservation or make a purchase. By using the Site, you represent and warrant that you meet this requirement and have the legal capacity to enter into this agreement.</p>
+<p>You agree to provide accurate, current, and complete information when placing a reservation, and to update such information as needed. You are responsible for maintaining the confidentiality of any account credentials and for all activity that occurs under your account.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">2. <em>Reservations</em> and the deposit model</h2>
+<p>yogacloak operates on a reservation-based pre-order model. The Site allows you to reserve a place in our first product drop by paying a non-refundable deposit ("Deposit"). The remainder of the purchase price ("Final Balance") will be charged separately at a later date prior to shipment.</p>
+<p>Submitting a reservation does not constitute a final, binding purchase contract until both: (a) the Final Balance is paid in full, and (b) yogacloak confirms allocation of inventory to your reservation. yogacloak reserves the right, in its sole discretion, to cancel any reservation prior to shipment, in which case the Deposit will be refunded.</p>
+<p><strong>Deposit terms:</strong></p>
+<ul>
+<li>Deposits are <strong>non-refundable</strong> except as expressly stated in these Terms or required by law.</li>
+<li>Deposits are <strong>transferable</strong> to another individual prior to final shipment, subject to written notice to yogacloak.</li>
+<li>The Deposit will be applied toward the Final Balance of your purchase.</li>
+<li>Deposits do not earn interest.</li>
+</ul>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">3. <em>Pricing,</em> taxes, and final balance</h2>
+<p>All prices displayed on the Site are in U.S. dollars and are subject to change without prior notice prior to the time of final purchase confirmation. The Final Balance for your reservation will be communicated at least thirty (30) days prior to the scheduled ship date.</p>
+<p>You are responsible for all applicable sales taxes, value-added taxes, customs duties, import fees, and other governmental charges. Such amounts will be calculated and disclosed at the time the Final Balance is charged or at checkout.</p>
+<p>If the Final Balance cannot be successfully charged to your provided payment method, yogacloak will make reasonable attempts to contact you. If payment is not received within a reasonable timeframe, yogacloak may cancel the reservation and retain the original Deposit as liquidated damages.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">4. <em>Payment</em> processing</h2>
+<p>All payments are processed by Stripe, Inc. By submitting payment information, you agree to Stripe's terms and privacy policy in addition to these Terms. yogacloak does not store full payment-card information on our servers.</p>
+<p>You represent and warrant that any payment method you provide is yours, that you are authorized to use it, and that there are sufficient funds available.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">5. <em>Shipping</em> and delivery</h2>
+<p>Estimated ship windows (currently November 2027 for the first drop) are estimates only and are not guaranteed. Actual delivery dates may vary due to production timelines, carrier performance, customs processing, and other factors outside our reasonable control.</p>
+<p>Risk of loss and title for products pass to you upon our delivery of the products to the carrier. yogacloak is not responsible for lost, stolen, or damaged shipments after delivery to the carrier. Domestic shipping is included on the first drop unless otherwise stated. International shipping availability and costs will be disclosed prior to final purchase.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">6. <em>Returns,</em> exchanges, and refunds</h2>
+<p>Products may be returned within <strong>thirty (30) days</strong> of delivery, provided they are unworn, unwashed, in original condition, and accompanied by all original tags and packaging. Returns received in any other condition may be refused or subject to a restocking fee.</p>
+<p>Refunds of accepted returns will be issued to the original payment method, less the original Deposit, which remains non-refundable as set forth in Section 2.</p>
+<p>If a product arrives damaged, defective, or incorrect, contact us at <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a> within 14 days of delivery. We will work in good faith to remedy the issue through replacement, repair, or full refund at our discretion.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">7. <em>Intellectual</em> property</h2>
+<p>All content on the Site — including the yogacloak name, logos, product designs, photography, copy, graphics, and underlying code — is owned by yogacloak or its licensors and is protected by United States and international copyright, trademark, and other intellectual property laws.</p>
+<p>You may not reproduce, distribute, modify, create derivative works of, publicly display, publicly perform, or otherwise exploit any content from the Site without our prior written permission, except for personal, non-commercial viewing.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">8. User <em>conduct</em></h2>
+<p>You agree not to use the Site to:</p>
+<ul>
+<li>Violate any applicable law, regulation, or third-party right.</li>
+<li>Submit false, misleading, or fraudulent information.</li>
+<li>Interfere with the security or functioning of the Site, including by introducing viruses, malware, or other harmful code.</li>
+<li>Attempt to gain unauthorized access to any portion of the Site, our systems, or other users' accounts.</li>
+<li>Scrape, harvest, or otherwise collect data from the Site by automated means without our express written permission.</li>
+<li>Use the Site for any commercial purpose other than placing reservations or purchases as a customer.</li>
+</ul>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">9. <em>Disclaimers</em></h2>
+<p class="all-caps">The site and all products are provided on an "as is" and "as available" basis. yogacloak makes no warranties, express or implied, including without limitation the implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement.</p>
+<p class="all-caps">Without limiting the foregoing, yogacloak does not warrant that the site will be uninterrupted, error-free, or secure, that defects will be corrected, or that products will meet your specific expectations.</p>
+<p>Some jurisdictions do not allow the disclaimer of certain warranties, so the above disclaimers may not apply to you in their entirety.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">10. Limitation of <em>liability</em></h2>
+<p class="all-caps">To the maximum extent permitted by law, yogacloak, its officers, directors, employees, agents, and affiliates shall not be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages arising out of or related to your use of the site or products, including but not limited to loss of profits, data, goodwill, or business opportunities, regardless of whether yogacloak has been advised of the possibility of such damages.</p>
+<p class="all-caps">In no event shall yogacloak's total aggregate liability arising out of or related to these terms or your use of the site or products exceed the total amount you have actually paid to yogacloak in the twelve (12) months preceding the event giving rise to the claim.</p>
+<p>Some jurisdictions do not allow the limitation or exclusion of certain damages, so portions of this section may not apply to you.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">11. <em>Indemnification</em></h2>
+<p>You agree to indemnify, defend, and hold harmless yogacloak, its officers, directors, employees, agents, affiliates, and licensors from and against any and all claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) your access to or use of the Site or products; (b) your breach of these Terms; (c) your violation of any law or third-party right; or (d) any content or information you submit through the Site.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">12. <em>Governing</em> law and venue</h2>
+<p>These Terms are governed by and construed in accordance with the laws of the State of Arizona, without regard to its conflict-of-laws principles. Subject to Section 13, any dispute arising out of or related to these Terms or your use of the Site shall be brought exclusively in the state or federal courts located in Maricopa County, Arizona, and you consent to the personal jurisdiction of those courts.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">13. <em>Dispute</em> resolution and arbitration</h2>
+<p class="all-caps">Please read this section carefully. It affects your legal rights, including the right to file a lawsuit in court.</p>
+<p><strong>Informal resolution:</strong> Before initiating any formal proceeding, you agree to first contact us in writing at <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a> and attempt to resolve the dispute informally for at least sixty (60) days.</p>
+<p><strong>Binding arbitration:</strong> Any dispute that cannot be resolved informally shall be settled by binding individual arbitration administered by the American Arbitration Association (AAA) under its Consumer Arbitration Rules, in Maricopa County, Arizona. Judgment on the arbitrator's award may be entered in any court of competent jurisdiction.</p>
+<p class="all-caps"><strong>Class-action waiver:</strong> You and yogacloak each waive the right to participate in a class action, class-wide arbitration, or other representative proceeding. Disputes shall be resolved on an individual basis only.</p>
+<p><strong>Exceptions:</strong> Either party may bring an individual action in small-claims court or seek injunctive or equitable relief in court to protect intellectual property rights.</p>
+<p><strong>Opt-out:</strong> You may opt out of this arbitration agreement by sending written notice to <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a> within 30 days of your first reservation or purchase. The notice must include your name, mailing address, and a clear statement that you wish to opt out.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">14. <em>Termination</em></h2>
+<p>yogacloak may suspend or terminate your access to the Site, refuse a reservation, or cancel an existing reservation at any time, with or without notice, for conduct that we believe violates these Terms, harms other users, or exposes yogacloak to legal liability. The provisions of these Terms that by their nature should survive termination shall survive, including Sections 7 through 16.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">15. <em>Changes</em> to these Terms</h2>
+<p>yogacloak may modify these Terms from time to time. The updated Terms will be posted on the Site with a new "Effective" date. Material changes will be communicated by email or prominent Site notice. Your continued use of the Site or services after such changes constitutes acceptance of the revised Terms. If you do not agree to the updated Terms, you must stop using the Site and services.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">16. <em>Miscellaneous</em></h2>
+<p><strong>Entire agreement:</strong> These Terms, together with our Privacy Policy, constitute the entire agreement between you and yogacloak regarding the Site and supersede all prior agreements.</p>
+<p><strong>Severability:</strong> If any provision of these Terms is found to be unenforceable, the remaining provisions shall remain in full force and effect.</p>
+<p><strong>No waiver:</strong> Our failure to enforce any provision of these Terms shall not constitute a waiver of that provision or any other.</p>
+<p><strong>Assignment:</strong> You may not assign or transfer any of your rights or obligations under these Terms without our prior written consent. yogacloak may assign these Terms freely.</p>
+<p><strong>Force majeure:</strong> yogacloak is not liable for any failure or delay in performance caused by events beyond our reasonable control, including but not limited to acts of God, war, terrorism, civil unrest, pandemics, government action, labor disputes, or supplier failures.</p>
+</div>
+
+<div class="legal-section">
+<h2 class="legal-section-title">17. <em>Contact</em> us</h2>
+<p>Questions about these Terms? Contact us:</p>
+<p><strong>yogacloak</strong><br>
+Email: <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a><br>
+Location: Scottsdale, Arizona, USA</p>
+</div>
+
+</div>
+
+<footer class="site-footer">
+<div class="footer-inner">
+<div class="footer-trust">
+<span class="footer-trust-label">Supported payment methods</span>
+<div class="payment-badges">
+<span class="payment-badge visa">VISA</span>
+<span class="payment-badge mc"></span>
+<span class="payment-badge amex">AMEX</span>
+<span class="payment-badge link">Link</span>
+<span class="payment-badge applepay">Pay</span>
+<span class="payment-badge klarna">K.</span>
+<span class="payment-badge cashapp">$</span>
+</div>
+</div>
+<div class="footer-legal">
+<p>All payments are securely processed by Stripe. yogacloak does not store your card details. By placing a reservation, you agree to our <a href="yogacloak-terms.html">Terms of Service</a> and <a href="yogacloak-privacy.html">Privacy Policy</a>.</p>
+<div class="footer-divider"></div>
+<div class="footer-meta">© 2026 yogacloak · All rights reserved · <a href="yogacloak-faq.html">FAQ</a> · <a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a></div>
+<div class="footer-credit">made with <span class="footer-heart">♥</span> by <a href="https://www.instagram.com/flowinglikeabrooke?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">@flowinglikeabrooke</a></div>
+</div>
+</div>
+</footer>
+
+<div class="contact-overlay" id="contactOverlay" aria-hidden="true">
+<div class="contact-modal" role="dialog" aria-modal="true" aria-label="Contact us">
+<button class="contact-close" id="contactClose" aria-label="Close">&times;</button>
+<div class="contact-form-wrap">
+<span class="contact-eyebrow">Say hello</span>
+<h3>Drop us <em>a note.</em></h3>
+<p>A real person reads every message. Usually back within 24 hours.</p>
+<form id="contactForm">
+<div class="contact-field"><label for="contactName">Name</label><input id="contactName" type="text" required autocomplete="name"></div>
+<div class="contact-field"><label for="contactEmail">Email</label><input id="contactEmail" type="email" required autocomplete="email"></div>
+<div class="contact-field"><label for="contactMessage">Message</label><textarea id="contactMessage" required placeholder="What's on your mind?"></textarea></div>
+<button type="submit" class="contact-btn">Send</button>
+</form>
+</div>
+<div class="contact-thanks">
+<h3>Got <em>it.</em></h3>
+<p>We'll be in touch shortly.</p>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+var ov=document.getElementById('contactOverlay');
+var openBtn=document.getElementById('contactOpenBtn');
+var closeBtn=document.getElementById('contactClose');
+var form=document.getElementById('contactForm');
+var modal=ov.querySelector('.contact-modal');
+function open(){ov.classList.add('show');ov.setAttribute('aria-hidden','false');setTimeout(function(){try{document.getElementById('contactName').focus()}catch(e){}},300)}
+function close(){ov.classList.remove('show');ov.setAttribute('aria-hidden','true');setTimeout(function(){modal.classList.remove('done');if(form)form.reset()},400)}
+if(openBtn)openBtn.addEventListener('click',open);
+if(closeBtn)closeBtn.addEventListener('click',close);
+ov.addEventListener('click',function(e){if(e.target===ov)close()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
+if(form){form.addEventListener('submit',function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')})}
+})();
+</script>
+</body>
+</html>
