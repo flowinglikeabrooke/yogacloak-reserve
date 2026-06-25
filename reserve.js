@@ -171,6 +171,7 @@ async function createCheckoutSession(payload) {
   const siteUrl = (process.env.SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '');
   const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
   const params = new URLSearchParams();
+  const fullPrice = payload.products.reduce((sum, product) => sum + PRODUCT_CONFIG[product].retail, 0);
   const finalBalance = payload.products.reduce((sum, product) => sum + PRODUCT_CONFIG[product].retail, 0) - payload.depositTotal;
 
   params.append('mode', 'payment');
@@ -184,7 +185,7 @@ async function createCheckoutSession(payload) {
   params.append('consent_collection[payment_method_reuse_agreement][position]', 'auto');
   params.append(
     'custom_text[submit][message]',
-    `You authorize yogacloak to save this payment method and automatically charge the remaining product balance of $${finalBalance} before shipment. We will email you before the final charge.`
+    `You are paying a $${payload.depositTotal} reservation deposit today. You authorize yogacloak to save this payment method and automatically charge the remaining product balance of $${finalBalance} before shipment. We will email you before the final charge.`
   );
   params.append('phone_number_collection[enabled]', 'true');
   params.append('shipping_address_collection[allowed_countries][0]', 'US');
@@ -192,7 +193,7 @@ async function createCheckoutSession(payload) {
   params.append('line_items[0][price_data][currency]', 'usd');
   params.append('line_items[0][price_data][unit_amount]', String(payload.depositTotal * 100));
   params.append('line_items[0][price_data][product_data][name]', `${payload.productNames} reservation deposit`);
-  params.append('line_items[0][price_data][product_data][description]', 'Deposit applied toward the final yogacloak order.');
+  params.append('line_items[0][price_data][product_data][description]', `$${payload.depositTotal} paid today. $${finalBalance} remaining balance paid later. $${fullPrice} full product price.`);
 
   const metadata = {
     contact_record_id: payload.contactRecordId,
@@ -202,6 +203,7 @@ async function createCheckoutSession(payload) {
     products: payload.products.join(','),
     cloak_size: payload.size || '',
     deposit_total: String(payload.depositTotal),
+    full_price_total: String(fullPrice),
     final_balance_total: String(finalBalance),
     future_charge_authorized: 'true'
   };

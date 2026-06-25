@@ -84,9 +84,12 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .pcard-availability{font-size:10px;letter-spacing:.16em;color:rgba(251,248,240,0.4);margin-bottom:28px;text-transform:uppercase;font-weight:600}
 .pcard-availability.low{color:#c4845a}
 .pcard-availability.soldout-label{color:#a06860}
-.pcard-price{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(251,248,240,0.06)}
+.pcard-price{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(251,248,240,0.06)}
+.price-stack{display:flex;flex-direction:column;gap:5px}
 .deposit-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(251,248,240,0.4);font-weight:600}
 .deposit-amt{font-size:28px;font-weight:700;letter-spacing:-.025em;color:var(--bone)}
+.full-price{font-size:12px;color:rgba(251,248,240,0.58);letter-spacing:.02em}
+.full-price strong{color:rgba(251,248,240,0.82);font-weight:600}
 .pcard-desc{font-size:13px;color:rgba(251,248,240,0.55);line-height:1.65;margin-bottom:0;letter-spacing:.005em}
 .disclaimer{text-align:center;font-size:11px;color:rgba(251,248,240,0.45);margin-top:40px;padding-top:32px;border-top:1px solid rgba(251,248,240,0.08);letter-spacing:.01em;line-height:1.6}
 .form-section{display:none;padding:0 40px;max-width:800px;margin:0 auto}
@@ -126,6 +129,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .deposit-line{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin:8px 0}
 .deposit-line .lbl{color:rgba(251,248,240,.65)}
 .deposit-line .amt{font-weight:500}
+.balance-line{border-top:1px solid rgba(251,248,240,.08);padding-top:12px;margin-top:12px}
+.balance-line .lbl{color:rgba(251,248,240,.72)}
 .deposit-total{border-top:1px solid rgba(251,248,240,.12);padding-top:12px;margin-top:12px;font-size:14px;font-weight:600;display:flex;justify-content:space-between}
 .form-btn{width:100%;background:var(--bone);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;padding:16px;border-radius:100px;border:none;cursor:pointer;transition:background .2s,transform .2s;margin-top:20px}
 .form-btn:hover{background:#fefdf8;transform:translateY(-2px)}
@@ -257,8 +262,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <span>Two ways to leave class covered. Save your spot on the full set.</span>
 </div>
 <div class="both-banner-price">
-<div class="both-total">$35 deposit</div>
-<div class="both-deposit">holds both spots</div>
+<div class="both-total">$166 full price</div>
+<div class="both-deposit">$35 today · $131 later</div>
 </div>
 <div class="both-banner-arrow">&#8594;</div>
 </div>
@@ -280,7 +285,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 </div>
 <div class="pcard-price">
 <span class="deposit-amt">$20</span>
+<span class="price-stack">
 <span class="deposit-label">deposit to reserve</span>
+<span class="full-price"><strong>$98</strong> full price · $78 later</span>
+</span>
 </div>
 <p class="pcard-desc">Hooded and open-front, falling to mid-thigh. Soft against warm skin, deeply absorbent, matte graphite. The layer you pull on still warm from class.</p>
 </div>
@@ -298,7 +306,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 </div>
 <div class="pcard-price">
 <span class="deposit-amt">$15</span>
+<span class="price-stack">
 <span class="deposit-label">deposit to reserve</span>
+<span class="full-price"><strong>$68</strong> full price · $53 later</span>
+</span>
 </div>
 <p class="pcard-desc">An oversized rectangular drape. Knot it, sling it, throw it over one shoulder. Lighter than the Cloak and packs down to nothing.</p>
 </div>
@@ -380,6 +391,14 @@ Back
 <div class="deposit-total">
 <span>Total deposit today</span>
 <span id="totalDeposit">$0</span>
+</div>
+<div class="deposit-line balance-line">
+<span class="lbl">Remaining balance paid later</span>
+<span class="amt" id="laterBalance">$0</span>
+</div>
+<div class="deposit-line">
+<span class="lbl">Full product price</span>
+<span class="amt" id="fullPrice">$0</span>
 </div>
 </div>
 
@@ -494,7 +513,7 @@ document.getElementById('addonImg').src = addon.img;
 document.getElementById('addonImg').alt = addon.name;
 document.getElementById('addonName').textContent = addon.name;
 document.getElementById('addonDesc').textContent = addon.desc;
-document.getElementById('addonPrice').textContent = '$' + addon.deposit + ' deposit';
+document.getElementById('addonPrice').textContent = '$' + addon.price + ' full · $' + addon.deposit + ' today';
 document.getElementById('addonSizeRow').style.display = (addonKey === 'cloak') ? 'block' : 'none';
 addonSection.style.display = 'block';
 addonSection.classList.remove('checked');
@@ -527,17 +546,23 @@ document.getElementById('depositLineCloak').style.display = showCloak ? 'flex' :
 document.getElementById('depositLineWrap').style.display = showWrap ? 'flex' : 'none';
 
 let total = 0;
+let fullTotal = 0;
 if (showCloak) total += 20;
 if (showWrap) total += 15;
+if (showCloak) fullTotal += PRODUCTS.cloak.price;
+if (showWrap) fullTotal += PRODUCTS.wrap.price;
+const laterTotal = fullTotal - total;
 document.getElementById('totalDeposit').textContent = '$' + total;
+document.getElementById('laterBalance').textContent = '$' + laterTotal;
+document.getElementById('fullPrice').textContent = '$' + fullTotal;
 
 const btn = document.getElementById('submitBtn');
 if (showCloak && showWrap) {
-btn.textContent = 'Reserve both: $35 deposit';
+btn.textContent = 'Reserve both: $35 today';
 } else if (showCloak) {
-btn.textContent = 'Reserve The Cloak: $20 deposit';
+btn.textContent = 'Reserve The Cloak: $20 today';
 } else {
-btn.textContent = 'Reserve The Wrap: $15 deposit';
+btn.textContent = 'Reserve The Wrap: $15 today';
 }
 }
 
