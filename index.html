@@ -159,7 +159,8 @@ a{text-decoration:none;color:inherit}
 .section-hero .sub{font-size:14px;color:rgba(var(--cream),0.55);letter-spacing:.01em;line-height:1.7;max-width:520px;margin:0 auto;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
 .section-hero .label{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:rgba(var(--cream),0.35);margin-top:32px;display:inline-block;font-weight:600}
 .product-pair{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);padding:20px clamp(24px,5vw,72px) clamp(60px,10vw,120px);max-width:1400px;margin:0 auto}
-.pcard{position:relative;display:flex;flex-direction:column;border-radius:18px;background:var(--ink);padding:clamp(20px,3vw,28px);transition:background .4s ease,transform .4s ease,box-shadow .4s ease}
+.pcard{position:relative;display:flex;flex-direction:column;border-radius:18px;background:var(--ink);padding:clamp(20px,3vw,28px);transition:background .4s ease,transform .4s ease,box-shadow .4s ease;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pcard:focus-visible{outline:1px solid rgba(var(--cream),.42);outline-offset:5px;background:#2a3029}
 .pcard:hover{background:#2a3029;transform:translateY(-6px);box-shadow:0 16px 48px rgba(0,0,0,0.5)}
 .pcard-photo{position:relative;display:block;overflow:hidden;border-radius:14px;background:transparent;box-shadow:0 30px 70px -30px rgba(0,0,0,0.6);aspect-ratio:4/5;margin-bottom:28px;cursor:pointer}
 .pcard-photo img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
@@ -319,8 +320,8 @@ a{text-decoration:none;color:inherit}
 .ed-break-caption{bottom:32px;left:22px;right:22px}
 .ed-break-caption h2{font-size:clamp(28px,7vw,42px);line-height:1.05;margin-top:10px;max-width:100%}
 .fabric{grid-template-columns:1fr;padding:60px 22px;gap:30px}
-.fabric-text{order:1}
-.fabric-img{order:2;aspect-ratio:4/5;border-radius:14px}
+.fabric-img{order:1;aspect-ratio:4/5;border-radius:14px}
+.fabric-text{order:2}
 .fabric-text h3{font-size:clamp(28px,7vw,42px);margin-bottom:22px;line-height:1.08}
 .fabric-text p{font-size:13.5px;line-height:1.7;margin-bottom:28px}
 .fabric-tag{font-size:9.5px;padding:8px 14px;letter-spacing:.14em}
@@ -351,6 +352,9 @@ a{text-decoration:none;color:inherit}
 @media(max-width:480px){
 .topbar,.topbar.solid{padding:14px 18px}
 .wordmark{font-size:21px}
+.topbar-actions{gap:10px}
+.topbar .reserve-link{font-size:11px}
+.topbar-contact{font-size:9.5px;padding:7px 12px;letter-spacing:.04em}
 .hero-photo-content{padding:90px 18px 50px}
 .hero-wordmark{font-size:clamp(48px,16vw,80px)}
 .hero-tagline{font-size:14px}
@@ -358,6 +362,7 @@ a{text-decoration:none;color:inherit}
 .section-hero h2{font-size:30px;letter-spacing:-.025em}
 .product-pair{padding:6px 18px 44px;gap:20px}
 .pcard{padding:14px;border-radius:14px}
+.pcard:active{transform:scale(.99)}
 .pname{font-size:34px}
 .amt{font-size:20px}
 .fabric{padding:50px 18px;gap:26px}
@@ -377,6 +382,7 @@ a{text-decoration:none;color:inherit}
 .reveal>*,.pop{opacity:1!important;transform:none!important;transition:none!important}
 }
 </style>
+<link rel="stylesheet" href="payment-badges.css">
 </head>
 <body>
 
@@ -386,6 +392,10 @@ a{text-decoration:none;color:inherit}
 <div class="loop-form">
 <h3>Be the <em>first</em> <strong>to know.</strong></h3>
 <p>for after class — coming 2027</p>
+<div class="loop-field">
+<label for="loopName">First name</label>
+<input id="loopName" type="text" placeholder="Brooke" autocomplete="given-name">
+</div>
 <div class="loop-field">
 <label for="loopPhone">Phone</label>
 <input id="loopPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel">
@@ -514,7 +524,7 @@ a{text-decoration:none;color:inherit}
 <footer class="site-footer">
 <div class="footer-inner">
 <div class="footer-trust">
-<span class="footer-trust-label">Cards + mobile wallets</span>
+<span class="footer-trust-label">Secure checkout accepts</span>
 <div class="payment-badges">
 <span class="payment-badge visa">VISA</span>
 <span class="payment-badge mc"></span>
@@ -540,31 +550,59 @@ a{text-decoration:none;color:inherit}
 <script src="/main.js"></script>
 <script>
 (function(){
+document.querySelectorAll('.product-pair .pcard').forEach(function(card){
+var link=card.querySelector('.pcard-photo');
+if(!link)return;
+card.setAttribute('role','link');
+card.setAttribute('tabindex','0');
+card.addEventListener('click',function(e){
+if(e.target.closest('a,button,input,textarea,select'))return;
+window.location.href=link.href;
+});
+card.addEventListener('keydown',function(e){
+if(e.key==='Enter'||e.key===' '){
+e.preventDefault();
+window.location.href=link.href;
+}
+});
+});
+})();
+</script>
+<script>
+(function(){
 var loopOv=document.getElementById('loopOv');
 var loopCard=document.getElementById('loopCard');
 var loopOpen=document.getElementById('ctaBtnOpen');
 var loopClose=document.getElementById('loopClose');
 var loopSubmit=document.getElementById('loopSubmit');
+var loopName=document.getElementById('loopName');
 var loopPhone=document.getElementById('loopPhone');
 var loopFine=document.getElementById('loopFine');
 var consentText='By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.';
 function openLoop(){
 loopOv.classList.add('show');
 loopOv.setAttribute('aria-hidden','false');
-setTimeout(function(){try{loopPhone.focus()}catch(e){}},320);
+setTimeout(function(){try{loopName.focus()}catch(e){}},320);
 }
 function closeLoop(){
 loopOv.classList.remove('show');
 loopOv.setAttribute('aria-hidden','true');
-setTimeout(function(){loopCard.classList.remove('done');loopPhone.value='';loopFine.textContent=consentText;loopFine.classList.remove('error')},400);
+setTimeout(function(){loopCard.classList.remove('done');loopName.value='';loopPhone.value='';loopFine.textContent=consentText;loopFine.classList.remove('error')},400);
 }
 if(loopOpen)loopOpen.addEventListener('click',openLoop);
 if(loopClose)loopClose.addEventListener('click',closeLoop);
 loopOv.addEventListener('click',function(e){if(e.target===loopOv)closeLoop()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&loopOv.classList.contains('show'))closeLoop()});
 if(loopSubmit)loopSubmit.addEventListener('click',async function(){
+var firstName=(loopName.value||'').trim();
 var phone=(loopPhone.value||'').trim();
 var digits=phone.replace(/\D/g,'');
+if(firstName.length<1){
+loopFine.textContent='Please enter your first name.';
+loopFine.classList.add('error');
+loopName.focus();
+return;
+}
 if(digits.length<10){
 loopFine.textContent='Please enter a valid phone number.';
 loopFine.classList.add('error');
@@ -577,7 +615,7 @@ loopSubmit.textContent='Saving...';
 loopFine.textContent=consentText;
 loopFine.classList.remove('error');
 try{
-var r=await fetch('/api/sms-optin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:phone,source_page:'Homepage',consent_language_version:'sms-launch-optin-v1',consent_text:consentText})});
+var r=await fetch('/api/sms-optin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name:firstName,phone:phone,source_page:'Homepage',consent_language_version:'sms-launch-optin-v1',consent_text:consentText})});
 if(!r.ok)throw new Error('failed');
 loopCard.classList.add('done');
 }catch(err){

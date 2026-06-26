@@ -1,0 +1,134 @@
+.payment-badges {
+  gap: 9px !important;
+}
+
+.payment-badge {
+  width: auto !important;
+  min-width: 46px !important;
+  height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 5px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #fff !important;
+  color: #111 !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 24px -18px rgba(0, 0, 0, 0.55) !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+
+.payment-badge.visa {
+  color: #1434CB !important;
+  font-size: 12px !important;
+  font-style: italic !important;
+  font-weight: 800 !important;
+}
+
+.payment-badge.mc {
+  position: relative !important;
+  min-width: 48px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.payment-badge.mc::before,
+.payment-badge.mc::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 50% !important;
+  width: 17px !important;
+  height: 17px !important;
+  border-radius: 999px !important;
+  transform: translateY(-50%) !important;
+}
+
+.payment-badge.mc::before {
+  left: 13px !important;
+  background: #EB001B !important;
+}
+
+.payment-badge.mc::after {
+  right: 13px !important;
+  background: #F79E1B !important;
+  mix-blend-mode: multiply !important;
+}
+
+.payment-badge.amex {
+  min-width: 50px !important;
+  background: #2E77BC !important;
+  color: #fff !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+}
+
+.payment-badge.applepay,
+.payment-badge.googlepay {
+  min-width: 72px !important;
+  justify-content: center !important;
+  font-size: 0 !important;
+}
+
+.payment-badge.applepay {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+.payment-badge.applepay::before {
+  content: "\F8FF" !important;
+  margin-right: 4px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+}
+
+.payment-badge.applepay::after {
+  content: "Pay" !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.payment-badge.googlepay {
+  background: #fff !important;
+}
+
+.payment-badge.googlepay::before {
+  content: "G" !important;
+  margin-right: 5px !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  background: linear-gradient(90deg, #4285F4 0 28%, #34A853 28% 48%, #FBBC04 48% 70%, #EA4335 70% 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.payment-badge.googlepay::after {
+  content: "Pay" !important;
+  color: #3C4043 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.03em !important;
+}
+
+@media (max-width: 480px) {
+  .payment-badges {
+    gap: 7px !important;
+  }
+
+  .payment-badge {
+    height: 28px !important;
+    min-width: 44px !important;
+    padding: 0 9px !important;
+  }
+
+  .payment-badge.applepay,
+  .payment-badge.googlepay {
+    min-width: 68px !important;
+  }
+}
+
