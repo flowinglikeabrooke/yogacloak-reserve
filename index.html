@@ -242,6 +242,9 @@ a{text-decoration:none;color:inherit}
 .loop-ov.show{opacity:1;visibility:visible}
 .loop-card{position:relative;width:100%;max-width:420px;background:var(--bone);color:var(--ink);border-radius:28px;padding:clamp(30px,5vw,44px);box-shadow:0 40px 90px -30px rgba(0,0,0,.6);transform:translateY(16px) scale(.98);transition:transform .55s cubic-bezier(.2,.7,.2,1)}
 .loop-ov.show .loop-card{transform:none}
+.loop-ov.cookie-up{align-items:center;padding-bottom:150px}
+.loop-dismiss{display:block;margin:14px auto 0;background:none;border:none;padding:4px;color:rgba(30,35,32,.34);font-family:Helvetica,sans-serif;font-size:11px;letter-spacing:.02em;text-decoration:underline;text-underline-offset:2px;cursor:pointer;transition:color .25s ease}
+.loop-dismiss:hover{color:rgba(30,35,32,.6)}
 .loop-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;background:transparent;cursor:pointer;color:rgba(30,35,32,.42);font-size:24px;line-height:1;transition:color .2s}
 .loop-close:hover{color:var(--ink)}
 .loop-eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);font-weight:600}
@@ -422,6 +425,7 @@ a{text-decoration:none;color:inherit}
 </div>
 <button class="loop-btn" id="loopSubmit">Keep me posted</button>
 <p class="loop-fine" id="loopFine">By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.</p>
+<button type="button" class="loop-dismiss" id="loopDismiss">Don't show this again</button>
 </div>
 <div class="loop-thanks">
 <h3>You're <strong>on the list.</strong></h3>
@@ -646,8 +650,16 @@ var loopSubmit=document.getElementById('loopSubmit');
 var loopName=document.getElementById('loopName');
 var loopPhone=document.getElementById('loopPhone');
 var loopFine=document.getElementById('loopFine');
+var loopDismiss=document.getElementById('loopDismiss');
 var consentText='By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.';
+// Stop auto-showing once they sign up OR click "Don't show this again".
+var DONE_KEY='yc_loop_done';
+function loopDone(){try{return localStorage.getItem(DONE_KEY)==='1'}catch(e){return false}}
+function markLoopDone(){try{localStorage.setItem(DONE_KEY,'1')}catch(e){}}
 function openLoop(){
+// If the cookie banner is still showing, lift the popup so they don't overlap.
+var cookieBanner=document.querySelector('.yc-cookie-banner.show');
+loopOv.classList.toggle('cookie-up',!!cookieBanner);
 loopOv.classList.add('show');
 loopOv.setAttribute('aria-hidden','false');
 setTimeout(function(){try{loopName.focus()}catch(e){}},320);
@@ -659,6 +671,7 @@ setTimeout(function(){loopCard.classList.remove('done');loopName.value='';loopPh
 }
 if(loopOpen)loopOpen.addEventListener('click',openLoop);
 if(loopClose)loopClose.addEventListener('click',closeLoop);
+if(loopDismiss)loopDismiss.addEventListener('click',function(){markLoopDone();closeLoop();});
 loopOv.addEventListener('click',function(e){if(e.target===loopOv)closeLoop()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&loopOv.classList.contains('show'))closeLoop()});
 if(loopSubmit)loopSubmit.addEventListener('click',async function(){
@@ -685,6 +698,7 @@ loopFine.classList.remove('error');
 try{
 var r=await fetch('/api/sms-optin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name:firstName,phone:phone,source_page:'Homepage',consent_language_version:'sms-launch-optin-v1',consent_text:consentText})});
 if(!r.ok)throw new Error('failed');
+markLoopDone();
 loopCard.classList.add('done');
 }catch(err){
 loopFine.textContent='That did not save. Please try again.';
@@ -694,6 +708,14 @@ loopSubmit.disabled=false;
 loopSubmit.textContent=original;
 }
 });
+// Auto-show the popup ~20s after load, on every visit, unless they've already
+// signed up or chosen "Don't show this again". (Closing it normally lets it
+// return on the next visit.) Change 20000 below to adjust the delay in ms.
+if(!loopDone()){
+setTimeout(function(){
+if(!loopDone()&&!loopOv.classList.contains('show'))openLoop();
+},20000);
+}
 })();
 </script>
 <div class="contact-overlay" id="contactOverlay" aria-hidden="true">
