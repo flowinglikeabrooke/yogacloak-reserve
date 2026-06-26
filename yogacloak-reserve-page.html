@@ -119,6 +119,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .both-banner-text{flex:1}
 .both-banner-text strong{font-size:15px;font-weight:600;letter-spacing:-.01em;display:block;margin-bottom:3px}
 .both-banner-text span{font-size:12px;color:rgba(251,248,240,0.55)}
+.mobile-copy{display:none}
 .both-banner-price{text-align:right;white-space:nowrap}
 .both-banner-price .both-total{font-size:18px;font-weight:600;letter-spacing:-.02em}
 .both-banner-price .both-deposit{font-size:11px;color:rgba(251,248,240,0.5);margin-top:2px}
@@ -238,6 +239,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .both-banner-text{min-width:0}
 .both-banner-text strong{font-size:15px;line-height:1;margin-bottom:0}
 .both-banner-text span{display:none}
+.desktop-copy{display:none}
+.mobile-copy{display:inline}
 .both-banner-price{text-align:right;margin-left:auto;color:rgba(251,248,240,0.58)}
 .both-banner-price .both-total{font-size:13px;line-height:1;font-weight:600}
 .both-banner-price .both-deposit{font-size:10.5px}
@@ -395,8 +398,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <div class="both-banner-inner" id="bothBannerBtn">
 <span class="both-badge">Most popular</span>
 <div class="both-banner-text">
-<strong>The full set</strong>
-<span>The Cloak + The Wrap</span>
+<strong><span class="desktop-copy">Reserve both: The Cloak &amp; The Wrap</span><span class="mobile-copy">The full set</span></strong>
+<span>A hooded layer and an oversized wrap, made for every way you leave class.</span>
 </div>
 <div class="both-banner-price">
 <div class="both-total">$35 today</div>
@@ -420,7 +423,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <h2 class="pcard-name"><span class="article">The</span><span class="name">Cloak</span></h2>
 <span class="pcard-availability" id="availCloak"></span>
 </div>
-<p class="pcard-desc">A hooded, open-front layer for the drive home. Mid-thigh, absorbent, and soft over warm skin.</p>
+<p class="pcard-desc"><span class="desktop-copy">A hooded, open-front layer in dark absorbent fabric. Mid-thigh coverage for the drive home, the coffee stop, and the space between class and the rest of your day.</span><span class="mobile-copy">Hooded, open-front, mid-thigh coverage.</span></p>
 <div class="pcard-price">
 <span class="price-stack">
 <span class="deposit-amt">$20</span>
@@ -441,7 +444,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <h2 class="pcard-name"><span class="article">The</span><span class="name">Wrap</span></h2>
 <span class="pcard-availability" id="availWrap"></span>
 </div>
-<p class="pcard-desc">An oversized drape for the walk out. Knot it, sling it, or fold it into your bag.</p>
+<p class="pcard-desc"><span class="desktop-copy">An oversized rectangular drape made to knot, sling, or fold into your bag. Lighter than The Cloak, soft over warm skin, and easy for the walk out.</span><span class="mobile-copy">Oversized, light, and easy to knot or sling.</span></p>
 <div class="pcard-price">
 <span class="price-stack">
 <span class="deposit-amt">$15</span>

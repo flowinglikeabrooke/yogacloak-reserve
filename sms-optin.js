@@ -41,8 +41,13 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    const firstName = cleanString(body.first_name || body.firstName || body.name, 120);
     const phone = cleanString(body.phone, 80);
     const digits = phone.replace(/\D/g, '');
+
+    if (!firstName) {
+      return res.status(400).json({ error: 'First name required' });
+    }
 
     if (digits.length < 10 || phone.length > 80) {
       return res.status(400).json({ error: 'Valid phone number required' });
@@ -69,6 +74,7 @@ export default async function handler(req, res) {
       ? body.tags.map((tag) => cleanString(tag, 40)).filter(Boolean)
       : DEFAULT_TAGS;
     const consentDetails = {
+      first_name: firstName,
       phone,
       sms_opt_in: true,
       opt_in_timestamp: now,
@@ -84,6 +90,7 @@ export default async function handler(req, res) {
     const richFields = {
       'Submission ID': submissionId,
       'Submission Date': now,
+      'First Name': firstName,
       'Phone': phone,
       'SMS Opt-In': true,
       'Opt-In Timestamp': now,
@@ -109,6 +116,7 @@ export default async function handler(req, res) {
     const fallbackFields = {
       'Submission ID': submissionId,
       'Submission Date': now,
+      'First Name': firstName,
       'Source Page': sourcePage,
       'Form Type': 'SMS Opt-In',
       'Lead Source': 'Website',
