@@ -21,10 +21,7 @@ const PATHS = [
   '/yogacloak-reserve-page.html',
   '/sitemap.xml',
   '/robots.txt',
-  '/hot-yoga-essentials.html',
-  '/what-to-wear-after-hot-yoga.html',
-  '/hot-yoga-towel-alternative.html',
-  '/studio-to-street-yoga-apparel.html'
+  '/hot-yoga-essentials.html'
 ];
 
 export default async function handler(req, res) {
