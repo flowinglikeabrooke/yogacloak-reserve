@@ -323,6 +323,22 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .footer-credit a{color:rgba(251,248,240,0.55);text-decoration:none;font-weight:500;font-style:normal;transition:color .25s}
 .footer-credit a:hover{color:var(--bone)}
 @keyframes heartbeat{0%,100%{transform:translateY(1px) scale(1)}15%{transform:translateY(1px) scale(1.15)}30%{transform:translateY(1px) scale(1)}45%{transform:translateY(1px) scale(1.1)}60%{transform:translateY(1px) scale(1)}}
+/* ── Mobile presentation: calmer cards, tactile taps, gentle entrance ── */
+@media (hover: none){
+.pcard:hover{background:var(--ink);transform:none;box-shadow:none}
+.pcard-thumb:hover img{transform:none}
+.pcard-hover-overlay{opacity:1;background:radial-gradient(75% 60% at 50% 52%,rgba(10,12,14,0.38) 0%,rgba(10,12,14,0.08) 60%,transparent 78%)}
+.pcard-hover-cta{transform:none;box-shadow:0 8px 24px -8px rgba(0,0,0,0.55)}
+.pcard-thumb,.pcard-hover-cta{transition:transform .2s cubic-bezier(.2,.7,.2,1)}
+.pcard-thumb:active{transform:scale(.98)}
+.pcard-thumb:active img{transform:scale(1.05);transition:transform .35s ease}
+.pcard-thumb:active .pcard-hover-cta{transform:scale(.95)}
+.form-btn:active,.tray-btn:active,.topbar-contact:active,.both-banner-inner:active,.contact-btn:active{transform:scale(.97)}
+}
+@keyframes ycRise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.product-grid .pcard{animation:ycRise .75s cubic-bezier(.2,.7,.2,1) both}
+.product-grid .pcard:nth-child(2){animation-delay:.13s}
+@media (prefers-reduced-motion: reduce){.product-grid .pcard{animation:none}}
 </style>
 </head>
 <body>
