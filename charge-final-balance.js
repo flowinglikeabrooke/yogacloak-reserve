@@ -5,6 +5,8 @@
 // Header: x-admin-token: ADMIN_TOKEN or FINAL_CHARGE_ADMIN_TOKEN
 // Body: { "reservation_record_id": "rec..." }
 
+import { timingSafeEqual } from 'crypto';
+
 const TABLES = {
   reservations: process.env.AIRTABLE_RESERVATIONS_TABLE || 'tbliv6V2gDUOhRmf3',
   payments: process.env.AIRTABLE_PAYMENTS_TABLE || 'tblc9s0jZj549dIGJ'
@@ -80,7 +82,15 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const adminToken = process.env.ADMIN_TOKEN || process.env.FINAL_CHARGE_ADMIN_TOKEN;
-  if (!adminToken || req.headers['x-admin-token'] !== adminToken) {
+  const providedToken = req.headers['x-admin-token'];
+
+  if (!adminToken || !providedToken) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    timingSafeEqual(Buffer.from(providedToken), Buffer.from(adminToken));
+  } catch (err) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

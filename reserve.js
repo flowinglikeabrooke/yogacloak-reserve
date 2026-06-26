@@ -2,6 +2,8 @@
 // Creates/links Airtable Contact, Website Form, and First-Run Reservation records,
 // then starts Stripe Checkout for the reservation deposit.
 
+import { checkRateLimit } from '../lib/yogacloak-ops.js';
+
 const TABLES = {
   contacts: process.env.AIRTABLE_CONTACTS_TABLE || 'tbl6mXGzw0Q9GZ3R3',
   forms: process.env.AIRTABLE_FORMS_TABLE || 'tblRvWlirlbzlW5Up',
@@ -303,6 +305,7 @@ async function createCheckoutSession(payload) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkRateLimit(req, res, { maxRequests: 10, windowSeconds: 60 })) return;
 
   try {
     const firstName = clean(req.body?.first_name);

@@ -188,10 +188,40 @@ function contactName(contact) {
   return clean(contact?.fields?.['First Name'] || contact?.fields?.['Full Name'] || '', 100);
 }
 
+function checkRateLimit(req, res, { maxRequests = 10, windowSeconds = 60 } = {}) {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'unknown';
+  const key = `ratelimit:${ip}`;
+
+  if (!global._rateLimitStore) global._rateLimitStore = {};
+
+  const store = global._rateLimitStore;
+  const now = Date.now();
+  const windowMs = windowSeconds * 1000;
+
+  if (!store[key]) {
+    store[key] = [];
+  }
+
+  store[key] = store[key].filter(timestamp => now - timestamp < windowMs);
+
+  if (store[key].length >= maxRequests) {
+    res.status(429).json({ error: 'Rate limit exceeded' });
+    return false;
+  }
+
+  store[key].push(now);
+  res.setHeader('X-RateLimit-Limit', String(maxRequests));
+  res.setHeader('X-RateLimit-Remaining', String(maxRequests - store[key].length));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil((now + windowMs) / 1000)));
+
+  return true;
+}
+
 export {
   TABLES,
   ACTIVE_RESERVATION_STATUSES,
   airtableRequest,
+  checkRateLimit,
   clean,
   contactEmail,
   contactForReservation,
