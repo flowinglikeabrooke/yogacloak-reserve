@@ -708,13 +708,13 @@ loopSubmit.disabled=false;
 loopSubmit.textContent=original;
 }
 });
-// Auto-show the popup ~20s after load, on every visit, unless they've already
+// Auto-show the popup ~7.3s after load, on every visit, unless they've already
 // signed up or chosen "Don't show this again". (Closing it normally lets it
-// return on the next visit.) Change 20000 below to adjust the delay in ms.
+// return on the next visit.) Change 7300 below to adjust the delay in ms.
 if(!loopDone()){
 setTimeout(function(){
 if(!loopDone()&&!loopOv.classList.contains('show'))openLoop();
-},20000);
+},7300);
 }
 })();
 </script>
