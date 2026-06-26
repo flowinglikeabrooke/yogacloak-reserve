@@ -234,6 +234,19 @@ a{text-decoration:none;color:inherit}
 .cta-band h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
 .cta-band h2 strong{font-weight:700;letter-spacing:-.045em}
 .cta-band p{font-size:14px;color:rgba(var(--cream),0.55);max-width:600px;margin:0 auto 32px;line-height:1.7;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
+.cta-form{display:flex;flex-direction:column;gap:11px;max-width:380px;margin:8px auto 16px}
+.cta-form input{width:100%;padding:15px 20px;border-radius:100px;border:1px solid rgba(var(--cream),0.18);background:rgba(var(--cream),0.06);color:rgb(var(--cream));font-size:15px;font-family:Helvetica,sans-serif;text-align:center;outline:none;transition:border-color .25s ease,background .25s ease}
+.cta-form input::placeholder{color:rgba(var(--cream),0.4)}
+.cta-form input:focus{border-color:rgba(var(--cream),0.55);background:rgba(var(--cream),0.1)}
+.cta-form-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:16px 24px;border-radius:100px;border:none;background:var(--bone);color:var(--ink);font-size:14px;font-weight:600;font-family:Helvetica,sans-serif;cursor:pointer;transition:transform .25s ease,opacity .25s ease}
+.cta-form-btn:hover{transform:translateY(-2px)}
+.cta-form-btn:disabled{opacity:.6;cursor:default;transform:none}
+.cta-form-btn svg{width:15px;height:15px}
+.cta-fine{font-size:11px!important;color:rgba(var(--cream),0.42)!important;max-width:380px;margin:0 auto!important;font-style:normal!important;line-height:1.5!important}
+.cta-fine.error{color:#e0a89f!important}
+.cta-thanks{display:none;font-size:clamp(18px,2.5vw,22px);color:rgb(var(--cream));font-family:'Hanken Grotesk',sans-serif;font-weight:500;font-style:normal}
+.cta-band.done .cta-form,.cta-band.done .cta-fine{display:none}
+.cta-band.done .cta-thanks{display:block}
 .float-reserve{position:fixed;left:50%;bottom:26px;z-index:45;transform:translateX(-50%) translateY(26px) scale(.92);opacity:0;pointer-events:none;display:inline-flex;align-items:center;gap:11px;background:var(--bone);color:var(--ink);font-size:14px;font-weight:600;letter-spacing:.02em;padding:16px 34px;border-radius:100px;box-shadow:0 18px 44px -14px rgba(0,0,0,0.6);transition:opacity .45s ease,transform .55s cubic-bezier(.34,1.4,.64,1),background .2s;font-family:Helvetica,sans-serif}
 .float-reserve.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:auto}
 .float-reserve:hover{background:#fefdf8}
@@ -538,10 +551,15 @@ a{text-decoration:none;color:inherit}
 <div style="position:relative;z-index:2">
 <span class="eyebrow">Join first access</span>
 <h2>Be the <strong>first</strong> <em>to know</em> when we launch.</h2>
-<p>Reserve now for early access and the clearest path to securing yours when we open.</p>
-<button id="ctaBtnOpen" class="btn">Keep me posted
+<form class="cta-form" id="ctaForm" novalidate>
+<input id="ctaName" type="text" placeholder="First name" autocomplete="given-name" aria-label="First name">
+<input id="ctaPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel" aria-label="Phone number">
+<button type="submit" class="cta-form-btn" id="ctaSubmit">Keep me posted
 <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
+</form>
+<p class="cta-fine" id="ctaFine">By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg &amp; data rates may apply. Reply STOP to opt out.</p>
+<p class="cta-thanks" id="ctaThanks">You're on the list — we'll be in touch.</p>
 </div>
 </section>
 
@@ -753,6 +771,40 @@ if(closeBtn)closeBtn.addEventListener('click',close);
 ov.addEventListener('click',function(e){if(e.target===ov)close()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
 if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'Homepage'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
+})();
+</script>
+<script>
+// Inline launch sign-up form in the closing CTA band. Posts to /api/sms-optin
+// (saves to Airtable), same as the popup. source_page distinguishes the two.
+(function(){
+var form=document.getElementById('ctaForm');
+if(!form)return;
+var nameEl=document.getElementById('ctaName');
+var phoneEl=document.getElementById('ctaPhone');
+var submitBtn=document.getElementById('ctaSubmit');
+var fine=document.getElementById('ctaFine');
+var band=form.closest('.cta-band');
+var consentText='By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.';
+form.addEventListener('submit',async function(e){
+e.preventDefault();
+var firstName=(nameEl.value||'').trim();
+var phone=(phoneEl.value||'').trim();
+var digits=phone.replace(/\D/g,'');
+if(firstName.length<1){fine.textContent='Please enter your first name.';fine.classList.add('error');nameEl.focus();return;}
+if(digits.length<10){fine.textContent='Please enter a valid phone number.';fine.classList.add('error');phoneEl.focus();return;}
+var original=submitBtn.innerHTML;
+submitBtn.disabled=true;submitBtn.textContent='Saving...';
+fine.textContent=consentText;fine.classList.remove('error');
+try{
+var r=await fetch('/api/sms-optin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name:firstName,phone:phone,source_page:'Homepage CTA',consent_language_version:'sms-launch-optin-v1',consent_text:consentText})});
+if(!r.ok)throw new Error('failed');
+try{localStorage.setItem('yc_loop_done','1')}catch(e){}
+band.classList.add('done');
+}catch(err){
+fine.textContent='That did not save. Please try again.';fine.classList.add('error');
+submitBtn.disabled=false;submitBtn.innerHTML=original;
+}
+});
 })();
 </script>
 <script src="/cookie-consent.js" defer></script>
