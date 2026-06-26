@@ -117,6 +117,7 @@ export default async function handler(req, res) {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const metadata = session.metadata || {};
+      const reservedProducts = String(metadata.products || '').split(',').map((product) => product.trim()).filter(Boolean);
       const amountPaid = session.amount_total ? session.amount_total / 100 : Number(metadata.deposit_total || 0);
       const paidDate = new Date().toISOString().slice(0, 10);
       const paymentIntent = session.payment_intent
@@ -134,8 +135,11 @@ export default async function handler(req, res) {
         'Reservation Status': 'Reserved',
         'Checkout Ready': true,
         Notes: JSON.stringify({
-          products: metadata.products,
+          products: reservedProducts,
+          product_selection: reservedProducts.join(' + '),
           cloak_size: metadata.cloak_size || '',
+          deposit_total: Number(metadata.deposit_total || amountPaid || 0),
+          full_price_total: Number(metadata.full_price_total || 0),
           stripe_checkout_session_id: session.id,
           stripe_payment_intent_id: session.payment_intent || '',
           stripe_customer_id: session.customer || '',

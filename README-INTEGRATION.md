@@ -112,10 +112,30 @@ Paste `ADMIN_TOKEN` to search reservations by status or email.
 
 ## Automated ops
 
-`vercel.json` schedules two hourly jobs:
+`vercel.json` schedules one daily runner so the project can deploy cleanly on Vercel Hobby:
+
+- `/api/daily-ops-runner` at 16:00 UTC, about 9:00 AM Arizona time
+
+The runner calls the daily jobs in order:
 
 - `/api/cleanup-pending-checkouts`
 - `/api/send-abandoned-reservations`
+- `/api/reconcile-stripe-airtable`
+- `/api/low-inventory-alert`
+- `/api/daily-owner-digest`
+- `/api/seo-health-check`
+
+If you upgrade to Vercel Pro, these can be moved back to hourly for faster hold cleanup and abandoned-checkout reminders.
+
+Vercel Hobby cron jobs are daily and approximate within the hour, so the 9:00 AM Arizona time run may happen any time between about 9:00 and 9:59 AM.
+
+Recommended owner email setting:
+
+```text
+OWNER_EMAIL=your@email.com
+```
+
+If `OWNER_EMAIL` is missing, owner alerts fall back to `ADMIN_EMAIL`, then `EMAIL_TO`, then `hello@yogacloak.com`.
 
 Set `CRON_SECRET` in Vercel so scheduled calls can authenticate. You can also call those endpoints manually with:
 
