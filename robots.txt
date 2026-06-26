@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /yogacloak-admin.html
+Allow: /
+
+Sitemap: https://www.yogacloak.com/sitemap.xml
