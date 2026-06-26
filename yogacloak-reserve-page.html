@@ -589,11 +589,19 @@ document.getElementById('trayPrompt').style.display = 'block';
 async function loadAvailability() {
 try {
 const res = await fetch('/api/availability');
-if (!res.ok) return;
+if (!res.ok) throw new Error('availability failed');
 const data = await res.json();
 availability = { cloak: data.cloak ?? TOTAL, wrap: data.wrap ?? TOTAL };
 updateAvailabilityUI();
-} catch (e) {}
+} catch (e) {
+['Cloak','Wrap'].forEach(function(cap){
+const label=document.getElementById('avail'+cap);
+if(label){
+label.textContent='Availability updating';
+label.className='pcard-availability low';
+}
+});
+}
 }
 
 function updateAvailabilityUI() {
