@@ -2,8 +2,8 @@
 // Protected endpoint to charge the saved Stripe payment method for the final balance.
 //
 // POST /api/charge-final-balance
-// Header: x-admin-token: FINAL_CHARGE_ADMIN_TOKEN
-// Body: { "reservation_record_id": "rec...", "notice_sent": true }
+// Header: x-admin-token: ADMIN_TOKEN or FINAL_CHARGE_ADMIN_TOKEN
+// Body: { "reservation_record_id": "rec..." }
 
 const TABLES = {
   reservations: process.env.AIRTABLE_RESERVATIONS_TABLE || 'tbliv6V2gDUOhRmf3',
@@ -79,7 +79,7 @@ async function updateReservation(recordId, fields) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const adminToken = process.env.FINAL_CHARGE_ADMIN_TOKEN;
+  const adminToken = process.env.ADMIN_TOKEN || process.env.FINAL_CHARGE_ADMIN_TOKEN;
   if (!adminToken || req.headers['x-admin-token'] !== adminToken) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -89,10 +89,6 @@ export default async function handler(req, res) {
     if (!reservationId.startsWith('rec')) {
       return res.status(400).json({ error: 'Missing reservation_record_id' });
     }
-    if (req.body?.notice_sent !== true) {
-      return res.status(400).json({ error: 'Send customer notice before charging final balance.' });
-    }
-
     const reservation = await airtableRequest(`${TABLES.reservations}/${reservationId}`);
     const fields = reservation.fields || {};
     const notes = parseNotes(fields.Notes);
@@ -104,7 +100,16 @@ export default async function handler(req, res) {
     const depositAmount = Number(fields['Deposit Amount'] || 0);
     const finalBalance = Number(notes.final_balance_total || finalRetailTotal - depositAmount);
     const amountCents = Math.round(finalBalance * 100);
+    const noticeSentAt = notes.final_balance_notice_sent_at ? Date.parse(notes.final_balance_notice_sent_at) : 0;
+    const noticeHours = Number(process.env.FINAL_BALANCE_NOTICE_HOURS || 24);
+    const noticeAgeHours = noticeSentAt ? (Date.now() - noticeSentAt) / (1000 * 60 * 60) : 0;
 
+    if (!noticeSentAt) {
+      return res.status(400).json({ error: 'Send final-balance notice before charging.' });
+    }
+    if (noticeAgeHours < noticeHours && req.body?.override_notice_wait !== true) {
+      return res.status(400).json({ error: `Final-balance notice must be at least ${noticeHours} hours old before charging.` });
+    }
     if (!notes.future_charge_authorized) {
       return res.status(400).json({ error: 'Reservation does not have saved future-charge authorization.' });
     }

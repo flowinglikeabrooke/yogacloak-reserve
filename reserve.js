@@ -13,6 +13,7 @@ const PRODUCT_CONFIG = {
   cloak: { name: 'The Cloak', contactInterest: 'Cloak', deposit: 20, retail: 98 },
   wrap: { name: 'The Wrap', contactInterest: 'Wrap', deposit: 15, retail: 68 }
 };
+const PENDING_HOLD_MS = Number(process.env.PENDING_HOLD_MINUTES || 120) * 60 * 1000;
 
 function clean(value, max = 200) {
   return String(value || '').trim().slice(0, max);
@@ -131,6 +132,7 @@ async function findReservedProductsForContact({ contactId, products, productIds 
     'Pending Payment',
     'Reserved',
     'Confirmed',
+    'Final Balance Notice Sent',
     'Converted to Order'
   ];
   const formula = `OR(${activeStatuses.map((status) => `{Reservation Status}='${status}'`).join(',')})`;
@@ -151,7 +153,7 @@ async function findReservedProductsForContact({ contactId, products, productIds 
 
     if (status === 'Pending Payment') {
       const startedAt = parsedNotes.checkout_started_at ? Date.parse(parsedNotes.checkout_started_at) : 0;
-      const isFreshCheckout = startedAt && Date.now() - startedAt < 1000 * 60 * 60 * 2;
+      const isFreshCheckout = startedAt && Date.now() - startedAt < PENDING_HOLD_MS;
       if (!isFreshCheckout) return;
     }
 
@@ -384,6 +386,7 @@ export default async function handler(req, res) {
         products,
         cloak_size: size || '',
         stripe_checkout_session_id: checkout.id,
+        stripe_checkout_url: checkout.url || '',
         checkout_started_at: new Date().toISOString()
       })
     });

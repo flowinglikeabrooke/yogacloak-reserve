@@ -4,6 +4,7 @@
 const TOTAL = Number(process.env.DROP_TOTAL || 100);
 const RESERVATIONS_TABLE = process.env.AIRTABLE_RESERVATIONS_TABLE || 'tbliv6V2gDUOhRmf3';
 const PRODUCTS_TABLE = process.env.AIRTABLE_PRODUCTS_TABLE || 'tblrPh8y0CY61PqaF';
+const PENDING_HOLD_MS = Number(process.env.PENDING_HOLD_MINUTES || 120) * 60 * 1000;
 
 async function airtableRequest(path) {
   const pat = process.env.AIRTABLE_PAT;
@@ -56,8 +57,18 @@ export default async function handler(req, res) {
 
       const data = await airtableRequest(`${RESERVATIONS_TABLE}?${params}`);
       for (const record of data.records || []) {
+        const status = record.fields?.['Reservation Status'] || '';
+        const rawNotes = String(record.fields?.Notes || '');
+        if (status === 'Pending Payment') {
+          let notesJson = {};
+          try {
+            notesJson = JSON.parse(rawNotes || '{}');
+          } catch (e) {}
+          const startedAt = notesJson.checkout_started_at ? Date.parse(notesJson.checkout_started_at) : 0;
+          if (!startedAt || Date.now() - startedAt > PENDING_HOLD_MS) continue;
+        }
         const linkedProducts = record.fields?.Product || [];
-        const notes = String(record.fields?.Notes || '').toLowerCase();
+        const notes = rawNotes.toLowerCase();
         if (linkedProducts.includes(products.cloak) || notes.includes('cloak')) cloakTaken += 1;
         if (linkedProducts.includes(products.wrap) || notes.includes('wrap')) wrapTaken += 1;
       }

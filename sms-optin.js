@@ -1,9 +1,10 @@
 // Vercel endpoint: /api/sms-optin
-// Saves homepage SMS launch opt-ins to Airtable.
+// Saves homepage SMS launch opt-ins to Airtable for later SMS CRM sync.
 
 const FORMS_TABLE_FALLBACK = 'tblRvWlirlbzlW5Up';
 const CONSENT_TEXT = 'By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.';
 const CONSENT_VERSION = 'sms-launch-optin-v1';
+const DEFAULT_TAGS = ['website-popup', 'launch-updates', 'reservations'];
 
 function cleanString(value, max = 500) {
   return String(value || '').trim().slice(0, max);
@@ -49,7 +50,10 @@ export default async function handler(req, res) {
 
     const pat = process.env.AIRTABLE_PAT;
     const baseId = process.env.AIRTABLE_BASE_ID;
-    const tableId = process.env.AIRTABLE_FORMS_TABLE || FORMS_TABLE_FALLBACK;
+    const tableId = process.env.AIRTABLE_SMS_OPTINS_TABLE
+      || process.env.AIRTABLE_SMS_TABLE
+      || process.env.AIRTABLE_FORMS_TABLE
+      || FORMS_TABLE_FALLBACK;
 
     if (!pat || !baseId || !tableId) {
       console.error('Missing Airtable SMS opt-in env vars');
@@ -61,6 +65,9 @@ export default async function handler(req, res) {
     const sourcePage = cleanString(body.source_page || body.source || 'Homepage', 100);
     const consentVersion = cleanString(body.consent_language_version || CONSENT_VERSION, 120);
     const consentText = cleanString(body.consent_text || CONSENT_TEXT, 1000);
+    const tags = Array.isArray(body.tags)
+      ? body.tags.map((tag) => cleanString(tag, 40)).filter(Boolean)
+      : DEFAULT_TAGS;
     const consentDetails = {
       phone,
       sms_opt_in: true,
@@ -68,7 +75,10 @@ export default async function handler(req, res) {
       source_page: sourcePage,
       consent_language_version: consentVersion,
       consent_text: consentText,
-      sms_status: 'Subscribed'
+      sms_status: 'Subscribed',
+      crm_sync_status: 'Ready to Sync',
+      crm_provider: process.env.SMS_CRM_PROVIDER || '',
+      tags
     };
 
     const richFields = {
@@ -81,6 +91,9 @@ export default async function handler(req, res) {
       'Consent Language Version': consentVersion,
       'Consent Text': consentText,
       'SMS Status': 'Subscribed',
+      'CRM Sync Status': 'Ready to Sync',
+      'CRM Provider': process.env.SMS_CRM_PROVIDER || '',
+      'Tags': tags.join(', '),
       'Form Type': 'SMS Opt-In',
       'Lead Source': 'Website',
       'Notes': JSON.stringify(consentDetails, null, 2)

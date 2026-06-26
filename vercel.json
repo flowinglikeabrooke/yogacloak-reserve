@@ -1,32 +1,12 @@
 {
-  "rewrites": [
+  "crons": [
     {
-      "source": "/api/reserve",
-      "destination": "/api-reserve.js"
+      "path": "/api/cleanup-pending-checkouts",
+      "schedule": "0 * * * *"
     },
     {
-      "source": "/api/availability",
-      "destination": "/api-availability.js"
-    },
-    {
-      "source": "/api/webhook",
-      "destination": "/api-webhook.js"
-    },
-    {
-      "source": "/reserve",
-      "destination": "/yogacloak-reserve-page.html"
-    },
-    {
-      "source": "/",
-      "destination": "/yogacloak-index.html"
-    },
-    {
-      "source": "/success",
-      "destination": "/yogacloak-success-page.html"
-    },
-    {
-      "source": "/faq",
-      "destination": "/yogacloak-faq.html"
+      "path": "/api/send-abandoned-reservations",
+      "schedule": "15 * * * *"
     }
   ]
 }

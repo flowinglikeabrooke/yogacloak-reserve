@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · yogacloak</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1E2320;--bone:#fbf8f0;--sage:#7C8C82;--cream:251,248,240}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--bone);font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:34px}
+.shell{max-width:1180px;margin:0 auto}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:34px}
+.wordmark{font-family:'Hanken Grotesk',sans-serif;font-size:26px;letter-spacing:-.02em}.wordmark strong{font-weight:700}.wordmark span{font-weight:400}
+.eyebrow{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--cream),.42);margin-bottom:10px;display:block}
+h1{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(34px,5vw,58px);font-weight:500;letter-spacing:-.04em;line-height:1}
+.panel{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:14px;padding:18px;margin-bottom:18px}
+.controls{display:grid;grid-template-columns:1.3fr 1fr .8fr auto;gap:10px;align-items:end}
+label{display:flex;flex-direction:column;gap:7px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.46);font-weight:600}
+input,select{width:100%;background:rgba(var(--cream),.055);border:1px solid rgba(var(--cream),.12);color:var(--bone);border-radius:10px;padding:12px 13px;font:14px Helvetica,Arial,sans-serif;outline:none}
+select option{background:#151618;color:var(--bone)}
+button{background:var(--bone);color:var(--ink);border:0;border-radius:100px;padding:13px 18px;font:700 12px Helvetica,Arial,sans-serif;cursor:pointer;white-space:nowrap}
+.quiet{background:transparent;color:rgba(var(--cream),.7);border:1px solid rgba(var(--cream),.14)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;color:rgba(var(--cream),.52);font-size:12px;margin-top:12px}
+.table-wrap{overflow:auto;border-radius:12px;border:1px solid rgba(var(--cream),.08)}
+table{width:100%;border-collapse:collapse;min-width:980px;background:#151618}
+th,td{text-align:left;border-bottom:1px solid rgba(var(--cream),.07);padding:13px 14px;font-size:12px;vertical-align:top}
+th{font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700;background:rgba(var(--cream),.025)}
+td{color:rgba(var(--cream),.72);line-height:1.35}
+.status{display:inline-block;border:1px solid rgba(var(--cream),.13);border-radius:100px;padding:5px 8px;color:rgba(var(--cream),.78);white-space:nowrap}
+.muted{color:rgba(var(--cream),.42)}
+.error{color:#d4948d}.ok{color:#9aaa88}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+@media(max-width:760px){body{padding:22px}.top{display:block}.controls{grid-template-columns:1fr}.actions button{width:100%}}
+</style>
+</head>
+<body>
+<main class="shell">
+<div class="top">
+<div>
+<a href="/" class="wordmark"><span>yoga</span><strong>cloak</strong></a>
+<span class="eyebrow" style="margin-top:28px">Private admin</span>
+<h1>Reservation status.</h1>
+</div>
+</div>
+
+<section class="panel">
+<div class="controls">
+<label>Admin token<input id="token" type="password" autocomplete="off" placeholder="Paste token"></label>
+<label>Email search<input id="email" type="email" placeholder="customer@email.com"></label>
+<label>Status<select id="status">
+<option value="">All statuses</option>
+<option>Pending Payment</option>
+<option>Reserved</option>
+<option>Final Balance Notice Sent</option>
+<option>Converted to Order</option>
+<option>Expired</option>
+<option>Cancelled</option>
+<option>Cancelled + Refunded</option>
+<option>Transferred</option>
+</select></label>
+<button id="loadBtn">Load</button>
+</div>
+<div class="actions">
+<button class="quiet" id="saveTokenBtn">Remember token here</button>
+<button class="quiet" id="clearTokenBtn">Forget token</button>
+</div>
+<div class="meta"><span id="statusText">Ready.</span></div>
+</section>
+
+<section class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Customer</th>
+<th>Product</th>
+<th>Money</th>
+<th>Timeline</th>
+<th>Record</th>
+</tr>
+</thead>
+<tbody id="rows">
+<tr><td colspan="6" class="muted">Load reservations to begin.</td></tr>
+</tbody>
+</table>
+</section>
+</main>
+
+<script>
+var tokenEl=document.getElementById('token');
+var emailEl=document.getElementById('email');
+var statusEl=document.getElementById('status');
+var rowsEl=document.getElementById('rows');
+var statusText=document.getElementById('statusText');
+tokenEl.value=localStorage.getItem('yc_admin_token')||'';
+document.getElementById('saveTokenBtn').addEventListener('click',function(){localStorage.setItem('yc_admin_token',tokenEl.value.trim());statusText.textContent='Token saved in this browser.'});
+document.getElementById('clearTokenBtn').addEventListener('click',function(){localStorage.removeItem('yc_admin_token');tokenEl.value='';statusText.textContent='Token cleared.'});
+document.getElementById('loadBtn').addEventListener('click',loadReservations);
+function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]})}
+function money(value){return value ? '$'+Number(value).toFixed(0) : ''}
+async function loadReservations(){
+var token=tokenEl.value.trim();
+if(!token){statusText.innerHTML='<span class=\"error\">Admin token required.</span>';return}
+statusText.textContent='Loading...';
+var params=new URLSearchParams();
+if(emailEl.value.trim())params.set('email',emailEl.value.trim());
+if(statusEl.value)params.set('status',statusEl.value);
+try{
+var res=await fetch('/api/admin-reservations?'+params.toString(),{headers:{'x-admin-token':token}});
+var data=await res.json();
+if(!res.ok)throw new Error(data.error||'Could not load');
+rowsEl.innerHTML=data.reservations.length?data.reservations.map(function(row){
+return '<tr><td><span class=\"status\">'+esc(row.status)+'</span><br><span class=\"muted\">'+esc(row.final_checkout_status)+'</span></td><td>'+esc(row.customer_name)+'<br><span class=\"muted\">'+esc(row.email)+'</span></td><td>'+esc(row.product)+'<br><span class=\"muted\">'+esc(row.size)+'</span></td><td>Deposit '+money(row.deposit_amount)+'<br><span class=\"muted\">Final '+money(row.final_balance_total||0)+'</span></td><td><span class=\"muted\">Started</span> '+esc(row.checkout_started_at||row.reservation_date)+'<br><span class=\"muted\">Paid</span> '+esc(row.paid_at)+'<br><span class=\"muted\">Notice</span> '+esc(row.final_balance_notice_sent_at)+'</td><td><code>'+esc(row.id)+'</code></td></tr>';
+}).join(''):'<tr><td colspan=\"6\" class=\"muted\">No matching reservations.</td></tr>';
+statusText.innerHTML='<span class=\"ok\">Loaded '+data.reservations.length+' reservation(s).</span>';
+}catch(err){
+statusText.innerHTML='<span class=\"error\">'+esc(err.message)+'</span>';
+}
+}
+</script>
+</body>
+</html>
