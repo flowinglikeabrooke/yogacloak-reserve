@@ -7,6 +7,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/cookie-consent.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -64,6 +65,17 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .both-banner-price .both-total{font-size:18px;font-weight:600;letter-spacing:-.02em}
 .both-banner-price .both-deposit{font-size:11px;color:rgba(251,248,240,0.5);margin-top:2px}
 .both-banner-arrow{color:rgba(251,248,240,0.4);font-size:20px;line-height:1}
+.tray-prompt{display:none;max-width:1200px;margin:0 auto 24px;padding:0 40px}
+.tray-prompt-inner{background:rgba(251,248,240,.035);border:1px solid rgba(251,248,240,.1);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:16px;justify-content:space-between}
+.tray-prompt-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tray-prompt-copy span{font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:rgba(251,248,240,.36);font-weight:600}
+.tray-prompt-copy strong{font-size:14px;font-weight:500;color:rgba(251,248,240,.76);letter-spacing:-.01em}
+.tray-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tray-btn{font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.03em;border-radius:100px;padding:10px 14px;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s;white-space:nowrap}
+.tray-btn:hover{transform:translateY(-1px)}
+.tray-btn.primary{background:var(--bone);color:var(--ink);border:1px solid var(--bone)}
+.tray-btn.secondary{background:transparent;color:rgba(251,248,240,.55);border:1px solid rgba(251,248,240,.14)}
+.tray-btn.secondary:hover{color:var(--bone);border-color:rgba(251,248,240,.32)}
 .browse-section{padding:0 40px 40px;max-width:1200px;margin:0 auto}
 .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);margin-bottom:48px}
 .pcard{position:relative;border-radius:18px;background:var(--ink);padding:clamp(28px,4vw,44px);display:flex;flex-direction:column;transition:background .4s ease,transform .4s ease,box-shadow .4s ease}
@@ -141,6 +153,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .form-btn:active{transform:translateY(-1px)}
 .back-link{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--bone);text-decoration:none;margin-bottom:32px;transition:opacity .2s}
 .back-link:hover{opacity:.6}.back-link svg{width:14px;height:14px}
+.success-section{display:none;padding:0 40px 72px;max-width:800px;margin:0 auto}
+.success-card{background:#151618;border:1px solid rgba(251,248,240,.1);border-radius:18px;padding:clamp(36px,5vw,56px);text-align:center}
+.success-card h2{font-size:clamp(34px,6vw,54px);font-weight:500;letter-spacing:-.04em;line-height:1;margin-bottom:18px}
+.success-card p{font-size:15px;color:rgba(251,248,240,.62);line-height:1.6;margin:0 auto;max-width:420px}
 .error-msg{background:rgba(160,104,96,0.15);border:1px solid rgba(160,104,96,0.4);border-radius:10px;padding:14px 18px;font-size:13px;color:#e0a090;margin-top:16px;display:none}
 @media(max-width:900px){
 .topbar{padding:14px 20px}
@@ -151,6 +167,10 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .page-hero .subtitle{font-size:13px;line-height:1.65}
 .page-hero .label{margin-top:28px;font-size:8.5px;letter-spacing:.28em}
 .both-banner{padding:0 22px;margin-bottom:24px}
+.tray-prompt{padding:0 22px;margin-bottom:20px}
+.tray-prompt-inner{align-items:flex-start;flex-direction:column;gap:12px;padding:15px 16px}
+.tray-actions{width:100%}
+.tray-btn{flex:1;text-align:center}
 .both-banner-inner{flex-wrap:wrap;gap:14px;padding:18px 20px}
 .both-banner-text strong{font-size:14px}
 .both-banner-text span{font-size:11.5px;line-height:1.45}
@@ -168,7 +188,9 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .pcard-desc{font-size:13px;line-height:1.6}
 .disclaimer{margin-top:32px;padding-top:24px;font-size:10.5px}
 .form-section{padding:0 22px}
+.success-section{padding:0 22px 60px}
 .gather-form{padding:28px 22px;border-radius:14px}
+.success-card{border-radius:14px;padding:34px 24px}
 .form-title{font-size:32px;margin-bottom:6px}
 .form-subtitle{font-size:13px;margin-bottom:24px}
 .form-grid{grid-template-columns:1fr;gap:16px;margin-bottom:18px}
@@ -201,6 +223,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .page-hero{padding:80px 18px 36px}
 .page-hero h1{font-size:clamp(28px,8vw,40px)}
 .both-banner{padding:0 18px}
+.tray-prompt{padding:0 18px}
 .both-banner-inner{padding:16px 18px}
 .both-badge{font-size:8.5px;padding:4px 10px}
 .browse-section{padding:0 18px 28px}
@@ -208,12 +231,12 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .pcard-name{font-size:34px}
 .deposit-amt{font-size:22px}
 .form-section{padding:0 18px}
+.success-section{padding:0 18px 52px}
 .gather-form{padding:24px 18px;border-radius:12px}
+.success-card{border-radius:12px}
 .form-title{font-size:28px}
 .site-footer{padding:32px 18px 44px}
 .payment-badge{width:36px;height:24px;font-size:8px}
-.payment-badge.cashapp{font-size:12px}
-.payment-badge.klarna{font-size:10px}
 .payment-badge.amex{font-size:7px}
 .footer-meta{font-size:9.5px;letter-spacing:.14em}
 }
@@ -229,10 +252,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
 .payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
 .payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
-.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
-.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
-.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
-.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:7.5px;width:58px;letter-spacing:0}
+.payment-badge.googlepay{background:#fff;color:#202124;font-size:8px;width:50px;letter-spacing:0}
 .footer-legal{font-size:10.5px;color:rgba(251,248,240,0.4);line-height:1.5;text-align:center;max-width:1040px;margin:0 auto;letter-spacing:.01em}
 .footer-legal p{margin:0 auto 7px;max-width:1040px}
 .footer-legal a{color:rgba(251,248,240,0.6);text-decoration:underline;text-decoration-color:rgba(251,248,240,0.2);text-underline-offset:2px;transition:color .2s,text-decoration-color .2s}
@@ -258,6 +279,26 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <p class="subtitle">A small deposit saves your spot in the first drop.<br>Estimated ship window: November 2027.</p>
 <span class="label" id="pickYoursLabel">PICK YOURS</span>
 </section>
+
+<section class="success-section" id="successSection" aria-live="polite">
+<div class="success-card">
+<h2>Your spot is held.</h2>
+<p>We'll email you before the remaining balance is charged.</p>
+</div>
+</section>
+
+<div class="tray-prompt" id="trayPrompt" aria-live="polite">
+<div class="tray-prompt-inner">
+<div class="tray-prompt-copy">
+<span>Saved in this browser</span>
+<strong id="trayPromptText">Continue your reservation</strong>
+</div>
+<div class="tray-actions">
+<button type="button" class="tray-btn primary" id="trayContinue">Continue</button>
+<button type="button" class="tray-btn secondary" id="trayClear">Clear</button>
+</div>
+</div>
+</div>
 
 <div class="both-banner" id="bothBannerWrap">
 <div class="both-banner-inner" id="bothBannerBtn">
@@ -416,9 +457,77 @@ const PRODUCTS = {
 cloak: { name:'The Cloak', deposit:20, price:98, img:'cloak-card.jpg', desc:'Hooded, open-front, mid-thigh.' },
 wrap: { name:'The Wrap', deposit:15, price:68, img:'wrap-card.jpg', desc:'Oversized rectangular drape. Packs down to nothing.' }
 };
+const TRAY_KEY = 'yc_reservation_tray_v1';
+const TRAY_TTL = 1000 * 60 * 60 * 24 * 14;
 
 let selectedProducts = [];
 let availability = { cloak: TOTAL, wrap: TOTAL };
+
+function showSuccessState() {
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') !== '1') return;
+clearTray();
+document.getElementById('successSection').style.display = 'block';
+document.getElementById('browseSection').style.display = 'none';
+document.getElementById('bothBannerWrap').style.display = 'none';
+document.getElementById('trayPrompt').style.display = 'none';
+document.getElementById('formSection').style.display = 'none';
+document.getElementById('pickYoursLabel').style.display = 'none';
+}
+
+showSuccessState();
+
+function normalizeProducts(products) {
+return [...new Set((products || []).filter(product => PRODUCTS[product]))];
+}
+
+function readTray() {
+try {
+const saved = JSON.parse(localStorage.getItem(TRAY_KEY) || 'null');
+if (!saved || !Array.isArray(saved.products) || !saved.products.length) return null;
+if (!saved.updated_at || Date.now() - saved.updated_at > TRAY_TTL) {
+localStorage.removeItem(TRAY_KEY);
+return null;
+}
+saved.products = normalizeProducts(saved.products);
+return saved.products.length ? saved : null;
+} catch (e) {
+return null;
+}
+}
+
+function saveTray(products) {
+const normalized = normalizeProducts(products);
+if (!normalized.length) return;
+try {
+const sizeSelect = document.getElementById('sizeSelect');
+const addonSizeSelect = document.getElementById('addonSizeSelect');
+localStorage.setItem(TRAY_KEY, JSON.stringify({
+products: normalized,
+cloak_size: (sizeSelect && sizeSelect.value) || (addonSizeSelect && addonSizeSelect.value) || '',
+updated_at: Date.now()
+}));
+} catch (e) {}
+}
+
+function clearTray() {
+try { localStorage.removeItem(TRAY_KEY); } catch (e) {}
+}
+
+function trayLabel(products) {
+const normalized = normalizeProducts(products);
+if (normalized.includes('cloak') && normalized.includes('wrap')) return 'The Cloak + The Wrap';
+if (normalized.includes('cloak')) return 'The Cloak';
+if (normalized.includes('wrap')) return 'The Wrap';
+return 'your reservation';
+}
+
+function showTrayPrompt() {
+const tray = readTray();
+if (!tray) return;
+document.getElementById('trayPromptText').textContent = trayLabel(tray.products);
+document.getElementById('trayPrompt').style.display = 'block';
+}
 
 async function loadAvailability() {
 try {
@@ -475,10 +584,12 @@ openForm([product]);
 });
 
 function openForm(products) {
-selectedProducts = products;
+selectedProducts = normalizeProducts(products);
+saveTray(selectedProducts);
 renderForm();
 document.getElementById('browseSection').style.display = 'none';
 document.getElementById('bothBannerWrap').style.display = 'none';
+document.getElementById('trayPrompt').style.display = 'none';
 document.getElementById('pickYoursLabel').style.display = 'none';
 document.getElementById('formSection').style.display = 'block';
 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -542,6 +653,10 @@ const addonKey = hasCloak ? 'wrap' : 'cloak';
 
 const showCloak = hasCloak || (addonChecked && addonKey === 'cloak');
 const showWrap = hasWrap || (addonChecked && addonKey === 'wrap');
+const trayProducts = [];
+if (showCloak) trayProducts.push('cloak');
+if (showWrap) trayProducts.push('wrap');
+saveTray(trayProducts);
 
 document.getElementById('depositLineCloak').style.display = showCloak ? 'flex' : 'none';
 document.getElementById('depositLineWrap').style.display = showWrap ? 'flex' : 'none';
@@ -572,7 +687,34 @@ document.getElementById('formSection').style.display = 'none';
 document.getElementById('browseSection').style.display = 'block';
 document.getElementById('bothBannerWrap').style.display = 'block';
 document.getElementById('pickYoursLabel').style.display = 'inline-block';
+showTrayPrompt();
 window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('trayContinue').addEventListener('click', function() {
+const tray = readTray();
+if (!tray) return;
+openForm(tray.products);
+if (tray.cloak_size) {
+const sizeSelect = document.getElementById('sizeSelect');
+const addonSizeSelect = document.getElementById('addonSizeSelect');
+if (sizeSelect) sizeSelect.value = tray.cloak_size;
+if (addonSizeSelect) addonSizeSelect.value = tray.cloak_size;
+saveTray(tray.products);
+}
+});
+
+document.getElementById('trayClear').addEventListener('click', function() {
+clearTray();
+document.getElementById('trayPrompt').style.display = 'none';
+});
+
+['sizeSelect','addonSizeSelect'].forEach(function(id) {
+const el = document.getElementById(id);
+if (el) el.addEventListener('change', function() {
+const tray = readTray();
+if (tray) saveTray(tray.products);
+});
 });
 
 document.getElementById('reserveForm').addEventListener('submit', function(e) {
@@ -639,20 +781,20 @@ if (preselect && PRODUCTS[preselect]) {
 loadAvailability().then(() => {
 if (availability[preselect] > 0) openForm([preselect]);
 });
+} else if (params.get('success') !== '1') {
+showTrayPrompt();
 }
 </script>
 <footer class="site-footer">
 <div class="footer-inner">
 <div class="footer-trust">
-<span class="footer-trust-label">Supported payment methods</span>
+<span class="footer-trust-label">Cards + mobile wallets</span>
 <div class="payment-badges">
 <span class="payment-badge visa">VISA</span>
 <span class="payment-badge mc"></span>
 <span class="payment-badge amex">AMEX</span>
-<span class="payment-badge link">Link</span>
-<span class="payment-badge applepay">Pay</span>
-<span class="payment-badge klarna">K.</span>
-<span class="payment-badge cashapp">$</span>
+<span class="payment-badge applepay">Apple Pay</span>
+<span class="payment-badge googlepay">G Pay</span>
 </div>
 </div>
 <div class="footer-legal">
@@ -703,5 +845,6 @@ if(form){form.addEventListener('submit',async function(e){e.preventDefault();var
 })();
 </script>
 
+<script src="/cookie-consent.js" defer></script>
 </body>
 </html>

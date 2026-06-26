@@ -1,0 +1,14 @@
+.yc-cookie-banner{position:fixed;left:50%;bottom:18px;z-index:180;transform:translateX(-50%);width:min(calc(100% - 28px),720px);background:#151618;color:#fbf8f0;border:1px solid rgba(251,248,240,.12);border-radius:14px;padding:16px;box-shadow:0 24px 70px -28px rgba(0,0,0,.72);font-family:Helvetica,Arial,sans-serif;display:none}
+.yc-cookie-banner.show{display:block}
+.yc-cookie-inner{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.yc-cookie-copy{font-size:12.5px;line-height:1.5;color:rgba(251,248,240,.66);margin:0}
+.yc-cookie-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.yc-cookie-btn{border:1px solid rgba(251,248,240,.16);border-radius:100px;padding:10px 14px;font:600 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.03em;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s;white-space:nowrap}
+.yc-cookie-btn:hover{transform:translateY(-1px)}
+.yc-cookie-btn.primary{background:#fbf8f0;color:#1e2320;border-color:#fbf8f0}
+.yc-cookie-btn.secondary{background:transparent;color:rgba(251,248,240,.72)}
+.yc-cookie-btn.secondary:hover{border-color:rgba(251,248,240,.34);color:#fbf8f0}
+.yc-cookie-manage{display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(251,248,240,.08);font-size:11.5px;line-height:1.55;color:rgba(251,248,240,.54)}
+.yc-cookie-banner.manage-open .yc-cookie-manage{display:block}
+.yc-cookie-manage strong{color:rgba(251,248,240,.76);font-weight:500}
+@media(max-width:680px){.yc-cookie-inner{grid-template-columns:1fr}.yc-cookie-actions{justify-content:flex-start}.yc-cookie-btn{flex:1;text-align:center;padding:12px 10px}.yc-cookie-banner{bottom:12px;border-radius:12px}}

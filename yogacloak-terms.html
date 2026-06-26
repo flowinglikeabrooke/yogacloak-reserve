@@ -7,6 +7,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/cookie-consent.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -64,10 +65,8 @@ a{color:inherit;text-decoration:none}
 .payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
 .payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
 .payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
-.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
-.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
-.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
-.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:7.5px;width:58px;letter-spacing:0}
+.payment-badge.googlepay{background:#fff;color:#202124;font-size:8px;width:50px;letter-spacing:0}
 .footer-legal{font-size:10.5px;color:rgba(var(--cream),0.4);line-height:1.5;text-align:center;max-width:1040px;margin:0 auto;letter-spacing:.01em}
 .footer-legal p{margin:0 auto 7px;max-width:1040px}
 .footer-legal a{color:rgba(var(--cream),0.6);text-decoration:underline;text-decoration-color:rgba(var(--cream),0.2);text-underline-offset:2px;transition:color .25s}
@@ -134,8 +133,6 @@ a{color:inherit;text-decoration:none}
 .legal-section p,.legal-section ul li{font-size:13px}
 .site-footer{padding:32px 18px 44px}
 .payment-badge{width:36px;height:24px;font-size:8px}
-.payment-badge.cashapp{font-size:12px}
-.payment-badge.klarna{font-size:10px}
 .payment-badge.amex{font-size:7px}
 .footer-meta{font-size:9.5px;letter-spacing:.14em}
 }
@@ -295,15 +292,13 @@ Location: Scottsdale, Arizona, USA</p>
 <footer class="site-footer">
 <div class="footer-inner">
 <div class="footer-trust">
-<span class="footer-trust-label">Supported payment methods</span>
+<span class="footer-trust-label">Cards + mobile wallets</span>
 <div class="payment-badges">
 <span class="payment-badge visa">VISA</span>
 <span class="payment-badge mc"></span>
 <span class="payment-badge amex">AMEX</span>
-<span class="payment-badge link">Link</span>
-<span class="payment-badge applepay">Pay</span>
-<span class="payment-badge klarna">K.</span>
-<span class="payment-badge cashapp">$</span>
+<span class="payment-badge applepay">Apple Pay</span>
+<span class="payment-badge googlepay">G Pay</span>
 </div>
 </div>
 <div class="footer-legal">
@@ -352,5 +347,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classLis
 if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'Terms of Service'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
 })();
 </script>
+<script src="/cookie-consent.js" defer></script>
 </body>
 </html>

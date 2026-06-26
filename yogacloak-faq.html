@@ -7,6 +7,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/cookie-consent.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -56,30 +57,33 @@ a{color:inherit;text-decoration:none}
 .contact-modal.done .contact-thanks{display:block}
 
 /* Hero */
-.faq-hero{padding:160px 40px 100px;text-align:center;background:var(--ink);position:relative;overflow:hidden}
+.faq-hero{padding:128px 40px 52px;text-align:center;background:var(--ink);position:relative;overflow:hidden}
 .faq-hero h1{font-size:clamp(40px,5.8vw,72px);font-weight:500;letter-spacing:-.035em;line-height:1.1;margin-bottom:24px;max-width:900px;margin-left:auto;margin-right:auto}
 .faq-hero h1 em{font-style:italic;font-weight:400;color:rgba(var(--cream),0.65)}
 .faq-hero h1 .accent{font-weight:700;letter-spacing:-.045em}
 .faq-hero .subtitle{font-size:15px;color:rgba(var(--cream),0.55);letter-spacing:.005em;line-height:1.75;max-width:540px;margin:0 auto;font-style:italic;font-weight:300}
+.faq-index{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;max-width:760px;margin:30px auto 0}
+.faq-index a{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(var(--cream),0.54);border:1px solid rgba(var(--cream),0.12);border-radius:100px;padding:9px 13px;transition:color .2s,border-color .2s,background .2s}
+.faq-index a:hover{color:var(--bone);border-color:rgba(var(--cream),0.3);background:rgba(var(--cream),0.03)}
 
 /* Chapter sections */
-.chapter{max-width:780px;margin:0 auto;padding:0 40px 80px}
-.chapter-header{text-align:center;padding:80px 0 50px;margin-bottom:8px}
+.chapter{max-width:860px;margin:0 auto;padding:0 40px 34px;scroll-margin-top:86px}
+.chapter-header{text-align:left;padding:34px 8px 12px;margin-bottom:0}
 .chapter-eyebrow{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:rgba(var(--cream),0.32);font-weight:600;display:block;margin-bottom:14px;font-family:Helvetica,sans-serif}
-.chapter-name{font-size:clamp(24px,3.2vw,32px);font-weight:400;letter-spacing:-.025em;font-style:italic;color:rgba(var(--cream),0.78);line-height:1.2}
+.chapter-name{font-size:clamp(20px,2.6vw,26px);font-weight:400;letter-spacing:-.025em;font-style:italic;color:rgba(var(--cream),0.78);line-height:1.2}
 .chapter-name em{font-style:normal;font-weight:600;color:var(--bone);letter-spacing:-.03em}
 
 /* FAQ items — softer treatment */
-.faq-item{padding:4px 0;transition:opacity .3s ease}
-.faq-q{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:24px 8px;cursor:pointer;font-size:clamp(15px,1.5vw,17px);font-weight:400;letter-spacing:-.005em;line-height:1.5;color:rgba(var(--cream),0.85);transition:color .3s ease,padding .3s ease;-webkit-tap-highlight-color:transparent;border-radius:12px}
+.faq-item{padding:0;transition:opacity .3s ease}
+.faq-q{display:flex;align-items:flex-start;justify-content:space-between;gap:22px;padding:15px 8px;cursor:pointer;font-size:clamp(14.5px,1.35vw,16px);font-weight:400;letter-spacing:-.005em;line-height:1.35;color:rgba(var(--cream),0.85);transition:color .3s ease,padding .3s ease;-webkit-tap-highlight-color:transparent;border-radius:10px}
 .faq-q:hover{color:var(--bone);background:rgba(var(--cream),0.02)}
-.faq-q-icon{flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:rgba(var(--cream),0.32);transition:transform .5s cubic-bezier(.4,0,.2,1),color .3s;margin-top:2px}
+.faq-q-icon{flex-shrink:0;width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:rgba(var(--cream),0.32);transition:transform .5s cubic-bezier(.4,0,.2,1),color .3s;margin-top:0}
 .faq-q-icon svg{width:14px;height:14px;stroke-width:1.5}
 .faq-item.open .faq-q{color:var(--bone)}
 .faq-item.open .faq-q-icon{transform:rotate(180deg);color:rgba(var(--cream),0.7)}
 .faq-a{max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.4,0,.2,1),opacity .4s ease;opacity:0}
-.faq-a-inner{padding:4px 8px 28px;max-width:640px;color:rgba(var(--cream),0.62);font-size:14.5px;line-height:1.8;font-family:Helvetica,sans-serif;letter-spacing:.005em;font-weight:300}
-.faq-a-inner p{margin-bottom:14px}
+.faq-a-inner{padding:2px 8px 18px;max-width:650px;color:rgba(var(--cream),0.62);font-size:13.5px;line-height:1.62;font-family:Helvetica,sans-serif;letter-spacing:.005em;font-weight:300}
+.faq-a-inner p{margin-bottom:9px}
 .faq-a-inner p:last-child{margin-bottom:0}
 .faq-a-inner em{font-style:italic;color:rgba(var(--cream),0.82);font-weight:400}
 .faq-a-inner strong{font-weight:500;color:var(--bone)}
@@ -97,7 +101,7 @@ a{color:inherit;text-decoration:none}
 .chapter-divider-dot{width:4px;height:4px;border-radius:50%;background:rgba(var(--cream),0.25)}
 
 /* Closing CTA — softer, more inviting */
-.closing-cta{position:relative;padding:120px 40px 130px;text-align:center;background:var(--ink);margin-top:60px}
+.closing-cta{position:relative;padding:82px 40px 92px;text-align:center;background:var(--ink);margin-top:28px}
 .closing-cta::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:1px;background:rgba(var(--cream),0.12)}
 .closing-cta .eyebrow{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:rgba(var(--cream),0.4);margin-bottom:22px;display:inline-block;font-weight:600;font-family:Helvetica,sans-serif}
 .closing-cta h2{font-size:clamp(34px,4.8vw,60px);font-weight:500;letter-spacing:-.035em;line-height:1.05;margin-bottom:22px;max-width:700px;margin-left:auto;margin-right:auto}
@@ -123,10 +127,8 @@ a{color:inherit;text-decoration:none}
 .payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
 .payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
 .payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
-.payment-badge.klarna{background:#FFB3C7;color:#0A0A0A;font-size:11px}
-.payment-badge.cashapp{background:#00D632;color:#fff;font-size:14px}
-.payment-badge.applepay{background:#000;color:#fff;font-size:9px}
-.payment-badge.link{background:#00D66F;color:#000;font-size:9px}
+.payment-badge.applepay{background:#000;color:#fff;font-size:7.5px;width:58px;letter-spacing:0}
+.payment-badge.googlepay{background:#fff;color:#202124;font-size:8px;width:50px;letter-spacing:0}
 .footer-legal{font-size:10.5px;color:rgba(var(--cream),0.4);line-height:1.5;text-align:center;max-width:1040px;margin:0 auto;letter-spacing:.01em}
 .footer-legal p{margin:0 auto 7px;max-width:1040px}
 .footer-legal a{color:rgba(var(--cream),0.6);text-decoration:underline;text-decoration-color:rgba(var(--cream),0.2);text-underline-offset:2px;transition:color .25s,text-decoration-color .25s}
@@ -148,19 +150,19 @@ a{color:inherit;text-decoration:none}
 .topbar-actions{gap:14px}
 .topbar a.reserve-link{font-size:11.5px}
 .topbar-contact{font-size:10.5px;padding:8px 16px;letter-spacing:.05em}
-.faq-hero{padding:110px 22px 70px}
+.faq-hero{padding:96px 22px 44px}
 .faq-hero h1{font-size:clamp(32px,7vw,46px);letter-spacing:-.03em;line-height:1.15;margin-bottom:20px}
 .faq-hero .subtitle{font-size:14px;line-height:1.7}
-.chapter{padding:0 22px 60px}
-.chapter-header{padding:50px 0 38px}
+.chapter{padding:0 22px 28px}
+.chapter-header{padding:30px 6px 10px}
 .chapter-name{font-size:22px}
 .chapter-eyebrow{font-size:8.5px;letter-spacing:.36em;margin-bottom:12px}
-.faq-q{padding:20px 6px;font-size:15px;gap:18px;line-height:1.5}
+.faq-q{padding:15px 6px;font-size:15px;gap:18px;line-height:1.38}
 .faq-q-icon{width:24px;height:24px}
-.faq-a-inner{padding:2px 6px 24px;font-size:14px;line-height:1.75}
-.faq-a-inner p{margin-bottom:12px}
+.faq-a-inner{padding:2px 6px 18px;font-size:13.5px;line-height:1.62}
+.faq-a-inner p{margin-bottom:9px}
 .chapter-divider{padding:24px 22px}
-.closing-cta{padding:80px 22px 90px;margin-top:40px}
+.closing-cta{padding:66px 22px 76px;margin-top:26px}
 .closing-cta h2{font-size:clamp(30px,7vw,44px);margin-bottom:18px}
 .closing-cta p{font-size:14px;margin-bottom:28px;line-height:1.7}
 .btn{padding:15px 28px;font-size:12.5px}
@@ -176,21 +178,19 @@ a{color:inherit;text-decoration:none}
 @media(max-width:480px){
 .topbar{padding:12px 18px}
 .wordmark{font-size:21px}
-.faq-hero{padding:96px 18px 60px}
+.faq-hero{padding:88px 18px 38px}
 .faq-hero h1{font-size:32px;line-height:1.15}
 .faq-hero .subtitle{font-size:13.5px}
-.chapter{padding:0 18px 50px}
-.chapter-header{padding:42px 0 32px}
+.chapter{padding:0 18px 24px}
+.chapter-header{padding:28px 4px 8px}
 .chapter-name{font-size:20px}
-.faq-q{padding:18px 4px;font-size:14.5px;gap:14px}
-.faq-a-inner{font-size:13.5px;padding:2px 4px 22px}
+.faq-q{padding:14px 4px;font-size:14.5px;gap:14px}
+.faq-a-inner{font-size:13.3px;padding:2px 4px 17px}
 .closing-cta{padding:70px 18px 80px}
 .closing-cta h2{font-size:28px}
 .closing-cta p{font-size:13.5px}
 .site-footer{padding:32px 18px 44px}
 .payment-badge{width:36px;height:24px;font-size:8px}
-.payment-badge.cashapp{font-size:12px}
-.payment-badge.klarna{font-size:10px}
 .payment-badge.amex{font-size:7px}
 .footer-meta{font-size:9.5px;letter-spacing:.14em}
 }
@@ -209,10 +209,17 @@ a{color:inherit;text-decoration:none}
 <section class="faq-hero">
 <h1>The <em>before</em> <span class="accent">you ask.</span></h1>
 <p class="subtitle">Quiet answers to the things we get asked most — about the brand, the reservation, the cloth itself.</p>
+<nav class="faq-index" aria-label="FAQ sections">
+<a href="#brand">Brand</a>
+<a href="#reserving">Reserving</a>
+<a href="#cloth">Cloth</a>
+<a href="#shipping">Shipping</a>
+<a href="#contact">Contact</a>
+</nav>
 </section>
 
 <!-- The brand -->
-<div class="chapter">
+<div class="chapter" id="brand">
 <div class="chapter-header">
 <h2 class="chapter-name">on the <em>brand</em></h2>
 </div>
@@ -248,7 +255,7 @@ a{color:inherit;text-decoration:none}
 
 
 <!-- Reserving -->
-<div class="chapter">
+<div class="chapter" id="reserving">
 <div class="chapter-header">
 <h2 class="chapter-name">on <em>reserving</em></h2>
 </div>
@@ -297,7 +304,7 @@ a{color:inherit;text-decoration:none}
 
 
 <!-- The cloth -->
-<div class="chapter">
+<div class="chapter" id="cloth">
 <div class="chapter-header">
 <h2 class="chapter-name">on the <em>cloth</em></h2>
 </div>
@@ -346,7 +353,7 @@ a{color:inherit;text-decoration:none}
 
 
 <!-- Shipping -->
-<div class="chapter">
+<div class="chapter" id="shipping">
 <div class="chapter-header">
 <h2 class="chapter-name">on <em>shipping</em></h2>
 </div>
@@ -383,7 +390,7 @@ a{color:inherit;text-decoration:none}
 
 
 <!-- Reaching us -->
-<div class="chapter">
+<div class="chapter" id="contact">
 <div class="chapter-header">
 <h2 class="chapter-name"><em>reaching</em> us</h2>
 </div>
@@ -431,15 +438,13 @@ a{color:inherit;text-decoration:none}
 <footer class="site-footer">
 <div class="footer-inner">
 <div class="footer-trust">
-<span class="footer-trust-label">Supported payment methods</span>
+<span class="footer-trust-label">Cards + mobile wallets</span>
 <div class="payment-badges">
 <span class="payment-badge visa">VISA</span>
 <span class="payment-badge mc"></span>
 <span class="payment-badge amex">AMEX</span>
-<span class="payment-badge link">Link</span>
-<span class="payment-badge applepay">Pay</span>
-<span class="payment-badge klarna">K.</span>
-<span class="payment-badge cashapp">$</span>
+<span class="payment-badge applepay">Apple Pay</span>
+<span class="payment-badge googlepay">G Pay</span>
 </div>
 </div>
 <div class="footer-legal">
@@ -504,5 +509,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classLis
 if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'FAQ Page'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
 })();
 </script>
+<script src="/cookie-consent.js" defer></script>
 </body>
 </html>

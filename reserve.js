@@ -76,6 +76,22 @@ async function airtableRequest(path, options = {}) {
   return response.status === 204 ? null : response.json();
 }
 
+async function listRecords(tableId, params = new URLSearchParams()) {
+  const records = [];
+  let offset = null;
+
+  do {
+    const pageParams = new URLSearchParams(params);
+    pageParams.set('pageSize', '100');
+    if (offset) pageParams.set('offset', offset);
+    const data = await airtableRequest(`${tableId}?${pageParams}`);
+    records.push(...(data.records || []));
+    offset = data.offset;
+  } while (offset);
+
+  return records;
+}
+
 async function createRecord(tableId, fields) {
   const data = await airtableRequest(tableId, {
     method: 'POST',
@@ -110,7 +126,50 @@ async function findProductIds(products) {
   return names.map((name) => byName.get(name)).filter(Boolean);
 }
 
-async function createOrUpdateContact({ firstName, lastName, email, products, size, formRecordId }) {
+async function findReservedProductsForContact({ contactId, products, productIds }) {
+  const activeStatuses = [
+    'Pending Payment',
+    'Reserved',
+    'Confirmed',
+    'Converted to Order'
+  ];
+  const formula = `OR(${activeStatuses.map((status) => `{Reservation Status}='${status}'`).join(',')})`;
+  const records = await listRecords(TABLES.reservations, new URLSearchParams({ filterByFormula: formula }));
+  const productIdByKey = new Map(products.map((product, index) => [product, productIds[index]]));
+  const duplicates = new Set();
+
+  records.forEach((record) => {
+    const linkedContacts = record.fields?.Contact || [];
+    if (!linkedContacts.includes(contactId)) return;
+
+    const status = record.fields?.['Reservation Status'] || '';
+    const rawNotes = record.fields?.Notes || '';
+    let parsedNotes = {};
+    try {
+      parsedNotes = typeof rawNotes === 'string' ? JSON.parse(rawNotes) : rawNotes;
+    } catch (e) {}
+
+    if (status === 'Pending Payment') {
+      const startedAt = parsedNotes.checkout_started_at ? Date.parse(parsedNotes.checkout_started_at) : 0;
+      const isFreshCheckout = startedAt && Date.now() - startedAt < 1000 * 60 * 60 * 2;
+      if (!isFreshCheckout) return;
+    }
+
+    const linkedProducts = record.fields?.Product || [];
+    let notes = '';
+    try {
+      notes = JSON.stringify(rawNotes).toLowerCase();
+    } catch (e) {}
+
+    productIdByKey.forEach((productId, product) => {
+      if (linkedProducts.includes(productId) || notes.includes(product)) duplicates.add(product);
+    });
+  });
+
+  return [...duplicates];
+}
+
+async function createOrUpdateContact({ firstName, lastName, email, products, size, formRecordId, existingContact }) {
   const fullName = `${firstName} ${lastName}`.trim();
   const fields = {
     'Full Name': fullName,
@@ -127,7 +186,7 @@ async function createOrUpdateContact({ firstName, lastName, email, products, siz
 
   if (formRecordId) fields['Website Forms'] = [formRecordId];
 
-  const existing = await findContactByEmail(email);
+  const existing = existingContact || await findContactByEmail(email);
   if (existing) {
     const existingForms = existing.fields?.['Website Forms'] || [];
     fields['Website Forms'] = [...new Set([...existingForms, formRecordId].filter(Boolean))];
@@ -267,6 +326,22 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Product setup is missing in Airtable.' });
     }
 
+    const existingContact = await findContactByEmail(email);
+    if (existingContact) {
+      const duplicateProducts = await findReservedProductsForContact({
+        contactId: existingContact.id,
+        products,
+        productIds
+      });
+
+      if (duplicateProducts.length) {
+        const duplicateNames = duplicateProducts.map((product) => PRODUCT_CONFIG[product].name).join(' and ');
+        return res.status(409).json({
+          error: `This email already has a reservation for ${duplicateNames}. One per person for each product.`
+        });
+      }
+    }
+
     const depositTotal = products.reduce((sum, product) => sum + PRODUCT_CONFIG[product].deposit, 0);
     const productNames = products.map((product) => PRODUCT_CONFIG[product].name).join(' + ');
     const formRecord = await createWebsiteForm({ firstName, lastName, email, products, size });
@@ -276,7 +351,8 @@ export default async function handler(req, res) {
       email,
       products,
       size,
-      formRecordId: formRecord.id
+      formRecordId: formRecord.id,
+      existingContact
     });
     await updateRecord(TABLES.forms, formRecord.id, { 'Linked Contact': [contactRecord.id] });
 
