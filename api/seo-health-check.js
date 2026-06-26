@@ -21,7 +21,10 @@ const PATHS = [
   '/yogacloak-reserve-page.html',
   '/sitemap.xml',
   '/robots.txt',
-  '/hot-yoga-essentials.html'
+  '/hot-yoga-essentials.html',
+  '/yogacloak-faq.html',
+  '/yogacloak-privacy.html',
+  '/yogacloak-terms.html'
 ];
 
 export default async function handler(req, res) {

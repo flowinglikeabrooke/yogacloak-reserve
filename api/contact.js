@@ -1,31 +1,21 @@
-// /api/contact.js
-// Receives contact form submissions and writes them to the
-// "Website Forms" table in your yogacloak 2027 Airtable base.
-//
-// REQUIRED VERCEL ENV VARS:
-//   AIRTABLE_PAT             your Airtable Personal Access Token
-//   AIRTABLE_BASE_ID         app2c6G7n666P0UI2
-//   AIRTABLE_FORMS_TABLE     tblRvWlirlbzlW5Up
-// OPTIONAL:
-//   ALLOWED_ORIGIN           https://yogacloak.com
+// Vercel endpoint: /api/contact
+// Saves contact modal submissions to Airtable.
+
+import { checkRateLimit } from '../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
-  const origin = process.env.ALLOWED_ORIGIN || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || 'https://yogacloak.com');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60 })) return;
 
   try {
     const { name, email, message, source } = req.body || {};
 
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    if (!name || !email || !message) return res.status(400).json({ error: 'Missing required fields' });
     if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
       return res.status(400).json({ error: 'Invalid field types' });
     }
@@ -41,21 +31,16 @@ export default async function handler(req, res) {
     const tableId = process.env.AIRTABLE_FORMS_TABLE;
 
     if (!pat || !baseId || !tableId) {
-      console.error('Missing Airtable env vars');
+      console.error('Missing Airtable contact env vars');
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Split "Brooke Smith" -> First "Brooke", Last "Smith"
     const trimmedName = name.trim().replace(/\s+/g, ' ');
     const parts = trimmedName.split(' ');
     const firstName = parts.shift() || '';
     const lastName = parts.join(' ');
-
-    // Unique submission ID
     const now = new Date();
-    const submissionId = 'web_' + now.getTime().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-
-    const airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableId}`;
+    const submissionId = `web_${now.getTime().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
     const fields = {
       'Submission ID': submissionId,
@@ -65,44 +50,22 @@ export default async function handler(req, res) {
       'Email': email.trim().toLowerCase(),
       'Notes': message.trim(),
       'Source Page': (source || 'unknown').toString().slice(0, 100),
-      'Form Type': 'Contact Form',
-      'Lead Source': 'Website Contact Form'
+      'Form Type': 'Contact',
+      'Lead Source': 'Website'
     };
 
-    const airtableRes = await fetch(airtableUrl, {
+    const airtableRes = await fetch(`https://api.airtable.com/v0/${baseId}/${tableId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${pat}`,
+        Authorization: `Bearer ${pat}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        records: [{ fields }],
-        typecast: true  // best-effort matching for singleSelect fields (Form Type, Lead Source)
-      })
+      body: JSON.stringify({ records: [{ fields }], typecast: true })
     });
 
     if (!airtableRes.ok) {
       const errText = await airtableRes.text();
-      console.error('Airtable error:', airtableRes.status, errText);
-
-      // If singleSelect options don't exist yet, retry without them
-      if (airtableRes.status === 422 && /Form Type|Lead Source/.test(errText)) {
-        delete fields['Form Type'];
-        delete fields['Lead Source'];
-        const retry = await fetch(airtableUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${pat}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ records: [{ fields }], typecast: true })
-        });
-        if (retry.ok) return res.status(200).json({ ok: true });
-        const retryErr = await retry.text();
-        console.error('Retry failed:', retryErr);
-        return res.status(502).json({ error: 'Failed to save submission' });
-      }
-
+      console.error('Airtable contact error:', airtableRes.status, errText);
       return res.status(502).json({ error: 'Failed to save submission' });
     }
 
