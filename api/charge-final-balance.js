@@ -20,6 +20,16 @@ function parseNotes(value) {
   }
 }
 
+function isAuthorized(providedToken, adminToken) {
+  const providedBuffer = Buffer.from(String(providedToken || ''));
+  const adminBuffer = Buffer.from(String(adminToken || ''));
+  return providedBuffer.length === adminBuffer.length && timingSafeEqual(providedBuffer, adminBuffer);
+}
+
+function escapeFormulaValue(value) {
+  return String(value || '').replace(/'/g, "\\'");
+}
+
 async function airtableRequest(path, options = {}) {
   const pat = process.env.AIRTABLE_PAT;
   const baseId = process.env.AIRTABLE_BASE_ID;
@@ -71,6 +81,16 @@ async function createPaymentRecord(fields) {
   return data.records[0];
 }
 
+async function findPaymentByTransactionId(transactionId) {
+  if (!transactionId) return null;
+  const params = new URLSearchParams({
+    maxRecords: '1',
+    filterByFormula: `{Stripe Transaction ID}='${escapeFormulaValue(transactionId)}'`
+  });
+  const data = await airtableRequest(`${TABLES.payments}?${params}`);
+  return (data.records || [])[0] || null;
+}
+
 async function updateReservation(recordId, fields) {
   return airtableRequest(`${TABLES.reservations}/${recordId}`, {
     method: 'PATCH',
@@ -88,9 +108,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  try {
-    timingSafeEqual(Buffer.from(providedToken), Buffer.from(adminToken));
-  } catch (err) {
+  if (!isAuthorized(providedToken, adminToken)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -113,6 +131,20 @@ export default async function handler(req, res) {
     const noticeSentAt = notes.final_balance_notice_sent_at ? Date.parse(notes.final_balance_notice_sent_at) : 0;
     const noticeHours = Number(process.env.FINAL_BALANCE_NOTICE_HOURS || 24);
     const noticeAgeHours = noticeSentAt ? (Date.now() - noticeSentAt) / (1000 * 60 * 60) : 0;
+    const alreadyCharged =
+      notes.final_balance_payment_intent_id ||
+      notes.final_balance_status === 'succeeded' ||
+      fields['Final Checkout Status'] === 'Completed' ||
+      fields['Reservation Status'] === 'Converted to Order';
+
+    if (alreadyCharged) {
+      return res.status(200).json({
+        ok: true,
+        already_charged: true,
+        payment_intent_id: notes.final_balance_payment_intent_id || '',
+        status: notes.final_balance_status || 'succeeded'
+      });
+    }
 
     if (!noticeSentAt) {
       return res.status(400).json({ error: 'Send final-balance notice before charging.' });
@@ -143,11 +175,15 @@ export default async function handler(req, res) {
 
     const paymentIntent = await stripeRequest('payment_intents', {
       method: 'POST',
+      headers: {
+        'Idempotency-Key': `final_balance_${reservationId}_${amountCents}`
+      },
       body: params
     });
 
     const paid = paymentIntent.status === 'succeeded';
-    const paymentRecord = await createPaymentRecord({
+    const existingPayment = await findPaymentByTransactionId(paymentIntent.id);
+    const paymentRecord = existingPayment || await createPaymentRecord({
       Contact: contactId ? [contactId] : [],
       Reservation: [reservationId],
       'Payment Date': new Date().toISOString().slice(0, 10),

@@ -42,6 +42,18 @@ function verifyStripeSignature(rawBody, signatureHeader, secret) {
   });
 }
 
+function parseNotes(value) {
+  try {
+    return JSON.parse(value || '{}');
+  } catch (err) {
+    return {};
+  }
+}
+
+function escapeFormulaValue(value) {
+  return String(value || '').replace(/'/g, "\\'");
+}
+
 async function airtableRequest(path, options = {}) {
   const pat = process.env.AIRTABLE_PAT;
   const baseId = process.env.AIRTABLE_BASE_ID;
@@ -78,6 +90,16 @@ async function createRecord(tableId, fields) {
     body: JSON.stringify({ records: [{ fields }], typecast: true })
   });
   return data.records[0];
+}
+
+async function findPaymentByTransactionId(transactionId) {
+  if (!transactionId) return null;
+  const params = new URLSearchParams({
+    maxRecords: '1',
+    filterByFormula: `{Stripe Transaction ID}='${escapeFormulaValue(transactionId)}'`
+  });
+  const data = await airtableRequest(`${TABLES.payments}?${params}`);
+  return (data.records || [])[0] || null;
 }
 
 async function stripeRequest(path, options = {}) {
@@ -124,6 +146,13 @@ export default async function handler(req, res) {
         ? await stripeRequest(`payment_intents/${session.payment_intent}`)
         : null;
       const savedPaymentMethod = paymentIntent?.payment_method || '';
+      const transactionId = session.payment_intent || session.id;
+      const reservation = metadata.reservation_record_id
+        ? await airtableRequest(`${TABLES.reservations}/${metadata.reservation_record_id}`)
+        : null;
+      const reservationFields = reservation?.fields || {};
+      const existingPayments = Array.isArray(reservationFields.Payment) ? reservationFields.Payment : [];
+      const existingNotes = parseNotes(reservationFields.Notes);
 
       await updateRecord(TABLES.contacts, metadata.contact_record_id, {
         'Contact Type': 'Reserved',
@@ -135,6 +164,7 @@ export default async function handler(req, res) {
         'Reservation Status': 'Reserved',
         'Checkout Ready': true,
         Notes: JSON.stringify({
+          ...existingNotes,
           products: reservedProducts,
           product_selection: reservedProducts.join(' + '),
           cloak_size: metadata.cloak_size || '',
@@ -151,19 +181,20 @@ export default async function handler(req, res) {
         })
       });
 
-      const payment = await createRecord(TABLES.payments, {
+      const existingPayment = await findPaymentByTransactionId(transactionId);
+      const payment = existingPayment || await createRecord(TABLES.payments, {
         Contact: metadata.contact_record_id ? [metadata.contact_record_id] : [],
         Reservation: metadata.reservation_record_id ? [metadata.reservation_record_id] : [],
         'Payment Date': paidDate,
         Amount: amountPaid,
         'Payment Type': 'Deposit',
-        'Stripe Transaction ID': session.payment_intent || session.id,
+        'Stripe Transaction ID': transactionId,
         'Stripe Customer ID': session.customer || '',
         'Payment Status': session.payment_status === 'paid' ? 'Paid' : 'Pending'
       });
 
       await updateRecord(TABLES.reservations, metadata.reservation_record_id, {
-        Payment: [payment.id]
+        Payment: [...new Set([...existingPayments, payment.id])]
       });
     }
 
