@@ -1,60 +1,62 @@
 // Protected endpoint: one Vercel Hobby-safe daily cron that runs YogaCloak ops in order.
 // GET /api/daily-ops-runner with Authorization: Bearer CRON_SECRET.
+//
+// The individual jobs live in lib/jobs/ (not api/) so they do not each count as a
+// separate Vercel Serverless Function. They are invoked in-process below.
 
-import {
-  requireAdmin,
-  sendEmail
-} from '../lib/yogacloak-ops.js';
+import { requireAdmin, sendEmail } from '../lib/yogacloak-ops.js';
+import cleanupPendingCheckouts from '../lib/jobs/cleanup-pending-checkouts.js';
+import sendAbandonedReservations from '../lib/jobs/send-abandoned-reservations.js';
+import reconcileStripeAirtable from '../lib/jobs/reconcile-stripe-airtable.js';
+import lowInventoryAlert from '../lib/jobs/low-inventory-alert.js';
+import dailyOwnerDigest from '../lib/jobs/daily-owner-digest.js';
+import seoHealthCheck from '../lib/jobs/seo-health-check.js';
 
 const TASKS = [
-  '/api/cleanup-pending-checkouts',
-  '/api/send-abandoned-reservations',
-  '/api/reconcile-stripe-airtable',
-  '/api/low-inventory-alert',
-  '/api/daily-owner-digest',
-  '/api/seo-health-check'
+  ['cleanup-pending-checkouts', cleanupPendingCheckouts],
+  ['send-abandoned-reservations', sendAbandonedReservations],
+  ['reconcile-stripe-airtable', reconcileStripeAirtable],
+  ['low-inventory-alert', lowInventoryAlert],
+  ['daily-owner-digest', dailyOwnerDigest],
+  ['seo-health-check', seoHealthCheck]
 ];
 
 function ownerEmail() {
   return process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || process.env.EMAIL_TO || 'hello@yogacloak.com';
 }
 
-function siteUrl(req) {
-  const configured = process.env.SITE_URL || process.env.VERCEL_URL || '';
-  const host = configured || req.headers.host || 'www.yogacloak.com';
-  const withProtocol = host.startsWith('http') ? host : `https://${host}`;
-  return withProtocol.replace(/\/$/, '');
-}
+// Run a job handler in-process by giving it a minimal req/res it understands.
+// The job already authenticates via requireAdmin, so we pass the cron secret.
+async function runTask(name, handler) {
+  const req = {
+    method: 'POST',
+    headers: { authorization: `Bearer ${process.env.CRON_SECRET || ''}` }
+  };
 
-async function runTask(baseUrl, path) {
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${process.env.CRON_SECRET || ''}`
-    }
-  });
-  let body = null;
+  let statusCode = 200;
+  let payload = null;
+  const res = {
+    status(code) { statusCode = code; return this; },
+    json(body) { payload = body; return this; },
+    setHeader() { return this; },
+    end() { return this; }
+  };
+
   try {
-    body = await response.json();
+    await handler(req, res);
+    return { path: `/api/${name}`, ok: statusCode >= 200 && statusCode < 300, status: statusCode, body: payload };
   } catch (err) {
-    body = { text: await response.text().catch(() => '') };
+    return { path: `/api/${name}`, ok: false, status: 'failed', error: err.message };
   }
-  return { path, ok: response.ok, status: response.status, body };
 }
 
 export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   if (!requireAdmin(req, res)) return;
 
-  const baseUrl = siteUrl(req);
   const results = [];
-
-  for (const path of TASKS) {
-    try {
-      results.push(await runTask(baseUrl, path));
-    } catch (err) {
-      results.push({ path, ok: false, status: 'failed', error: err.message });
-    }
+  for (const [name, taskHandler] of TASKS) {
+    results.push(await runTask(name, taskHandler));
   }
 
   const failures = results.filter((result) => !result.ok);
@@ -80,5 +82,5 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(failures.length ? 207 : 200).json({ ok: failures.length === 0, baseUrl, results });
+  return res.status(failures.length ? 207 : 200).json({ ok: failures.length === 0, results });
 }
