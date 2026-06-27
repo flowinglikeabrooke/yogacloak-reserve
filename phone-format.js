@@ -8,9 +8,9 @@
   function formatUSPhone(value){
     var digits = phoneDigits(value);
     if(!digits) return '';
-    if(digits.length < 4) return '+1 (' + digits;
-    if(digits.length < 7) return '+1 (' + digits.slice(0, 3) + ') ' + digits.slice(3);
-    return '+1 (' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+    if(digits.length <= 3) return '(' + digits;
+    if(digits.length <= 6) return '(' + digits.slice(0, 3) + ') ' + digits.slice(3);
+    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
   }
 
   function isPhoneInput(el){
