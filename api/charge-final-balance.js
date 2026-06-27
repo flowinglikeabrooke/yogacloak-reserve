@@ -53,8 +53,8 @@ async function airtableRequest(path, options = {}) {
 }
 
 async function stripeRequest(path, options = {}) {
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) throw new Error('Missing STRIPE_SECRET_KEY');
+  const stripeKey = process.env.STRIPE_SECRET_KEY || process.env.RESERVE_STRIPE_SECRET_KEY;
+  if (!stripeKey) throw new Error('Missing STRIPE_SECRET_KEY or RESERVE_STRIPE_SECRET_KEY');
 
   const response = await fetch(`https://api.stripe.com/v1/${path}`, {
     ...options,

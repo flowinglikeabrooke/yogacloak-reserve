@@ -285,8 +285,8 @@ async function createReservation({ contactId, formRecordId, productIds, products
 }
 
 async function createCheckoutSession(payload) {
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) throw new Error('Missing STRIPE_SECRET_KEY');
+  const stripeKey = process.env.STRIPE_SECRET_KEY || process.env.RESERVE_STRIPE_SECRET_KEY;
+  if (!stripeKey) throw new Error('Missing STRIPE_SECRET_KEY or RESERVE_STRIPE_SECRET_KEY');
 
   const siteUrl = (process.env.SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '');
   const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;

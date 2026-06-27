@@ -228,21 +228,23 @@ a{text-decoration:none;color:inherit}
 .closing h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
 .closing h2 strong{font-weight:700;letter-spacing:-.05em}
 .closing .year{font-size:11px;letter-spacing:.3em;color:rgba(124,140,130,0.75);margin-bottom:40px;text-transform:uppercase;font-weight:600}
-.cta-band{position:relative;padding:clamp(60px,10vh,100px) clamp(24px,5vw,72px);text-align:center;background:var(--ink);overflow:hidden}
-.cta-band .eyebrow{margin-bottom:20px;display:inline-block}
-.cta-band h2{font-size:clamp(32px,4.5vw,56px);font-weight:500;letter-spacing:-.035em;margin-bottom:18px;line-height:1.1}
+.cta-band{position:relative;padding:clamp(68px,10vh,108px) clamp(24px,5vw,72px);text-align:center;background:linear-gradient(180deg,var(--ink) 0%,#171c18 100%);overflow:hidden}
+.cta-band .orb{display:none}
+.cta-band-panel{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:clamp(34px,5vw,56px) clamp(24px,5vw,70px)}
+.cta-band .eyebrow{margin-bottom:18px;display:inline-block;color:rgba(var(--cream),0.42)}
+.cta-band h2{font-size:clamp(34px,4.8vw,66px);font-weight:500;letter-spacing:-.035em;margin:0 auto 30px;line-height:1.04;max-width:800px}
 .cta-band h2 em{font-style:italic;font-weight:300;color:rgba(var(--cream),0.7)}
 .cta-band h2 strong{font-weight:700;letter-spacing:-.045em}
 .cta-band p{font-size:14px;color:rgba(var(--cream),0.55);max-width:600px;margin:0 auto 32px;line-height:1.7;font-style:italic;font-family:'Hanken Grotesk',sans-serif}
-.cta-form{display:flex;flex-direction:column;align-items:center;gap:2px;max-width:340px;margin:6px auto 4px}
-.cta-form input{width:100%;padding:15px 6px;border:none;border-bottom:1px solid rgba(var(--cream),0.2);background:transparent;color:rgb(var(--cream));font-size:16px;font-family:'Hanken Grotesk',sans-serif;text-align:center;outline:none;transition:border-color .3s ease}
-.cta-form input::placeholder{color:rgba(var(--cream),0.34);font-style:italic}
-.cta-form input:focus{border-bottom-color:rgba(var(--cream),0.6)}
-.cta-form-btn{margin-top:26px;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:15px 34px;border-radius:100px;border:none;background:var(--bone);color:var(--ink);font-size:13px;font-weight:600;letter-spacing:.01em;font-family:Helvetica,sans-serif;cursor:pointer;transition:transform .3s ease,opacity .3s ease}
+.cta-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;margin:0 auto 4px}
+.cta-form input{width:100%;height:52px;padding:0 18px;border:1px solid rgba(var(--cream),0.13);border-radius:100px;background:rgba(8,10,9,0.18);color:rgb(var(--cream));font-size:14px;font-family:'Hanken Grotesk',sans-serif;text-align:left;outline:none;transition:border-color .3s ease,background .3s ease}
+.cta-form input::placeholder{color:rgba(var(--cream),0.38);font-style:normal}
+.cta-form input:focus{border-color:rgba(var(--cream),0.44);background:rgba(8,10,9,0.28)}
+.cta-form-btn{grid-column:1/-1;margin:8px auto 0;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:15px 38px;border-radius:100px;border:none;background:var(--bone);color:var(--ink);font-size:13px;font-weight:600;letter-spacing:.01em;font-family:Helvetica,sans-serif;cursor:pointer;transition:transform .3s ease,opacity .3s ease,background .3s ease;min-width:220px}
 .cta-form-btn:hover{transform:translateY(-2px)}
 .cta-form-btn:disabled{opacity:.6;cursor:default;transform:none}
 .cta-form-btn svg{width:15px;height:15px}
-.cta-fine{font-size:11px!important;color:rgba(var(--cream),0.42)!important;max-width:380px;margin:0 auto!important;font-style:normal!important;line-height:1.5!important}
+.cta-fine{font-size:10.5px!important;color:rgba(var(--cream),0.36)!important;max-width:560px;margin:18px auto 0!important;font-style:normal!important;line-height:1.5!important}
 .cta-fine.error{color:#e0a89f!important}
 .cta-thanks{display:none;font-size:clamp(18px,2.5vw,22px);color:rgb(var(--cream));font-family:'Hanken Grotesk',sans-serif;font-weight:500;font-style:normal}
 .cta-band.done .cta-form,.cta-band.done .cta-fine{display:none}
@@ -360,9 +362,14 @@ a{text-decoration:none;color:inherit}
 .fabric-text p{font-size:13.5px;line-height:1.7;margin-bottom:28px}
 .fabric-tag{font-size:9.5px;padding:8px 14px;letter-spacing:.14em}
 .fabric-tags{gap:8px}
-.cta-band{padding:60px 22px}
-.cta-band h2{font-size:clamp(28px,7vw,40px);line-height:1.15;margin-bottom:14px}
+.cta-band{padding:58px 22px}
+.cta-band-panel{padding:28px 20px 34px}
+.cta-band h2{font-size:clamp(30px,8vw,44px);line-height:1.08;margin-bottom:24px}
 .cta-band p{font-size:13px;margin-bottom:24px;line-height:1.65}
+.cta-form{display:flex;flex-direction:column;gap:10px;max-width:330px}
+.cta-form input{height:50px;text-align:center;font-size:15px}
+.cta-form-btn{width:auto;margin-top:2px}
+.cta-fine{max-width:310px!important;font-size:10px!important}
 .closing{height:75svh;min-height:440px}
 .closing-inner{padding:0 22px}
 .closing h2{font-size:clamp(54px,16vw,90px);margin-bottom:14px}
@@ -403,8 +410,9 @@ a{text-decoration:none;color:inherit}
 .amt{font-size:20px}
 .fabric{padding:50px 18px;gap:26px}
 .fabric-text h3{font-size:28px}
-.cta-band{padding:50px 18px}
-.cta-band h2{font-size:28px}
+.cta-band{padding:48px 18px}
+.cta-band-panel{padding:26px 16px 32px}
+.cta-band h2{font-size:32px}
 .closing h2{font-size:52px}
 .site-footer{padding:34px 18px 44px}
 .payment-badge{width:36px;height:24px;font-size:8px}
@@ -429,12 +437,12 @@ a{text-decoration:none;color:inherit}
 <h3>Be the <em>first</em> <strong>to know.</strong></h3>
 <p>for after class — coming 2027</p>
 <div class="loop-field">
-<label for="loopName">First name</label>
-<input id="loopName" type="text" placeholder="Brooke" autocomplete="given-name">
+<label for="loopName">Name</label>
+<input id="loopName" type="text" placeholder="Name" autocomplete="given-name">
 </div>
 <div class="loop-field">
 <label for="loopPhone">Phone</label>
-<input id="loopPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel">
+<input id="loopPhone" type="tel" inputmode="tel" placeholder="+1 (444) 444-4444" autocomplete="tel">
 </div>
 <button class="loop-btn" id="loopSubmit">Keep me posted</button>
 <p class="loop-fine" id="loopFine">By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.</p>
@@ -539,27 +547,21 @@ a{text-decoration:none;color:inherit}
 <img src="material.jpg" alt="The Cloak draped over a collarbone, sweat still on the skin" loading="lazy" decoding="async">
 </div>
 <div class="fabric-text reveal">
-<span class="eyebrow">The feeling</span>
-<h3><em>For the</em> <strong>walk out,</strong><br>not the workout.</h3>
-<p>A quiet layer for the space between heat and the rest of the day. Close to the body, easy in a bag, and considered enough to keep on.</p>
+<span class="eyebrow">The material</span>
+<h3><em>Soft after heat.</em><br><strong>Dark on purpose.</strong></h3>
+<p>Matte graphite fabric made for warm skin after class. Absorbent without the bulk of a towel, light enough to keep on for the way home.</p>
 </div>
 </section>
 
 <section class="cta-band">
 <span class="orb o1" style="width:400px;height:400px;top:-80px;left:2%;opacity:.25"></span>
 <span class="orb o2" style="width:350px;height:350px;bottom:-100px;right:3%;opacity:.2;animation:drift2 34s ease-in-out infinite;animation-delay:-8s"></span>
-<div style="position:relative;z-index:2">
+<div class="cta-band-panel">
 <span class="eyebrow">Join first access</span>
-<h2>Be the <strong>first</strong> <em>to know</em> when we launch.</h2>
-<form class="cta-form" id="ctaForm" novalidate>
-<input id="ctaName" type="text" placeholder="First name" autocomplete="given-name" aria-label="First name">
-<input id="ctaPhone" type="tel" inputmode="tel" placeholder="+1 (555) 000-0000" autocomplete="tel" aria-label="Phone number">
-<button type="submit" class="cta-form-btn" id="ctaSubmit">Keep me posted
+<h2>Be the <strong>first</strong> <em>to know</em><br>when we launch.</h2>
+<button type="button" class="cta-form-btn" id="ctaBtnOpen">Keep me posted
 <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#1E2320" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
-</form>
-<p class="cta-fine" id="ctaFine">By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg &amp; data rates may apply. Reply STOP to opt out.</p>
-<p class="cta-thanks" id="ctaThanks">You're on the list — we'll be in touch.</p>
 </div>
 </section>
 
@@ -807,6 +809,7 @@ submitBtn.disabled=false;submitBtn.innerHTML=original;
 });
 })();
 </script>
+<script src="/phone-format.js" defer></script>
 <script src="/cookie-consent.js" defer></script>
 </body>
 </html>

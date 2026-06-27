@@ -360,6 +360,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classLis
 if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'Terms of Service'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
 })();
 </script>
+<script src="/phone-format.js" defer></script>
 <script src="/cookie-consent.js" defer></script>
 </body>
 </html>
