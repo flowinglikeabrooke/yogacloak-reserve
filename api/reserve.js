@@ -297,7 +297,7 @@ async function createCheckoutSession(payload) {
   params.append('mode', 'payment');
   params.append('customer_creation', 'always');
   params.append('customer_email', payload.email);
-  params.append('success_url', `${baseUrl}/yogacloak-confirmation.html?session_id={CHECKOUT_SESSION_ID}`);
+  params.append('success_url', `${baseUrl}/yogacloak-confirmation.html?session_id={CHECKOUT_SESSION_ID}&deposit=${payload.depositTotal}&remaining=${finalBalance}`);
   params.append('cancel_url', `${baseUrl}/yogacloak-reserve-page.html?cancelled=1`);
   params.append('payment_method_types[0]', 'card');
   params.append('payment_intent_data[setup_future_usage]', 'off_session');

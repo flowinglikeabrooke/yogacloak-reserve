@@ -43,11 +43,38 @@ a{color:inherit;text-decoration:none}
 <div class="confirm-inner">
 <div class="eyebrow">Reservation confirmed</div>
 <h1>Your spot <em>is held.</em></h1>
-<p>Your deposit went through. We’ll email you before the remaining balance is charged.</p>
+<div id="loadingMsg" style="color:rgba(251,248,240,.62)">Loading your reservation details...</div>
+<div id="successMsg" style="display:none">
+<p>You paid <strong id="depositAmt">$0</strong> today as a deposit.</p>
+<p>Your remaining balance is <strong id="remainingAmt">$0</strong>. When your yogacloak product is ready, we will notify you before charging this amount to the payment method you used for your deposit.</p>
 <p class="confirm-note">A confirmation is also being saved to our reservation system. If you do not see an email shortly, write us at hello@yogacloak.com.</p>
+</div>
 <a href="/" class="btn">Back to yogacloak</a>
 </div>
 </main>
+<script>
+function showReservationDetails() {
+  var params = new URLSearchParams(window.location.search);
+  var deposit = Number(params.get('deposit'));
+  var remaining = Number(params.get('remaining'));
+
+  if (!deposit && deposit !== 0) {
+    document.getElementById('loadingMsg').innerHTML = 'Reservation confirmed. Check your email for details.';
+    return;
+  }
+
+  document.getElementById('depositAmt').textContent = '$' + deposit.toFixed(2);
+  document.getElementById('remainingAmt').textContent = '$' + remaining.toFixed(2);
+  document.getElementById('loadingMsg').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', showReservationDetails);
+} else {
+  showReservationDetails();
+}
+</script>
 <footer class="site-footer">© 2026 yogacloak</footer>
 <script src="/phone-format.js" defer></script>
 <script src="/cookie-consent.js" defer></script>
