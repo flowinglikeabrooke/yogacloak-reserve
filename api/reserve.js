@@ -447,6 +447,11 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, url: checkout.url });
   } catch (err) {
     console.error('Reserve endpoint error:', err);
-    return res.status(500).json({ error: 'Could not start checkout. Please try again.' });
+    // TEMP DIAGNOSTIC: surface the underlying error so we can see why checkout fails.
+    // Remove the `detail` field once the root cause is fixed.
+    return res.status(500).json({
+      error: 'Could not start checkout. Please try again.',
+      detail: String(err && err.message ? err.message : err).slice(0, 600)
+    });
   }
 }
