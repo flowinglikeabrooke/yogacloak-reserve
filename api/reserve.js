@@ -15,6 +15,7 @@ const PRODUCT_CONFIG = {
   cloak: { name: 'The Cloak', contactInterest: 'Cloak', deposit: 20, retail: 98 },
   wrap: { name: 'The Wrap', contactInterest: 'Wrap', deposit: 15, retail: 68 }
 };
+const DROP_TOTAL = Number(process.env.DROP_TOTAL || 100);
 const PENDING_HOLD_MS = Number(process.env.PENDING_HOLD_MINUTES || 120) * 60 * 1000;
 
 function clean(value, max = 200) {
@@ -27,6 +28,16 @@ function today() {
 
 function escapeFormulaValue(value) {
   return String(value).replace(/'/g, "\\'");
+}
+
+function parseNotes(value) {
+  if (!value) return {};
+  if (typeof value === 'object') return value;
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return {};
+  }
 }
 
 function sizeLabel(size) {
@@ -148,10 +159,7 @@ async function findReservedProductsForContact({ contactId, products, productIds 
 
     const status = record.fields?.['Reservation Status'] || '';
     const rawNotes = record.fields?.Notes || '';
-    let parsedNotes = {};
-    try {
-      parsedNotes = typeof rawNotes === 'string' ? JSON.parse(rawNotes) : rawNotes;
-    } catch (e) {}
+    const parsedNotes = parseNotes(rawNotes);
 
     if (status === 'Pending Payment') {
       const startedAt = parsedNotes.checkout_started_at ? Date.parse(parsedNotes.checkout_started_at) : 0;
@@ -171,6 +179,41 @@ async function findReservedProductsForContact({ contactId, products, productIds 
   });
 
   return [...duplicates];
+}
+
+async function findSoldOutProducts({ products, productIds }) {
+  const activeStatuses = [
+    'Pending Payment',
+    'Reserved',
+    'Confirmed',
+    'Final Balance Notice Sent',
+    'Converted to Order'
+  ];
+  const formula = `OR(${activeStatuses.map((status) => `{Reservation Status}='${status}'`).join(',')})`;
+  const records = await listRecords(TABLES.reservations, new URLSearchParams({ filterByFormula: formula }));
+  const productIdByKey = new Map(products.map((product, index) => [product, productIds[index]]));
+  const reserved = Object.fromEntries(products.map((product) => [product, 0]));
+
+  records.forEach((record) => {
+    const status = record.fields?.['Reservation Status'] || '';
+    const rawNotes = record.fields?.Notes || '';
+    const parsedNotes = parseNotes(rawNotes);
+
+    if (status === 'Pending Payment') {
+      const startedAt = parsedNotes.checkout_started_at ? Date.parse(parsedNotes.checkout_started_at) : 0;
+      const isFreshCheckout = startedAt && Date.now() - startedAt < PENDING_HOLD_MS;
+      if (!isFreshCheckout) return;
+    }
+
+    const linkedProducts = record.fields?.Product || [];
+    const notesText = `${String(rawNotes).toLowerCase()} ${JSON.stringify(parsedNotes).toLowerCase()}`;
+
+    productIdByKey.forEach((productId, product) => {
+      if (linkedProducts.includes(productId) || notesText.includes(product)) reserved[product] += 1;
+    });
+  });
+
+  return products.filter((product) => reserved[product] >= DROP_TOTAL);
 }
 
 async function createOrUpdateContact({ firstName, lastName, email, products, size, formRecordId, existingContact }) {
@@ -329,6 +372,13 @@ export default async function handler(req, res) {
     const productIds = await findProductIds(products);
     if (productIds.length !== products.length) {
       return res.status(500).json({ error: 'Product setup is missing in Airtable.' });
+    }
+
+    const soldOutProducts = await findSoldOutProducts({ products, productIds });
+    if (soldOutProducts.length) {
+      const soldOutNames = soldOutProducts.map((product) => PRODUCT_CONFIG[product].name).join(' and ');
+      const verb = soldOutProducts.length === 1 ? 'is' : 'are';
+      return res.status(409).json({ error: `${soldOutNames} ${verb} sold out.` });
     }
 
     const existingContact = await findContactByEmail(email);

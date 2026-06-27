@@ -115,6 +115,8 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .both-banner{max-width:1200px;margin:0 auto 32px;padding:0 40px}
 .both-banner-inner{background:linear-gradient(135deg,rgba(124,140,130,0.18) 0%,rgba(124,140,130,0.08) 100%);border:1px solid rgba(124,140,130,0.35);border-radius:16px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;transition:border-color .25s,background .25s}
 .both-banner-inner:hover{border-color:rgba(124,140,130,0.6);background:linear-gradient(135deg,rgba(124,140,130,0.26) 0%,rgba(124,140,130,0.12) 100%)}
+.both-banner-inner.soldout{opacity:.6;cursor:not-allowed}
+.both-banner-inner.soldout:hover{border-color:rgba(124,140,130,0.35);background:linear-gradient(135deg,rgba(124,140,130,0.18) 0%,rgba(124,140,130,0.08) 100%)}
 .both-badge{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:700;background:rgba(124,140,130,0.18);padding:5px 12px;border-radius:100px;border:1px solid rgba(124,140,130,0.3);white-space:nowrap}
 .both-banner-text{flex:1}
 .both-banner-text strong{font-size:15px;font-weight:600;letter-spacing:-.01em;display:block;margin-bottom:3px}
@@ -234,17 +236,20 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 .tray-prompt-inner{align-items:flex-start;flex-direction:column;gap:12px;padding:15px 16px}
 .tray-actions{width:100%}
 .tray-btn{flex:1;text-align:center}
-.both-banner-inner{display:grid;grid-template-columns:1fr auto;gap:8px 14px;padding:14px 16px;border-radius:14px}
-.both-badge{display:none}
+.both-banner-inner{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px 12px;padding:14px 16px;border-radius:14px;align-items:center}
+.both-badge{display:inline-flex;align-items:center;justify-content:center;font-size:8px;letter-spacing:.16em;padding:5px 9px;grid-column:1;white-space:nowrap}
 .both-banner-text{min-width:0}
-.both-banner-text strong{font-size:15px;line-height:1;margin-bottom:0}
-.both-banner-text span{display:none}
+.both-banner-text strong{font-size:13px;line-height:1.15;margin-bottom:4px}
+.both-banner-text > span{display:block;font-size:10.5px;line-height:1.3;color:rgba(251,248,240,0.48)}
+.both-banner-text strong span{display:none}
 .desktop-copy{display:none}
 .mobile-copy{display:inline}
-.both-banner-price{text-align:right;margin-left:auto;color:rgba(251,248,240,0.58)}
+.both-banner-text strong .desktop-copy{display:inline}
+.both-banner-text strong .mobile-copy{display:none}
+.both-banner-price{text-align:right;margin-left:auto;color:rgba(251,248,240,0.58);white-space:nowrap}
 .both-banner-price .both-total{font-size:13px;line-height:1;font-weight:600}
 .both-banner-price .both-deposit{font-size:10.5px}
-.both-banner-arrow{display:none}
+.both-banner-arrow{display:block;font-size:15px;color:rgba(251,248,240,0.38)}
 .browse-section{padding:0 22px 32px}
 .product-grid{display:grid;grid-template-columns:1fr;gap:18px;margin:0 0 32px;padding:0;overflow:visible}
 .pcard{padding:20px;width:100%}
@@ -616,9 +621,26 @@ if (normalized.includes('wrap')) return 'The Wrap';
 return 'your reservation';
 }
 
+function canReserveProducts(products) {
+const normalized = normalizeProducts(products);
+return normalized.length && normalized.every(product => Number(availability[product] || 0) > 0);
+}
+
+function selectedProductsWithAddon() {
+const products = [...selectedProducts];
+const addonSection = document.getElementById('addonSection');
+const addonChecked = addonSection && addonSection.classList.contains('checked');
+const addonKey = selectedProducts.includes('cloak') ? 'wrap' : 'cloak';
+if (addonChecked && PRODUCTS[addonKey] && !products.includes(addonKey)) products.push(addonKey);
+return normalizeProducts(products);
+}
+
 function showTrayPrompt() {
 const tray = readTray();
-if (!tray) return;
+if (!tray || !canReserveProducts(tray.products)) {
+clearTray();
+return;
+}
 document.getElementById('trayPromptText').textContent = trayLabel(tray.products);
 document.getElementById('trayPrompt').style.display = 'block';
 }
@@ -653,7 +675,7 @@ const cta = document.getElementById('cta' + cap);
 if (!label) return;
 
 if (remaining <= 0) {
-label.textContent = 'First drop full';
+label.textContent = 'Sold out';
 label.className = 'pcard-availability soldout-label';
 card.classList.add('soldout');
 thumb.classList.add('soldout-thumb');
@@ -662,19 +684,50 @@ if (cta) cta.textContent = 'Sold Out';
 } else if (remaining <= 20) {
 label.textContent = 'Only ' + remaining + ' pieces remain';
 label.className = 'pcard-availability low';
+card.classList.remove('soldout');
+thumb.classList.remove('soldout-thumb');
+thumb.setAttribute('data-action', 'select-product');
+if (cta) cta.textContent = key === 'cloak' ? "I'll Take the Cloak" : "I'll Take the Wrap";
 } else if (remaining < TOTAL) {
 label.textContent = remaining + ' pieces remain';
 label.className = 'pcard-availability';
+card.classList.remove('soldout');
+thumb.classList.remove('soldout-thumb');
+thumb.setAttribute('data-action', 'select-product');
+if (cta) cta.textContent = key === 'cloak' ? "I'll Take the Cloak" : "I'll Take the Wrap";
 } else {
 label.textContent = TOTAL + '-piece first drop';
 label.className = 'pcard-availability';
+card.classList.remove('soldout');
+thumb.classList.remove('soldout-thumb');
+thumb.setAttribute('data-action', 'select-product');
+if (cta) cta.textContent = key === 'cloak' ? "I'll Take the Cloak" : "I'll Take the Wrap";
 }
 });
+updateBothBannerAvailability();
+}
+
+function updateBothBannerAvailability() {
+const banner = document.getElementById('bothBannerBtn');
+if (!banner) return;
+const totalEl = banner.querySelector('.both-total');
+const depositEl = banner.querySelector('.both-deposit');
+const soldOut = !canReserveProducts(['cloak', 'wrap']);
+banner.classList.toggle('soldout', soldOut);
+banner.setAttribute('aria-disabled', soldOut ? 'true' : 'false');
+if (soldOut) {
+if (totalEl) totalEl.textContent = 'Sold out';
+if (depositEl) depositEl.textContent = 'Full set';
+} else {
+if (totalEl) totalEl.textContent = '$35 today';
+if (depositEl) depositEl.textContent = '$166 full set';
+}
 }
 
 loadAvailability();
 
 document.getElementById('bothBannerBtn').addEventListener('click', function() {
+if (!canReserveProducts(['cloak','wrap'])) return;
 openForm(['cloak','wrap']);
 });
 
@@ -696,7 +749,12 @@ chooseProduct();
 });
 
 function openForm(products) {
-selectedProducts = normalizeProducts(products);
+const normalized = normalizeProducts(products);
+if (!canReserveProducts(normalized)) {
+updateAvailabilityUI();
+return;
+}
+selectedProducts = normalized;
 saveTray(selectedProducts);
 renderForm();
 document.getElementById('browseSection').style.display = 'none';
@@ -760,11 +818,16 @@ updateSummary();
 function updateSummary() {
 const hasCloak = selectedProducts.includes('cloak');
 const hasWrap = selectedProducts.includes('wrap');
-const addonChecked = document.getElementById('addonSection').classList.contains('checked');
+const addonSection = document.getElementById('addonSection');
+const addonChecked = addonSection.classList.contains('checked');
 const addonKey = hasCloak ? 'wrap' : 'cloak';
+if (addonChecked && (!PRODUCTS[addonKey] || availability[addonKey] <= 0)) {
+addonSection.classList.remove('checked');
+}
 
-const showCloak = hasCloak || (addonChecked && addonKey === 'cloak');
-const showWrap = hasWrap || (addonChecked && addonKey === 'wrap');
+const activeAddonChecked = addonSection.classList.contains('checked');
+const showCloak = hasCloak || (activeAddonChecked && addonKey === 'cloak');
+const showWrap = hasWrap || (activeAddonChecked && addonKey === 'wrap');
 const trayProducts = [];
 if (showCloak) trayProducts.push('cloak');
 if (showWrap) trayProducts.push('wrap');
@@ -833,15 +896,18 @@ document.getElementById('reserveForm').addEventListener('submit', function(e) {
 e.preventDefault();
 
 const hasCloak = selectedProducts.includes('cloak');
-const hasWrap = selectedProducts.includes('wrap');
-const addonChecked = document.getElementById('addonSection').classList.contains('checked');
-const addonKey = hasCloak ? 'wrap' : 'cloak';
-
-const products = [...selectedProducts];
-if (addonChecked && !products.includes(addonKey)) products.push(addonKey);
+const products = selectedProductsWithAddon();
 
 const needsSize = products.includes('cloak');
 const cloakSize = document.getElementById('sizeSelect').value || document.getElementById('addonSizeSelect').value || '';
+const errEl = document.getElementById('errorMsg');
+
+if (!canReserveProducts(products)) {
+updateAvailabilityUI();
+errEl.textContent = 'This piece is sold out.';
+errEl.style.display = 'block';
+return;
+}
 
 if (needsSize && !cloakSize) {
 document.getElementById('sizeSelect').focus();
@@ -857,7 +923,6 @@ size: cloakSize
 };
 
 const btn = document.getElementById('submitBtn');
-const errEl = document.getElementById('errorMsg');
 btn.disabled = true;
 btn.textContent = 'Redirecting to checkout…';
 errEl.style.display = 'none';
