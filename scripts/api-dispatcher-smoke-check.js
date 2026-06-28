@@ -104,6 +104,48 @@ const batchUnauthorized = await call({
 assert.equal(batchUnauthorized.statusCode, 401);
 assert.deepEqual(batchUnauthorized.body, { error: 'Unauthorized' });
 
+const profileUnauthorized = await call({
+  method: 'POST',
+  route: 'admin-update-customer-profile',
+  body: '{"customer_id":"cusDispatcherSmoke"}',
+  headers: { 'content-type': 'application/json' }
+});
+assert.equal(profileUnauthorized.statusCode, 401);
+assert.deepEqual(profileUnauthorized.body, { error: 'Unauthorized' });
+
+const profileMissingCustomer = await call({
+  method: 'POST',
+  route: 'admin-update-customer-profile',
+  body: '{}',
+  headers: {
+    'content-type': 'application/json',
+    'x-admin-token': process.env.ADMIN_TOKEN
+  }
+});
+assert.equal(profileMissingCustomer.statusCode, 400);
+assert.deepEqual(profileMissingCustomer.body, { error: 'Missing customer id.' });
+
+const syncUnauthorized = await call({
+  method: 'POST',
+  route: 'admin-sync-raw-airtable',
+  body: '{"limit":1}',
+  headers: { 'content-type': 'application/json' }
+});
+assert.equal(syncUnauthorized.statusCode, 401);
+assert.deepEqual(syncUnauthorized.body, { error: 'Unauthorized' });
+
+const syncWithoutDatabase = await call({
+  method: 'POST',
+  route: 'admin-sync-raw-airtable',
+  body: '{"limit":1}',
+  headers: {
+    'content-type': 'application/json',
+    'x-admin-token': process.env.ADMIN_TOKEN
+  }
+});
+assert.equal(syncWithoutDatabase.statusCode, 400);
+assert.match(syncWithoutDatabase.body?.error || '', /Private CRM database is not configured/);
+
 const batchEmpty = await call({
   method: 'POST',
   route: 'batch-final-balance',

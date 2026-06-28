@@ -19,7 +19,9 @@ export default async function handler(req, res) {
     });
     return res.status(200).json({ ok: true, sync });
   } catch (err) {
-    console.error('Admin raw Airtable sync error:', err);
+    if (!String(err.message || '').includes('Private CRM database is not configured')) {
+      console.error('Admin raw Airtable sync error:', err);
+    }
     return res.status(400).json({ error: err.message || 'Could not sync Airtable raw backup.' });
   }
 }
