@@ -20,12 +20,11 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/cookie-consent.css">
-<link rel="stylesheet" href="/footer.css">
+<link rel="preload" href="/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="/footer.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/cookie-consent.css"><link rel="stylesheet" href="/footer.css"></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/hanken-grotesk-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"></noscript>
 <script type="application/ld+json">
@@ -428,7 +427,8 @@ a{text-decoration:none;color:inherit}
 .reveal>*,.pop{opacity:1!important;transform:none!important;transition:none!important}
 }
 </style>
-<link rel="stylesheet" href="payment-badges.css">
+<link rel="preload" href="/payment-badges.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/payment-badges.css"></noscript>
 </head>
 <body>
 
@@ -467,7 +467,7 @@ a{text-decoration:none;color:inherit}
 
 <section class="hero-photo">
 <div class="hero-photo-bg">
-<img src="hero-duo.jpg" alt="Two friends heading home from class wrapped in the Cloak, beside the Cloak hanging on a hook" fetchpriority="high" decoding="async">
+<img src="hero-duo.jpg" srcset="assets/optimized/hero-duo-900.jpg 900w, assets/optimized/hero-duo-1200.jpg 1200w, hero-duo.jpg 1878w" sizes="100vw" alt="Two friends heading home from class wrapped in the Cloak, beside the Cloak hanging on a hook" fetchpriority="high" decoding="async" width="1878" height="1056">
 </div>
 <div class="hero-photo-scrim"></div>
 <div class="hero-photo-content">
@@ -490,7 +490,7 @@ a{text-decoration:none;color:inherit}
 <section class="product-pair">
 <div class="pcard reveal" id="cloak">
 <a class="pcard-photo" href="yogacloak-reserve-page.html?product=cloak" aria-label="Reserve the Cloak">
-<img src="cloak-card.jpg" alt="The Cloak — hooded open-front drape with pockets" loading="lazy" decoding="async">
+<img src="cloak-card.jpg" srcset="assets/optimized/cloak-card-560.jpg 560w, assets/optimized/cloak-card-760.jpg 760w, cloak-card.jpg 1120w" sizes="(max-width: 820px) calc(100vw - 88px), calc((100vw - 204px) / 2)" alt="The Cloak — hooded open-front drape with pockets" loading="lazy" decoding="async" width="1120" height="1400">
 <div class="pcard-hover-overlay">
 <span class="pcard-hover-cta">I'll Take the Cloak
 <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -513,7 +513,7 @@ a{text-decoration:none;color:inherit}
 
 <div class="pcard reveal" id="wrap">
 <a class="pcard-photo" href="yogacloak-reserve-page.html?product=wrap" aria-label="Reserve the Wrap">
-<img src="wrap-card.jpg" alt="The Wrap — oversized rectangular drape" loading="lazy" decoding="async">
+<img src="wrap-card.jpg" srcset="assets/optimized/wrap-card-560.jpg 560w, assets/optimized/wrap-card-760.jpg 760w, wrap-card.jpg 1120w" sizes="(max-width: 820px) calc(100vw - 88px), calc((100vw - 204px) / 2)" alt="The Wrap — oversized rectangular drape" loading="lazy" decoding="async" width="1120" height="1400">
 <div class="pcard-hover-overlay">
 <span class="pcard-hover-cta">I'll Take the Wrap
 <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -614,7 +614,7 @@ a{text-decoration:none;color:inherit}
 <p>Payments are processed by Stripe; yogacloak never stores card details. By reserving, you agree to our <a href="yogacloak-terms.html">Terms</a> and <a href="yogacloak-privacy.html">Privacy Policy</a>.</p>
 <p>Reservation is not a final purchase contract. Product images are representative; final product may vary.</p>
 <div class="footer-divider"></div>
-<div class="footer-meta"><span>© 2026 yogacloak</span><span>All rights reserved</span><span><a href="yogacloak-faq.html">FAQ</a></span><span><a href="mailto:hello@yogacloak.com">hello@yogacloak.com</a></span></div>
+<div class="footer-meta"><span>© 2026 yogacloak</span><span>All rights reserved</span><span><a href="yogacloak-faq.html">FAQ</a></span></div>
 <div class="footer-credit">made with <span class="footer-heart">♥</span> by <a href="https://www.instagram.com/flowinglikeabrooke?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">@flowinglikeabrooke</a></div>
 </div>
 </div>

@@ -1,5 +1,5 @@
 .payment-badges {
-  gap: 10px !important;
+  gap: 12px !important;
   align-items: center !important;
 }
 
@@ -120,7 +120,7 @@
 
 @media (max-width: 480px) {
   .payment-badges {
-    gap: 6px !important;
+    gap: 8px !important;
   }
 
   .payment-badge {

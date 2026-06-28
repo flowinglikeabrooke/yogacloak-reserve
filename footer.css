@@ -4,48 +4,60 @@
    one identical, WCAG-AA-compliant footer everywhere.
    Depends on --cream (251,248,240) being defined on the page (it is on all). */
 
-.site-footer{border-top:1px solid rgba(251,248,240,0.08);margin-top:0;padding:34px 40px 42px;background:#151618;font-family:Helvetica,'Helvetica Neue',Arial,sans-serif}
-.site-footer .footer-inner{max-width:1160px;margin:0 auto}
-.site-footer .footer-trust{text-align:center;margin-bottom:26px}
-.site-footer .footer-trust-label{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:rgba(251,248,240,0.72);margin-bottom:14px;display:block;font-weight:600}
+.site-footer{border-top:1px solid rgba(251,248,240,0.05)!important;margin-top:0!important;padding:78px 40px 96px!important;background:#121416!important;font-family:Helvetica,'Helvetica Neue',Arial,sans-serif!important;text-align:center!important;color:rgba(251,248,240,0.38)!important}
+.site-footer .footer-inner{max-width:1160px!important;margin:0 auto!important}
+.site-footer .footer-trust{text-align:center!important;margin-bottom:62px!important}
+.site-footer .footer-trust-label{font-size:12px!important;letter-spacing:.34em!important;text-transform:uppercase!important;color:rgba(251,248,240,0.32)!important;margin-bottom:28px!important;display:block!important;font-weight:600!important}
 
-.site-footer .payment-badges{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
-.site-footer .payment-badge{width:42px;height:28px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:700;font-size:9px;letter-spacing:0;background:#fff;color:#1A1F71}
-.site-footer .payment-badge.visa{background:#1A1F71;color:#fff;font-style:italic;letter-spacing:.5px}
-.site-footer .payment-badge.mc{background:#fff;position:relative;overflow:hidden}
-.site-footer .payment-badge.mc::before{content:'';position:absolute;left:8px;width:14px;height:14px;border-radius:50%;background:#EB001B}
-.site-footer .payment-badge.mc::after{content:'';position:absolute;right:8px;width:14px;height:14px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply}
-.site-footer .payment-badge.amex{background:#006FCF;color:#fff;font-size:7.5px;letter-spacing:.3px}
-.site-footer .payment-badge.applepay{background:#000;color:#fff;font-size:7.5px;width:58px;letter-spacing:0}
-.site-footer .payment-badge.googlepay{background:#fff;color:#202124;font-size:8px;width:50px;letter-spacing:0}
+.site-footer .payment-badges{display:flex!important;justify-content:center!important;align-items:center!important;gap:12px!important;flex-wrap:wrap!important}
+.site-footer .payment-badge{width:84px!important;min-width:84px!important;height:44px!important;padding:0!important;border-radius:7px!important;border:1px solid rgba(255,255,255,0.1)!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;font-family:Arial,Helvetica,sans-serif!important;font-weight:800!important;font-size:18px!important;line-height:1!important;letter-spacing:0!important;background:#fff!important;color:#1434CB!important;box-shadow:0 1px 0 rgba(255,255,255,0.08),0 10px 24px -18px rgba(0,0,0,0.55)!important}
+.site-footer .payment-badge.visa{background:#fff!important;color:#1434CB!important;font-style:italic!important;letter-spacing:.01em!important}
+.site-footer .payment-badge.mc{background:#fff!important;position:relative!important;overflow:hidden!important;color:transparent!important}
+.site-footer .payment-badge.mc::before,.site-footer .payment-badge.mc::after{content:""!important;position:absolute!important;top:50%!important;left:50%!important;width:23px!important;height:23px!important;border-radius:999px!important}
+.site-footer .payment-badge.mc::before{background:#EB001B!important;transform:translate(-72%,-50%)!important}
+.site-footer .payment-badge.mc::after{background:#F79E1B!important;mix-blend-mode:multiply!important;transform:translate(-28%,-50%)!important}
+.site-footer .payment-badge.amex{background:#2E77BC!important;color:#fff!important;font-size:15px!important;font-weight:800!important;letter-spacing:.01em!important}
+.site-footer .payment-badge.applepay,.site-footer .payment-badge.googlepay{width:84px!important;min-width:84px!important;font-size:0!important;justify-content:center!important}
+.site-footer .payment-badge.applepay{background:#000!important;color:#fff!important}
+.site-footer .payment-badge.applepay::before{content:"\F8FF"!important;margin-right:5px!important;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;font-size:21px!important;font-weight:500!important;line-height:1!important}
+.site-footer .payment-badge.applepay::after{content:"Pay"!important;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;font-size:18px!important;font-weight:600!important;letter-spacing:-.03em!important}
+.site-footer .payment-badge.googlepay{background:#fff!important}
+.site-footer .payment-badge.googlepay::before{content:"G"!important;margin-right:5px!important;font-family:Arial,Helvetica,sans-serif!important;font-size:20px!important;font-weight:700!important;background:linear-gradient(90deg,#4285F4 0 28%,#34A853 28% 48%,#FBBC04 48% 70%,#EA4335 70% 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.site-footer .payment-badge.googlepay::after{content:"Pay"!important;color:#3C4043!important;font-family:Arial,Helvetica,sans-serif!important;font-size:18px!important;font-weight:500!important;letter-spacing:-.03em!important}
 
-.site-footer .footer-legal{font-size:12px;color:rgba(251,248,240,0.72);line-height:1.55;text-align:center;max-width:1040px;margin:0 auto;letter-spacing:.01em}
-.site-footer .footer-legal p{margin:0 auto 7px;max-width:1040px}
-.site-footer .footer-legal a{color:rgba(251,248,240,0.8);text-decoration:underline;text-decoration-color:rgba(251,248,240,0.3);text-underline-offset:2px;transition:color .2s,text-decoration-color .2s}
-.site-footer .footer-legal a:hover{color:#fbf8f0;text-decoration-color:rgba(251,248,240,0.6)}
+.site-footer .footer-legal{font-size:14px!important;color:rgba(251,248,240,0.36)!important;line-height:1.65!important;text-align:center!important;max-width:1040px!important;margin:0 auto!important;letter-spacing:.01em!important;text-transform:none!important}
+.site-footer .footer-legal p{margin:0 auto 10px!important;max-width:1040px!important}
+.site-footer .footer-legal a{color:rgba(251,248,240,0.48)!important;text-decoration:underline!important;text-decoration-color:rgba(251,248,240,0.24)!important;text-underline-offset:3px!important;transition:color .2s,text-decoration-color .2s!important}
+.site-footer .footer-legal a:hover{color:#fbf8f0!important;text-decoration-color:rgba(251,248,240,0.58)!important}
 
-.site-footer .footer-divider{width:36px;height:1px;background:rgba(251,248,240,0.1);margin:18px auto}
+.site-footer .footer-divider{width:36px!important;height:1px!important;background:rgba(251,248,240,0.1)!important;margin:28px auto 24px!important}
 
-.site-footer .footer-meta{font-size:12px;color:rgba(251,248,240,0.72);letter-spacing:.16em;text-transform:uppercase;text-align:center;font-weight:600;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
-.site-footer .footer-meta span{white-space:nowrap}
-.site-footer .footer-meta a{color:rgba(251,248,240,0.78);text-decoration:none;transition:color .2s}
-.site-footer .footer-meta a:hover{color:#fbf8f0}
+.site-footer .footer-meta{font-size:12px!important;color:rgba(251,248,240,0.34)!important;letter-spacing:.22em!important;text-transform:uppercase!important;text-align:center!important;font-weight:600!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:18px!important;flex-wrap:wrap!important}
+.site-footer .footer-meta span{white-space:nowrap!important}
+.site-footer .footer-meta a{color:rgba(251,248,240,0.48)!important;text-decoration:underline!important;text-decoration-color:rgba(251,248,240,0.22)!important;text-underline-offset:3px!important;transition:color .2s,text-decoration-color .2s!important}
+.site-footer .footer-meta a:hover{color:#fbf8f0!important;text-decoration-color:rgba(251,248,240,0.58)!important}
 
-.site-footer .footer-credit{font-size:12px;color:rgba(251,248,240,0.72);text-align:center;margin-top:14px;letter-spacing:.02em;font-style:italic}
-.site-footer .footer-credit .footer-heart{color:#5a6760;font-style:normal;display:inline-block;transform:translateY(1px);animation:yc-footer-heartbeat 2.5s ease-in-out infinite}
-.site-footer .footer-credit a{color:rgba(251,248,240,0.78);text-decoration:none;font-weight:500;font-style:normal;transition:color .25s}
-.site-footer .footer-credit a:hover{color:#fbf8f0}
+.site-footer .footer-credit{font-size:14px!important;color:rgba(251,248,240,0.36)!important;text-align:center!important;margin-top:30px!important;letter-spacing:.02em!important;font-style:italic!important;text-transform:none!important}
+.site-footer .footer-credit .footer-heart{color:#29302b!important;font-style:normal!important;display:inline-block!important;transform:translateY(1px)!important;animation:yc-footer-heartbeat 2.5s ease-in-out infinite!important}
+.site-footer .footer-credit a{color:rgba(251,248,240,0.46)!important;text-decoration:none!important;font-weight:600!important;font-style:normal!important;transition:color .25s!important}
+.site-footer .footer-credit a:hover{color:#fbf8f0!important}
 
 @keyframes yc-footer-heartbeat{0%,100%{transform:translateY(1px) scale(1)}50%{transform:translateY(1px) scale(1.18)}}
 
 @media(max-width:700px){
-  .site-footer{padding:40px 22px 50px}
-  .site-footer .footer-trust{margin-bottom:32px}
-  .site-footer .footer-trust-label{font-size:12px;margin-bottom:14px}
-  .site-footer .payment-badges{gap:8px}
-  .site-footer .payment-badge{width:38px;height:26px}
-  .site-footer .payment-badge.amex{font-size:7px}
-  .site-footer .footer-legal{font-size:12px;line-height:1.65}
-  .site-footer .footer-meta{font-size:12px;letter-spacing:.14em}
-  .site-footer .footer-credit{font-size:12px;margin-top:14px}
+  .site-footer{padding:56px 22px 68px!important}
+  .site-footer .footer-trust{margin-bottom:42px!important}
+  .site-footer .footer-trust-label{font-size:10px!important;letter-spacing:.28em!important;margin-bottom:20px!important}
+  .site-footer .payment-badges{gap:8px!important}
+  .site-footer .payment-badge{width:58px!important;min-width:58px!important;height:36px!important;border-radius:6px!important;font-size:13px!important}
+  .site-footer .payment-badge.mc::before,.site-footer .payment-badge.mc::after{width:18px!important;height:18px!important}
+  .site-footer .payment-badge.amex{font-size:10px!important}
+  .site-footer .payment-badge.applepay,.site-footer .payment-badge.googlepay{width:58px!important;min-width:58px!important}
+  .site-footer .payment-badge.applepay::before{font-size:16px!important;margin-right:3px!important}
+  .site-footer .payment-badge.applepay::after{font-size:13px!important}
+  .site-footer .payment-badge.googlepay::before{font-size:15px!important;margin-right:3px!important}
+  .site-footer .payment-badge.googlepay::after{font-size:13px!important}
+  .site-footer .footer-legal{font-size:12px!important;line-height:1.65!important}
+  .site-footer .footer-meta{font-size:10px!important;letter-spacing:.14em!important;gap:10px!important}
+  .site-footer .footer-credit{font-size:12px!important;margin-top:22px!important}
 }
