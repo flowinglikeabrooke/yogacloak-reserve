@@ -3,21 +3,21 @@
 These files are ready for Vercel-style hosting:
 
 - `/yogacloak-admin.html` is the private branded CRM, sales, charging, communications, and accounting hub.
-- `/api/contact.js` saves contact form messages to the hidden customer database first, then Airtable if configured.
-- `/api/sms-optin.js` saves SMS consent to the customer CRM first, then Airtable if configured.
-- `/api/sms-optins-export.js` exports subscribed SMS opt-ins for CRM import/sync.
-- `/api/reserve.js` creates an Airtable reservation, then opens Stripe Checkout.
-- `/api/availability.js` reads Airtable reservations to show remaining spots.
-- `/api/stripe-webhook.js` updates Airtable and the hidden CRM database after Stripe payment succeeds.
-- `/api/send-abandoned-reservations.js` sends abandoned reservation reminders.
-- `/api/cleanup-pending-checkouts.js` releases unpaid checkout holds.
-- `/api/admin-reservations.js` powers the final-balance tab.
-- `/api/admin-dashboard.js`, `/api/admin-customers.js`, `/api/admin-communications.js`, and related admin endpoints power the branded CRM hub.
-- `/api/manage-reservation.js` handles cancel, refund, and transfer actions.
-- `/api/send-final-balance-notice.js` emails the customer before the final charge.
-- `/api/charge-final-balance.js` charges the saved Stripe payment method for the final balance from a protected admin-only request.
-- `/api/twilio-sms-webhook.js` receives inbound SMS replies from opted-in customers.
-- `/api/email-webhook.js` receives inbound email replies from an email provider webhook.
+- Public API URLs stay under `/api/...`, but Vercel deploys them through one catch-all function at `/api/[...path].js` so the project fits the Hobby plan function limit.
+- The actual endpoint handlers live in `server/api/`.
+- `/api/contact` saves contact form messages to the hidden customer database first, then Airtable if configured.
+- `/api/sms-optin` saves SMS consent to the customer CRM first, then Airtable if configured.
+- `/api/sms-optins-export` exports subscribed SMS opt-ins for CRM import/sync.
+- `/api/reserve` creates an Airtable reservation, then opens Stripe Checkout.
+- `/api/availability` reads Airtable reservations to show remaining spots.
+- `/api/stripe-webhook` updates Airtable and the hidden CRM database after Stripe payment succeeds.
+- `/api/admin-reservations` powers the final-balance tab.
+- `/api/admin-dashboard`, `/api/admin-customers`, `/api/admin-communications`, and related admin endpoints power the branded CRM hub.
+- `/api/manage-reservation` handles cancel, refund, and transfer actions.
+- `/api/send-final-balance-notice` emails the customer before the final charge.
+- `/api/charge-final-balance` charges the saved Stripe payment method for the final balance from a protected admin-only request.
+- `/api/twilio-sms-webhook` receives inbound SMS replies from opted-in customers.
+- `/api/email-webhook` receives inbound email replies from an email provider webhook.
 
 Set these environment variables in your host:
 

@@ -359,6 +359,7 @@ async function runBatch(dryRun){
 if(state.batchBusy){statusText.innerHTML='<span class="muted">Batch request already running.</span>';return}
 var ids=Array.from(state.selected);
 if(!ids.length){statusText.innerHTML='<span class="error">Select at least one reservation.</span>';return}
+if(ids.length>100){statusText.innerHTML='<span class="error">Batch limit is 100 reservations. Select fewer records and try again.</span>';return}
 if(!dryRun){
 var readyRows=state.reservations.filter(function(row){return state.selected.has(row.id)&&row.charge_eligible&&!row.already_charged});
 var readyCount=readyRows.length;

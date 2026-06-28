@@ -22,12 +22,13 @@ function functionBody(file, name) {
 }
 
 const finalBalance = 'lib/final-balance.js';
-const batchEndpoint = 'api/batch-final-balance.js';
-const noticeEndpoint = 'api/send-final-balance-notice.js';
-const adminReservations = 'api/admin-reservations.js';
+const batchEndpoint = 'server/api/batch-final-balance.js';
+const noticeEndpoint = 'server/api/send-final-balance-notice.js';
+const adminReservations = 'server/api/admin-reservations.js';
 const adminHub = 'private/admin-hub.html';
-const reserve = 'api/reserve.js';
-const stripeWebhook = 'api/stripe-webhook.js';
+const reserve = 'server/api/reserve.js';
+const stripeWebhook = 'server/api/stripe-webhook.js';
+const apiDispatcher = 'api/[...path].js';
 const noRawCardFiles = [
   finalBalance,
   batchEndpoint,
@@ -85,6 +86,9 @@ includes(finalBalance, 'const productText = escapeHtml(product)', 'final-balance
 includes(finalBalance, 'const amountText = escapeHtml(money(amount))', 'final-balance notice amount text is HTML escaped');
 
 includes(batchEndpoint, 'chargeFinalBalanceReservation(reservationId, { dryRun })', 'batch endpoint reuses shared charge logic');
+includes(apiDispatcher, "'batch-final-balance': batchFinalBalance", 'API dispatcher preserves /api/batch-final-balance public route');
+includes(apiDispatcher, 'bodyParser: false', 'API dispatcher preserves raw-body support for Stripe webhooks');
+includes(apiDispatcher, "name === 'stripe-webhook'", 'API dispatcher does not pre-parse Stripe webhook raw body');
 notIncludes(batchEndpoint, "stripeRequest('payment_intents'", 'batch endpoint must not duplicate Stripe charge logic');
 includes(batchEndpoint, 'requireAdmin(req, res)', 'batch endpoint requires admin authorization');
 includes(batchEndpoint, "const unsafe = isUnsafeSkip(message)", 'unsafe records are identified before reporting');
@@ -147,6 +151,7 @@ includes(adminHub, 'readyAmount', 'admin calculates selected ready-to-charge tot
 includes(adminHub, "totaling '+money(readyAmount)+'", 'admin confirmation shows the batch charge total');
 includes(adminHub, 'Batch charge cancelled.', 'admin reports cancelled real batch charge');
 includes(adminHub, 'No selected reservations are ready to charge.', 'admin blocks real batch when no selected reservation is ready');
+includes(adminHub, 'Batch limit is 100 reservations. Select fewer records and try again.', 'admin blocks oversized final-balance batch requests before sending');
 includes(adminHub, 'batchBusy', 'admin tracks in-progress batch requests');
 includes(adminHub, 'Batch request already running.', 'admin blocks duplicate in-progress batch requests');
 includes(adminHub, 'Charge eligible', 'admin rows show eligibility');

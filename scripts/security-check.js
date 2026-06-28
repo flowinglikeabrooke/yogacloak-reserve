@@ -3,7 +3,7 @@ import path from 'path';
 
 const root = process.cwd();
 const publicExtensions = new Set(['.html', '.js', '.css']);
-const excludedDirs = new Set(['api', 'lib', 'private', 'scripts', '.git', 'node_modules']);
+const excludedDirs = new Set(['api', 'lib', 'private', 'scripts', 'server', '.git', 'node_modules']);
 const publicHtml = [];
 const publicFiles = [];
 const failures = [];
@@ -90,6 +90,17 @@ if (!fs.existsSync(vercelPath)) {
 
 if (!fs.existsSync(path.join(root, 'supabase-rls.sql'))) {
   fail('supabase-rls.sql is missing.');
+}
+
+const apiDir = path.join(root, 'api');
+const apiFunctionFiles = fs.existsSync(apiDir)
+  ? fs.readdirSync(apiDir).filter((file) => file.endsWith('.js'))
+  : [];
+if (apiFunctionFiles.length > 12) {
+  fail(`Vercel Hobby supports at most 12 serverless functions; /api currently has ${apiFunctionFiles.length}.`);
+}
+if (!apiFunctionFiles.includes('[...path].js')) {
+  fail('The single /api/[...path].js dispatcher is missing.');
 }
 
 if (failures.length) {
