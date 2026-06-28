@@ -19,6 +19,7 @@ for (const route of [
   'admin-customers',
   'admin-dashboard',
   'admin-duplicates',
+  'admin-import-raw-customer',
   'admin-inquiries',
   'admin-login',
   'admin-logout',

@@ -5,6 +5,7 @@ import adminCustomerDetail from '../server/api/admin-customer-detail.js';
 import adminCustomers from '../server/api/admin-customers.js';
 import adminDashboard from '../server/api/admin-dashboard.js';
 import adminDuplicates from '../server/api/admin-duplicates.js';
+import adminImportRawCustomer from '../server/api/admin-import-raw-customer.js';
 import adminInquiries from '../server/api/admin-inquiries.js';
 import adminLogin from '../server/api/admin-login.js';
 import adminLogout from '../server/api/admin-logout.js';
@@ -48,6 +49,7 @@ const routes = {
   'admin-customers': adminCustomers,
   'admin-dashboard': adminDashboard,
   'admin-duplicates': adminDuplicates,
+  'admin-import-raw-customer': adminImportRawCustomer,
   'admin-inquiries': adminInquiries,
   'admin-login': adminLogin,
   'admin-logout': adminLogout,
