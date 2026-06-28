@@ -18,6 +18,7 @@ alter table if exists admin_actions enable row level security;
 alter table if exists airtable_sync_log enable row level security;
 alter table if exists automation_rules enable row level security;
 alter table if exists automation_runs enable row level security;
+alter table if exists owner_tasks enable row level security;
 
 comment on table customers is 'Private yogacloak CRM customers. RLS enabled; server-only access via service role.';
 comment on table inquiries is 'Private customer inquiries. RLS enabled; server-only access via service role.';
@@ -30,3 +31,4 @@ comment on table admin_actions is 'Private admin audit trail.';
 comment on table airtable_sync_log is 'Private Airtable raw backup reconciliation log.';
 comment on table automation_rules is 'Private CRM automation rules. RLS enabled; server-only access via service role.';
 comment on table automation_runs is 'Private CRM automation run history and drafts.';
+comment on table owner_tasks is 'Private owner task center for customer-linked and business operations work.';

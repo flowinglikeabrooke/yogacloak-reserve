@@ -40,6 +40,10 @@ for (const route of [
   'admin-delete-inquiry',
   'admin-automations',
   'admin-update-automation',
+  'admin-tasks',
+  'admin-create-task',
+  'admin-update-task',
+  'admin-record-sms-optin',
   'admin-merge-inquiries',
   'admin-move-inquiry',
   'admin-sync-raw-airtable'
@@ -51,6 +55,9 @@ for (const file of [
   'server/api/admin-delete-customer.js',
   'server/api/admin-delete-inquiry.js',
   'server/api/admin-update-automation.js',
+  'server/api/admin-create-task.js',
+  'server/api/admin-update-task.js',
+  'server/api/admin-record-sms-optin.js',
   'server/api/admin-merge-inquiries.js',
   'server/api/admin-move-inquiry.js',
   'server/api/admin-sync-raw-airtable.js'
@@ -73,7 +80,16 @@ includes(adminHub, 'formatStatus(row.inquiry_type', 'admin hub renders normalize
 includes(adminHub, 'data-tab="automations"', 'admin hub exposes the automations tab');
 includes(adminHub, '/api/admin-automations', 'admin hub loads automation rules and logs');
 includes(adminHub, '/api/admin-update-automation', 'admin hub can save automation rules');
+includes(adminHub, 'data-tab="tasks"', 'admin hub exposes the task center tab');
+includes(adminHub, '/api/admin-tasks', 'admin hub loads owner tasks');
+includes(adminHub, '/api/admin-create-task', 'admin hub can create owner tasks');
+includes(adminHub, '/api/admin-update-task', 'admin hub can update owner tasks');
+includes(adminHub, '/api/admin-record-sms-optin', 'admin hub can record SMS opt-ins with consent');
+includes(adminHub, 'renderCustomerTasks', 'customer profiles include customer-linked tasks');
+includes(adminHub, 'createTaskForInquiry', 'inquiries can create follow-up tasks');
+includes(adminHub, 'inquirySignal', 'inquiries show whether they are new or linked customers');
 includes('lib/automations.js', 'runAutomationTrigger', 'automation trigger runner exists');
+includes('lib/owner-tasks.js', 'createOwnerTask', 'owner task creator exists');
 includes('server/api/contact.js', "runAutomationTrigger('inquiry_created'", 'contact form triggers CRM automations');
 includes('server/api/sms-optin.js', "runAutomationTrigger('sms_opt_in_created'", 'SMS opt-in triggers CRM automations');
 

@@ -132,6 +132,8 @@ tr:last-child td{border-bottom:0}
 .automation-card textarea{min-height:128px}
 .toggle-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0}
 .toggle-row input[type=checkbox]{width:auto;accent-color:#d8c7a2}
+.check-row{display:flex;flex-direction:row;align-items:center;gap:9px;margin-top:10px;font-size:11px;letter-spacing:0;text-transform:none;color:rgba(30,35,32,.66)}
+.check-row input[type=checkbox]{width:auto;accent-color:var(--sage)}
 .automation-card .meta{margin-top:12px}
 .automation-log-body{white-space:pre-wrap;max-width:420px}
 .id-line{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:rgba(30,35,32,.52);word-break:break-all;margin-top:4px}
@@ -204,6 +206,7 @@ tr:last-child td{border-bottom:0}
 
 <nav class="tabs" aria-label="Admin sections">
 <button class="tab active" data-tab="today">Today</button>
+<button class="tab" data-tab="tasks">Tasks</button>
 <button class="tab" data-tab="customers">Customers</button>
 <button class="tab" data-tab="inquiries">Inquiries</button>
 <button class="tab" data-tab="reservations">Reservations</button>
@@ -217,6 +220,7 @@ tr:last-child td{border-bottom:0}
 </nav>
 
 <section id="today" class="view"></section>
+<section id="tasks" class="view hide"></section>
 <section id="customers" class="view hide"></section>
 <section id="inquiries" class="view hide"></section>
 <section id="reservations" class="view hide"></section>
@@ -237,7 +241,7 @@ var currentTabLabel=document.getElementById('currentTabLabel');
 var csrfToken='__ADMIN_CSRF_TOKEN__';
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,automations:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
+var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,automations:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
 document.getElementById('loadBtn').addEventListener('click',loadCurrent);
 document.getElementById('logoutBtn').addEventListener('click',async function(){await fetch('/api/admin-logout',{method:'POST'});location.reload()});
 document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
@@ -249,7 +253,7 @@ function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(asyn
 function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
 function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
-function tabLabel(tab){return ({today:'Today',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',automations:'Automations',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
+function tabLabel(tab){return ({today:'Today',tasks:'Tasks',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',automations:'Automations',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
 function health(value){return value?'<span class="health good">On</span>':'<span class="health bad">Missing</span>'}
 function renderHeroStatus(){
 var d=state.dashboard||{};
@@ -284,6 +288,7 @@ async function loadCurrent(){
 try{
 if(directFilePreview){renderDirectFileNotice();return}
 if(activeTab==='today'){setBusy('Loading dashboard...');state.dashboard=await endpoint('/api/admin-dashboard')}
+if(activeTab==='tasks'){setBusy('Loading tasks...');state.tasks=await endpoint('/api/admin-tasks?status='+encodeURIComponent(state.taskFilter||'active'))}
 if(activeTab==='customers'){setBusy('Loading customers...');state.customers=(await endpoint('/api/admin-customers')).customers||[]}
 if(activeTab==='inquiries'){setBusy('Loading inquiries...');state.inquiries=(await endpoint('/api/admin-inquiries')).inquiries||[]}
 if(activeTab==='reservations'){setBusy('Loading reservations...');var reservationData=await endpoint('/api/admin-reservations');state.reservations=reservationData.reservations||[];state.finalBalanceSafety=reservationData.final_balance_safety||null;state.finalBalanceSummary=reservationData.final_balance_summary||null;state.finalBalanceMeta={records_available:reservationData.records_available||0,records_returned:reservationData.records_returned||0,record_limit:reservationData.record_limit||0,has_more:!!reservationData.has_more}}
@@ -313,7 +318,7 @@ heroStatus.innerHTML='<strong>Disconnected preview.</strong><br>This page was op
 document.getElementById('today').innerHTML='<section class="panel"><div class="section-title">Open the real admin hub</div><div class="notice warn"><strong>This local file will always look incomplete.</strong><br>The CRM only works through the protected server page. Use the deployed private admin URL when you want live customers, inquiries, payments, and final-balance tools.</div><div class="meta"><span class="pill">Admin session <strong>not connected</strong></span><span class="pill">CRM APIs <strong>not connected</strong></span><span class="pill">Stripe tools <strong>not connected</strong></span><span class="pill">Airtable sync <strong>not connected</strong></span></div><div class="actions" style="margin-top:16px"><a class="btn" href="https://www.yogacloak.com/yogacloak-admin.html">Open live admin hub</a><a class="btn quiet" href="https://www.yogacloak.com/api/admin-page">Open protected admin route</a></div></section>';
 }
 
-function render(){({today:renderToday,customers:renderCustomers,inquiries:renderInquiries,reservations:renderReservations,payments:renderPayments,communications:renderCommunications,automations:renderAutomations,finals:renderFinals,accounting:renderAccounting,duplicates:renderDuplicates,settings:renderSettings}[activeTab]||renderToday)()}
+function render(){({today:renderToday,tasks:renderTasks,customers:renderCustomers,inquiries:renderInquiries,reservations:renderReservations,payments:renderPayments,communications:renderCommunications,automations:renderAutomations,finals:renderFinals,accounting:renderAccounting,duplicates:renderDuplicates,settings:renderSettings}[activeTab]||renderToday)()}
 
 function renderCards(summary){
 var items=[
@@ -334,11 +339,92 @@ var canSyncRaw=data.database_enabled!==false&&rawBackupCount>0;
 var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="syncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'';
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
 root.innerHTML=renderCards(summary)+syncStatusNotice()+databaseNotice+rawNotice+rawSyncReport()+
-'<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Type','Task','Customer','Date'],tasks.map(function(row){return [esc(row.type),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at))]}),true)+'</section>'+
-'<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Event','Customer','Details','Date'],(data.recent_events||[]).map(function(row){return [esc(row.title||row.event_type),customerLink(row.customer_id||row.customers&&row.customers.id,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at))]}),true)+'</section>';
+'<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Signal','What happened','Contact','Date','Action'],tasks.map(function(row){return [esc(formatStatus(row.type)),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at)),openProfileButton(row.customer_id,'Open profile')]}),true)+'</section>'+
+'<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Signal','Contact','Details','Date','Action'],(data.recent_events||[]).map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [esc(row.title||row.event_type),customerLink(customerId,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at)),openProfileButton(customerId,'Open timeline')]}),true)+'</section>';
 bindCustomerOpeners();
 var syncBtn=document.getElementById('syncRawBackupBtn');
 if(syncBtn){syncBtn.addEventListener('click',syncRawAirtable)}
+}
+
+function taskStatusOptions(value){
+var options=[['open','Open'],['in_progress','In progress'],['waiting','Waiting'],['done','Done'],['archived','Archived']];
+return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===value?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
+}
+
+function taskPriorityOptions(value){
+var options=[['low','Low'],['normal','Normal'],['high','High'],['urgent','Urgent']];
+return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===value?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
+}
+
+function taskTypeOptions(value){
+var options=[['general','General'],['customer_reply','Customer reply'],['inquiry_followup','Inquiry follow-up'],['payment','Payment'],['final_balance','Final balance'],['operations','Operations'],['accounting','Accounting'],['payroll','Payroll'],['inventory','Inventory']];
+return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===value?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
+}
+
+function dueStatus(task){
+if(task.status==='done')return '<span class="status charged">Done</span>';
+if(task.due_at&&Date.parse(task.due_at)<Date.now())return '<span class="status blocked">Overdue</span>';
+if(task.priority==='urgent'||task.priority==='high')return '<span class="status needs">'+esc(formatStatus(task.priority))+'</span>';
+return '<span class="status ready">'+esc(formatStatus(task.status||'open'))+'</span>';
+}
+
+function taskRows(tasks){
+return (tasks||[]).map(function(task){
+var customerId=task.customer_id||task.customers&&task.customers.id;
+var linked=customerLink(customerId,task.customers&&task.customers.full_name||task.customer_id||'Owner task');
+var context=[task.inquiries&&task.inquiries.inquiry_type,task.reservations&&task.reservations.status,task.description].filter(Boolean).join(' · ');
+var actions='<div class="actions">'+openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="done">Done</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button></div>';
+return [dueStatus(task),esc(task.title)+'<br><span class="muted">'+esc(context)+'</span>',linked,esc(formatStatus(task.task_type)),esc(formatStatus(task.priority)),esc(date(task.due_at)),actions];
+});
+}
+
+function renderTasks(){
+var root=document.getElementById('tasks');
+var data=state.tasks;
+if(!data){root.innerHTML='<div class="empty">Load tasks to see your owner task center.</div>';return}
+var stats=data.stats||{};
+var tasks=data.tasks||[];
+root.innerHTML='<div class="grid">'+
+'<div class="card"><span>Active tasks</span><strong>'+esc(stats.active||0)+'</strong></div>'+
+'<div class="card"><span>Overdue</span><strong>'+esc(stats.overdue||0)+'</strong></div>'+
+'<div class="card"><span>High priority</span><strong>'+esc(stats.urgent||0)+'</strong></div>'+
+'<div class="card"><span>Done</span><strong>'+esc(stats.done||0)+'</strong></div>'+
+'</div>'+
+'<section class="panel"><div class="bar"><div><div class="section-title">Task Center</div><p class="muted">Track customer replies, inquiry follow-ups, accounting, payroll, inventory, and anything else that should not get lost.</p></div><div class="actions"><select id="taskFilter"><option value="active" '+(state.taskFilter==='active'?'selected':'')+'>Active</option><option value="overdue" '+(state.taskFilter==='overdue'?'selected':'')+'>Overdue</option><option value="" '+(!state.taskFilter?'selected':'')+'>All</option><option value="done" '+(state.taskFilter==='done'?'selected':'')+'>Done</option></select><button class="btn quiet" id="reloadTasks">Refresh</button></div></div>'+
+'<div class="record-grid"><label>Task<input id="newTaskTitle" placeholder="Example: reply to Brooke about Wrap sizing"></label><label>Customer ID optional<input id="newTaskCustomerId" placeholder="Paste customer ID if linked"></label><label>Type<select id="newTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="newTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due<input id="newTaskDue" type="datetime-local"></label><label>Notes<textarea id="newTaskDescription" placeholder="What needs to happen?"></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" id="createTaskBtn">Add task</button></div></section>'+
+'<section class="panel"><div class="section-title">Needs attention</div>'+table(['State','Task','Linked to','Type','Priority','Due','Action'],taskRows(tasks),true)+'</section>';
+document.getElementById('taskFilter').addEventListener('change',function(){state.taskFilter=document.getElementById('taskFilter').value;loadCurrent()});
+document.getElementById('reloadTasks').addEventListener('click',loadCurrent);
+document.getElementById('createTaskBtn').addEventListener('click',createTaskFromHub);
+bindTaskButtons();
+bindCustomerOpeners();
+}
+
+async function createTaskFromHub(){
+var title=document.getElementById('newTaskTitle').value.trim();
+if(!title){statusText.innerHTML='<span class="error">Add a task title first.</span>';return}
+setBusy('Creating task...');
+try{
+await post('/api/admin-create-task',{title:title,customer_id:document.getElementById('newTaskCustomerId').value.trim(),task_type:document.getElementById('newTaskType').value,priority:document.getElementById('newTaskPriority').value,due_at:document.getElementById('newTaskDue').value,description:document.getElementById('newTaskDescription').value});
+state.tasks=await endpoint('/api/admin-tasks?status='+encodeURIComponent(state.taskFilter||'active'));
+renderTasks();
+statusText.innerHTML='<span class="ok">Task added.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not create task.')+'</span>'}
+}
+
+function bindTaskButtons(){
+document.querySelectorAll('[data-task-status]').forEach(function(btn){btn.addEventListener('click',async function(){await updateTaskStatus(btn.dataset.taskStatus,btn.dataset.status)})});
+}
+
+async function updateTaskStatus(taskId,status){
+if(!taskId)return;
+setBusy('Updating task...');
+try{
+await post('/api/admin-update-task',{task_id:taskId,status:status});
+if(activeTab==='tasks'){state.tasks=await endpoint('/api/admin-tasks?status='+encodeURIComponent(state.taskFilter||'active'));renderTasks()}
+if(activeTab==='customers'&&state.customerDetail&&state.customerDetail.customer){state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(state.customerDetail.customer.id));renderCustomers()}
+statusText.innerHTML='<span class="ok">Task updated.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not update task.')+'</span>'}
 }
 
 function renderCustomers(){
@@ -372,11 +458,16 @@ var sendEmail=document.getElementById('sendEmailBtn');
 if(sendEmail){sendEmail.addEventListener('click',async function(){await post('/api/admin-send-email',{customer_id:detail.customer.id,subject:document.getElementById('emailSubject').value,body:document.getElementById('emailBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Email sent and logged.</span>'})}
 var sendSms=document.getElementById('sendSmsBtn');
 if(sendSms){sendSms.addEventListener('click',async function(){await post('/api/admin-send-sms',{customer_id:detail.customer.id,body:document.getElementById('smsBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">SMS sent and logged.</span>'})}
+var recordSms=document.getElementById('recordSmsOptinBtn');
+if(recordSms){recordSms.addEventListener('click',async function(){await recordSmsOptinFromProfile(detail)})}
 var saveContact=document.getElementById('saveContactStatusBtn');
 if(saveContact){saveContact.addEventListener('click',async function(){await post('/api/admin-update-contact-status',{customer_id:detail.customer.id,contact_status:document.getElementById('contactStatus').value,next_follow_up_at:document.getElementById('nextFollowUp').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Contact status saved.</span>'})}
 document.querySelectorAll('[data-quick-status]').forEach(function(btn){btn.addEventListener('click',async function(){await quickContactStatus(detail.customer.id,btn.dataset.quickStatus,btn.dataset.followUpDays)})});
 var addNote=document.getElementById('addInternalNoteBtn');
 if(addNote){addNote.addEventListener('click',async function(){await post('/api/admin-add-internal-note',{customer_id:detail.customer.id,note_type:document.getElementById('noteType').value,contact_status:document.getElementById('contactStatus').value,next_follow_up_at:document.getElementById('nextFollowUp').value,body:document.getElementById('internalNoteBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Internal note added.</span>'})}
+var addCustomerTask=document.getElementById('addCustomerTaskBtn');
+if(addCustomerTask){addCustomerTask.addEventListener('click',async function(){await addTaskFromProfile(detail)})}
+bindTaskButtons();
 var archiveCustomerBtn=document.getElementById('archiveCustomerBtn');
 if(archiveCustomerBtn){archiveCustomerBtn.addEventListener('click',async function(){await archiveCustomerFromProfile(detail)})}
 var mergeCustomerBtn=document.getElementById('mergeThisCustomerBtn');
@@ -554,6 +645,52 @@ if(customerId){state.customerDetail=await endpoint('/api/admin-customer-detail?i
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Final-balance action failed.')+'</span>'}
 }
 
+async function recordSmsOptinFromProfile(detail){
+var c=detail&&detail.customer||{};
+var phone=document.getElementById('smsOptinPhone')&&document.getElementById('smsOptinPhone').value.trim();
+var consent=document.getElementById('smsConsentText')&&document.getElementById('smsConsentText').value.trim();
+var confirmed=document.getElementById('smsConsentConfirmed')&&document.getElementById('smsConsentConfirmed').checked;
+if(!confirmed){statusText.innerHTML='<span class="error">Confirm the customer gave SMS consent first.</span>';return}
+setBusy('Recording SMS opt-in...');
+try{
+await post('/api/admin-record-sms-optin',{customer_id:c.id,phone:phone,consent_confirmed:true,consent_text:consent});
+state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(c.id));
+renderCustomers();
+statusText.innerHTML='<span class="ok">SMS opt-in recorded.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not record SMS opt-in.')+'</span>'}
+}
+
+async function addTaskFromProfile(detail){
+var c=detail&&detail.customer||{};
+var title=document.getElementById('profileTaskTitle')&&document.getElementById('profileTaskTitle').value.trim();
+if(!title){statusText.innerHTML='<span class="error">Add a task title first.</span>';return}
+setBusy('Adding customer task...');
+try{
+await post('/api/admin-create-task',{customer_id:c.id,title:title,task_type:document.getElementById('profileTaskType').value,priority:document.getElementById('profileTaskPriority').value,due_at:document.getElementById('profileTaskDue').value,description:document.getElementById('profileTaskDescription').value});
+state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(c.id));
+renderCustomers();
+statusText.innerHTML='<span class="ok">Customer task added.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not add task.')+'</span>'}
+}
+
+function tomorrowLocal(){
+var d=new Date(Date.now()+24*60*60*1000);
+d.setMinutes(0,0,0);
+return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}
+
+async function createTaskForInquiry(inquiryId,customerId){
+if(!inquiryId){statusText.innerHTML='<span class="error">This inquiry is missing its CRM ID.</span>';return}
+var title='Reply to inquiry';
+setBusy('Adding inquiry task...');
+try{
+await post('/api/admin-create-task',{customer_id:customerId||'',inquiry_id:inquiryId,title:title,task_type:'inquiry_followup',priority:'high',due_at:tomorrowLocal(),description:'Follow up on this inquiry from the admin hub.'});
+if(activeTab==='inquiries'){state.inquiries=(await endpoint('/api/admin-inquiries')).inquiries||[];renderInquiries()}
+if(customerId){state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(customerId))}
+statusText.innerHTML='<span class="ok">Inquiry follow-up task added.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not add inquiry task.')+'</span>'}
+}
+
 function tagsValue(tags){
 if(Array.isArray(tags))return tags.join(', ');
 return String(tags||'');
@@ -633,6 +770,32 @@ return '<div class="profile-hubs">'+
 '</div>';
 }
 
+function smsOptedIn(detail){
+return (detail.inquiries||[]).some(function(row){
+return row.inquiry_type==='sms_opt_in'&&['new','subscribed','active'].includes(String(row.status||'new').toLowerCase());
+});
+}
+
+function renderSmsConsentBlock(detail){
+var c=detail.customer||{};
+var subscribed=smsOptedIn(detail);
+if(subscribed){
+return '<div class="notice good"><strong>SMS opt-in is on this profile.</strong><br>You can send texts from the hub. If they reply STOP later, the webhook should mark them unsubscribed.</div>';
+}
+return '<div class="notice warn"><strong>SMS opt-in needed before texting.</strong><br>Only record this if the customer clearly agreed to receive yogacloak texts. This keeps the CRM usable without making the public form the only path.</div>'+
+'<div class="record-grid sms-consent-grid"><label>Phone for SMS<input id="smsOptinPhone" value="'+esc(c.phone||'')+'" placeholder="+1 555 555 5555"></label><label>Consent note<textarea id="smsConsentText">Customer gave yogacloak permission to send SMS updates and replies. Msg & data rates may apply. Reply STOP to opt out.</textarea></label></div>'+
+'<label class="check-row"><input id="smsConsentConfirmed" type="checkbox"> Customer gave SMS consent</label><button class="btn quiet" id="recordSmsOptinBtn" style="margin-top:10px">Record SMS opt-in</button>';
+}
+
+function renderCustomerTasks(detail){
+var tasks=detail.tasks||[];
+var active=tasks.filter(function(task){return !['done','archived'].includes(task.status)});
+var done=tasks.filter(function(task){return task.status==='done'}).length;
+return '<div class="detail-block"><div class="bar"><div><div class="section-title">Tasks for this customer</div><p class="muted">Create follow-ups, reply reminders, payment tasks, or owner-only notes tied to this profile.</p></div><span class="pill">Active <strong>'+esc(active.length)+'</strong></span><span class="pill">Done <strong>'+esc(done)+'</strong></span></div>'+
+'<div class="record-grid"><label>Task<input id="profileTaskTitle" placeholder="Example: text back about sizing"></label><label>Type<select id="profileTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="profileTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due<input id="profileTaskDue" type="datetime-local"></label><label>Notes<textarea id="profileTaskDescription" placeholder="What should future you remember?"></textarea></label></div><button class="btn" id="addCustomerTaskBtn" style="margin-top:10px">Add customer task</button>'+
+(tasks.length?'<div style="margin-top:14px">'+table(['State','Task','Linked to','Type','Priority','Due','Action'],taskRows(tasks.slice(0,12)),true)+'</div>':'<div class="empty" style="margin-top:14px">No tasks for this customer yet.</div>')+'</div>';
+}
+
 function renderCustomerDetail(detail){
 if(!detail)return '<div class="muted">Select a customer to see their timeline.</div>';
 var c=detail.customer||{};
@@ -668,6 +831,8 @@ renderCrmManagement(detail)+
 '<div class="profile-actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>'+
 '<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
 '<div class="detail-block"><div class="section-title">Send from hub</div><label>Email subject<input id="emailSubject" value="A note from yogacloak"></label><label style="margin-top:8px">Email message<textarea id="emailBody"></textarea></label><button class="btn quiet" id="sendEmailBtn" style="margin-top:10px">Send email</button><label style="margin-top:14px">SMS message<textarea id="smsBody" maxlength="1000"></textarea></label><button class="btn quiet" id="sendSmsBtn" style="margin-top:10px">Send SMS</button></div></div>'+
+renderSmsConsentBlock(detail)+
+renderCustomerTasks(detail)+
 '<div class="detail-block"><div class="section-title">Relationship timeline</div>'+renderTimeline(detail)+'</div>'+
 '<div class="detail-block"><div class="section-title">Internal notes</div><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>'+
 '<div class="detail-block"><div class="section-title">Owner note</div><label>Private customer note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div>'+
@@ -805,6 +970,11 @@ if(!id)return esc(label||'');
 return '<span class="link" data-open-customer="'+esc(id)+'">'+esc(label||'Open customer')+'</span>';
 }
 
+function openProfileButton(id,label){
+if(!id)return '<span class="muted">No linked profile</span>';
+return '<button class="btn quiet small" data-open-customer="'+esc(id)+'">'+esc(label||'Open profile')+'</button>';
+}
+
 async function openCustomer(customerId){
 if(!customerId)return;
 setBusy('Opening customer profile...');
@@ -898,10 +1068,22 @@ if(!items.length)return '<div class="empty">No timeline activity yet.</div>';
 return '<div class="timeline-list">'+items.map(function(item){var meta=[date(item.at),item.source,item.status,item.amount!==null&&item.amount!==undefined?money(item.amount):''].filter(Boolean).join(' · ');return '<div class="timeline-item"><strong>'+esc(item.type)+' · '+esc(item.title)+'</strong><span>'+esc(meta)+'</span>'+esc(item.body||'')+'</div>'}).join('')+'</div>';
 }
 
+function inquirySignal(row){
+var metadata=row.metadata||{};
+if(typeof metadata==='string'){
+try{metadata=JSON.parse(metadata)}catch(err){metadata={}}
+}
+if(metadata.customer_match==='new_customer')return '<span class="status needs">New customer</span>';
+if(metadata.customer_match==='existing_customer')return '<span class="status ready">Added to contact</span>';
+if(row.customer_id||row.customers&&row.customers.id)return '<span class="status ready">Linked profile</span>';
+return '<span class="status blocked">Needs review</span>';
+}
+
 function renderInquiries(){
-document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.email||row.phone||'Customer'),esc(formatStatus(row.inquiry_type)),esc(row.product_interest),esc(row.message),esc(row.status),esc(date(row.created_at))]}),true);
+document.getElementById('inquiries').innerHTML='<div class="bar"><div><div class="section-title">Inquiries</div><p class="muted">Each line shows whether it created a new contact or attached to someone already in the CRM.</p></div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Signal','Customer','Type','Interest','Message','Status','Date','Action'],state.inquiries.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;var raw=String(row.id||'').indexOf('airtable:')===0||row.raw_backup_only;var taskAction=raw?'<span class="muted">Import to task</span>':'<button class="btn quiet small" data-task-from-inquiry="'+esc(row.id||'')+'" data-task-customer="'+esc(customerId||'')+'">Add task</button>';return [inquirySignal(row),customerLink(customerId,row.customers&&row.customers.full_name||row.email||row.phone||'Customer'),esc(formatStatus(row.inquiry_type)),esc(row.product_interest),esc(row.message),esc(row.status),esc(date(row.created_at)),'<div class="actions">'+openProfileButton(customerId,'Open timeline')+taskAction+'</div>']}),true);
 bindCustomerOpeners();
-document.getElementById('exportInquiries').addEventListener('click',function(){exportCsv('yogacloak-inquiries.csv',['customer','type','interest','message','status','date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,row.created_at]}))});
+document.querySelectorAll('[data-task-from-inquiry]').forEach(function(btn){btn.addEventListener('click',async function(){await createTaskForInquiry(btn.dataset.taskFromInquiry,btn.dataset.taskCustomer)})});
+document.getElementById('exportInquiries').addEventListener('click',function(){exportCsv('yogacloak-inquiries.csv',['signal','customer','type','interest','message','status','date'],state.inquiries.map(function(row){return [inquirySignal(row).replace(/<[^>]*>/g,''),row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,row.created_at]}))});
 }
 
 function renderReservations(){

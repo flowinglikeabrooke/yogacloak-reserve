@@ -269,3 +269,30 @@ create index if not exists automation_runs_created_idx
 
 create index if not exists automation_runs_customer_idx
   on automation_runs (customer_id, created_at desc);
+
+create table if not exists owner_tasks (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete set null,
+  inquiry_id uuid references inquiries(id) on delete set null,
+  reservation_id uuid references reservations(id) on delete set null,
+  task_type text default 'general',
+  title text not null,
+  description text,
+  status text default 'open',
+  priority text default 'normal',
+  due_at timestamptz,
+  completed_at timestamptz,
+  created_by text default 'owner',
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists owner_tasks_status_due_idx
+  on owner_tasks (status, due_at asc);
+
+create index if not exists owner_tasks_customer_due_idx
+  on owner_tasks (customer_id, due_at asc);
+
+create index if not exists owner_tasks_inquiry_idx
+  on owner_tasks (inquiry_id);

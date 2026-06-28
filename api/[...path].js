@@ -4,6 +4,7 @@ import adminAutomations from '../server/api/admin-automations.js';
 import adminCommunications from '../server/api/admin-communications.js';
 import adminCustomerDetail from '../server/api/admin-customer-detail.js';
 import adminCustomers from '../server/api/admin-customers.js';
+import adminCreateTask from '../server/api/admin-create-task.js';
 import adminDashboard from '../server/api/admin-dashboard.js';
 import adminDeleteCustomer from '../server/api/admin-delete-customer.js';
 import adminDeleteInquiry from '../server/api/admin-delete-inquiry.js';
@@ -23,6 +24,8 @@ import adminSendEmail from '../server/api/admin-send-email.js';
 import adminSendSms from '../server/api/admin-send-sms.js';
 import adminSession from '../server/api/admin-session.js';
 import adminSyncRawAirtable from '../server/api/admin-sync-raw-airtable.js';
+import adminTasks from '../server/api/admin-tasks.js';
+import adminUpdateTask from '../server/api/admin-update-task.js';
 import adminUpdateContactStatus from '../server/api/admin-update-contact-status.js';
 import adminUpdateCustomerProfile from '../server/api/admin-update-customer-profile.js';
 import adminUpdateCustomerNote from '../server/api/admin-update-customer-note.js';
@@ -57,6 +60,7 @@ const routes = {
   'admin-communications': adminCommunications,
   'admin-customer-detail': adminCustomerDetail,
   'admin-customers': adminCustomers,
+  'admin-create-task': adminCreateTask,
   'admin-dashboard': adminDashboard,
   'admin-delete-customer': adminDeleteCustomer,
   'admin-delete-inquiry': adminDeleteInquiry,
@@ -76,6 +80,8 @@ const routes = {
   'admin-send-sms': adminSendSms,
   'admin-session': adminSession,
   'admin-sync-raw-airtable': adminSyncRawAirtable,
+  'admin-tasks': adminTasks,
+  'admin-update-task': adminUpdateTask,
   'admin-update-contact-status': adminUpdateContactStatus,
   'admin-update-automation': adminUpdateAutomation,
   'admin-update-customer-profile': adminUpdateCustomerProfile,
