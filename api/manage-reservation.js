@@ -10,8 +10,10 @@ import {
   clean,
   createRecord,
   getRecord,
+  checkRateLimit,
   notesWith,
   parseNotes,
+  rejectLargeRequest,
   requireAdmin,
   stripeRequest,
   updateRecord
@@ -47,6 +49,8 @@ async function createTransferContact({ firstName, lastName, email }) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60, keyPrefix: 'manage-reservation' })) return;
+  if (rejectLargeRequest(req, res, 12 * 1024)) return;
   if (!requireAdmin(req, res)) return;
 
   try {

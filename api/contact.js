@@ -1,7 +1,7 @@
 // Vercel endpoint: /api/contact
 // Saves contact modal submissions to Airtable.
 
-import { checkRateLimit } from '../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest } from '../lib/yogacloak-ops.js';
 import { findOrCreateCustomer, recordInquiry } from '../lib/customer-identity.js';
 
 export default async function handler(req, res) {
@@ -11,7 +11,8 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60 })) return;
+  if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60, keyPrefix: 'contact' })) return;
+  if (rejectLargeRequest(req, res, 16 * 1024)) return;
 
   try {
     const { name, email, message, source } = req.body || {};
@@ -32,7 +33,10 @@ export default async function handler(req, res) {
     const firstName = parts.shift() || '';
     const lastName = parts.join(' ');
     const now = new Date();
-    const submissionId = `web_${now.getTime().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    const providedSubmissionId = String(req.body?.submission_id || '').trim().slice(0, 120);
+    const submissionId = /^[A-Za-z0-9._:-]{8,120}$/.test(providedSubmissionId)
+      ? providedSubmissionId
+      : `web_${now.getTime().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
     const fields = {
       'Submission ID': submissionId,

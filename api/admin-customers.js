@@ -7,7 +7,8 @@ export default async function handler(req, res) {
 
   try {
     const search = String(req.query?.search || '');
-    const customers = await loadCustomers({ search });
+    const contactStatus = String(req.query?.contact_status || '');
+    const customers = await loadCustomers({ search, contactStatus });
     return res.status(200).json({ ok: true, customers });
   } catch (err) {
     console.error('Admin customers error:', err);

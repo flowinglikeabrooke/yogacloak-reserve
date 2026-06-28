@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { hasAdminSession } from '../lib/admin-auth.js';
+import { CSRF_COOKIE, hasAdminSession } from '../lib/admin-auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +19,7 @@ function securityHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
 }
 
 function loginPage() {
@@ -65,6 +66,14 @@ msg.textContent=data.error||'Could not log in.';
 </html>`;
 }
 
+function parseCookies(req) {
+  return Object.fromEntries(String(req.headers.cookie || '').split(';').map((part) => {
+    const index = part.indexOf('=');
+    if (index === -1) return ['', ''];
+    return [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1).trim())];
+  }).filter(([key]) => key));
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end('Method not allowed');
   securityHeaders(res);
@@ -75,7 +84,8 @@ export default async function handler(req, res) {
   }
 
   const htmlPath = path.join(__dirname, '..', 'private', 'admin-hub.html');
-  const html = fs.readFileSync(htmlPath, 'utf8');
+  const csrf = parseCookies(req)[CSRF_COOKIE] || '';
+  const html = fs.readFileSync(htmlPath, 'utf8').replace('__ADMIN_CSRF_TOKEN__', csrf);
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   return res.status(200).send(html);
 }

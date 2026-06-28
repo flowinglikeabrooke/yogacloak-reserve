@@ -112,8 +112,9 @@ tr:last-child td{border-bottom:0}
 <script>
 var statusText=document.getElementById('statusText');
 var storageText=document.getElementById('storageText');
+var csrfToken='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set()};
+var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
 document.getElementById('loadBtn').addEventListener('click',loadCurrent);
 document.getElementById('logoutBtn').addEventListener('click',async function(){await fetch('/api/admin-logout',{method:'POST'});location.reload()});
 document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
@@ -122,7 +123,7 @@ function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){ret
 function money(value){return '$'+Number(value||0).toFixed(0)}
 function date(value){return value?String(value).slice(0,10):''}
 function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok)throw new Error(data.error||'Could not load');return data})}
-function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
+function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
 function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
 
@@ -139,10 +140,10 @@ try{
 if(activeTab==='today'){setBusy('Loading dashboard...');state.dashboard=await endpoint('/api/admin-dashboard')}
 if(activeTab==='customers'){setBusy('Loading customers...');state.customers=(await endpoint('/api/admin-customers')).customers||[]}
 if(activeTab==='inquiries'){setBusy('Loading inquiries...');state.inquiries=(await endpoint('/api/admin-inquiries')).inquiries||[]}
-if(activeTab==='reservations'){setBusy('Loading reservations...');state.reservations=(await endpoint('/api/admin-reservations')).reservations||[]}
+if(activeTab==='reservations'){setBusy('Loading reservations...');var reservationData=await endpoint('/api/admin-reservations');state.reservations=reservationData.reservations||[];state.finalBalanceSafety=reservationData.final_balance_safety||null;state.finalBalanceSummary=reservationData.final_balance_summary||null;state.finalBalanceMeta={records_available:reservationData.records_available||0,records_returned:reservationData.records_returned||0,record_limit:reservationData.record_limit||0,has_more:!!reservationData.has_more}}
 if(activeTab==='payments'){setBusy('Loading payments...');state.payments=(await endpoint('/api/admin-payments')).payments||[]}
 if(activeTab==='communications'){setBusy('Loading communications...');state.communications=await endpoint('/api/admin-communications')}
-if(activeTab==='finals'){setBusy('Loading final balances...');state.reservations=(await endpoint('/api/admin-reservations')).reservations||[];state.selected.clear()}
+if(activeTab==='finals'){setBusy('Loading final balances...');var finalData=await endpoint('/api/admin-reservations');state.reservations=finalData.reservations||[];state.finalBalanceSafety=finalData.final_balance_safety||null;state.finalBalanceSummary=finalData.final_balance_summary||null;state.finalBalanceMeta={records_available:finalData.records_available||0,records_returned:finalData.records_returned||0,record_limit:finalData.record_limit||0,has_more:!!finalData.has_more};state.selected.clear()}
 if(activeTab==='accounting'){setBusy('Loading accounting...');state.accounting=await endpoint('/api/admin-accounting')}
 if(activeTab==='duplicates'){setBusy('Loading duplicates...');state.duplicates=(await endpoint('/api/admin-duplicates')).duplicates||[]}
 if(activeTab==='settings'){state.dashboard=state.dashboard||await endpoint('/api/admin-dashboard')}
@@ -175,10 +176,11 @@ root.innerHTML=renderCards(data.summary||{})+
 function renderCustomers(){
 var root=document.getElementById('customers');
 var detail=state.customerDetail;
-root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions"><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button></div></div>'+
+root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions"><select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div></div>'+
 '<div class="split"><div>'+table(['Customer','Email','Phone','Contact','Follow-up','Last seen'],state.customers.map(function(row){return ['<span class="link" data-customer="'+esc(row.id)+'">'+esc(row.full_name||row.email||row.phone||'Customer')+'</span>',row.email,row.phone,row.contact_status||'not_contacted',date(row.next_follow_up_at),date(row.last_seen_at)]}),true)+'</div>'+
 '<aside class="panel detail" id="customerDetail">'+renderCustomerDetail(detail)+'</aside></div>';
-document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
+document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();var status=document.getElementById('customerContactFilter').value;setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q)+'&contact_status='+encodeURIComponent(status))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
+document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){return [row.full_name,row.email,row.phone,row.contact_status,row.next_follow_up_at,row.last_seen_at]}))});
 document.querySelectorAll('[data-customer]').forEach(function(el){el.addEventListener('click',async function(){setBusy('Loading customer...');state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(el.dataset.customer));renderCustomers();statusText.innerHTML='<span class="ok">Customer loaded.</span>'})});
 var save=document.getElementById('saveNoteBtn');
 if(save){save.addEventListener('click',async function(){await post('/api/admin-update-customer-note',{customer_id:detail.customer.id,note:document.getElementById('ownerNote').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Note saved.</span>'})}
@@ -218,11 +220,13 @@ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,1
 }
 
 function renderInquiries(){
-document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,date(row.created_at)]}));
+document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,date(row.created_at)]}));
+document.getElementById('exportInquiries').addEventListener('click',function(){exportCsv('yogacloak-inquiries.csv',['customer','type','interest','message','status','date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,row.created_at]}))});
 }
 
 function renderReservations(){
-document.getElementById('reservations').innerHTML='<div class="bar"><div class="section-title">Reservations</div><button class="btn quiet" onclick="loadCurrent()">Refresh</button></div>'+reservationTable(state.reservations,false);
+document.getElementById('reservations').innerHTML='<div class="bar"><div class="section-title">Reservations</div><button class="btn quiet" id="refreshReservations">Refresh</button></div>'+reservationLoadNotice()+reservationTable(state.reservations,false);
+document.getElementById('refreshReservations').addEventListener('click',loadCurrent);
 }
 
 function renderPayments(){
@@ -235,20 +239,30 @@ if(!data){document.getElementById('communications').innerHTML='<div class="empty
 var optins=data.sms_optins||[];
 var comms=data.communications||[];
 document.getElementById('communications').innerHTML='<div class="grid"><div class="card"><span>SMS sending</span><strong>'+esc(data.sms_enabled?'On':'Setup')+'</strong></div><div class="card"><span>SMS opt-ins</span><strong>'+optins.length+'</strong></div><div class="card"><span>Messages</span><strong>'+comms.length+'</strong></div><div class="card"><span>Inbound</span><strong>'+comms.filter(function(row){return row.direction==='inbound'}).length+'</strong></div></div>'+
-'<section class="panel"><div class="section-title">Message inbox and outbox</div>'+table(['Customer','Channel','Direction','Subject / Message','Status','Date'],comms.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.channel,row.direction,row.subject||row.body,row.status,date(row.created_at)]}))+'</section>'+
-'<section class="panel"><div class="section-title">SMS opt-ins</div>'+table(['Customer','Phone','Status','Source','Date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,date(row.created_at)]}))+'</section>'+
+'<section class="panel"><div class="bar"><div class="section-title">Message inbox and outbox</div><button class="btn quiet" id="exportMessages">Export CSV</button></div>'+table(['Customer','Channel','Direction','Subject / Message','Status','Date'],comms.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.channel,row.direction,row.subject||row.body,row.status,date(row.created_at)]}))+'</section>'+
+'<section class="panel"><div class="bar"><div class="section-title">SMS opt-ins</div><button class="btn quiet" id="exportSmsOptins">Export CSV</button></div>'+table(['Customer','Phone','Status','Source','Date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,date(row.created_at)]}))+'</section>'+
 '<section class="panel"><div class="section-title">Receiving setup</div><table><tbody>'+
 row('Inbound SMS URL','https://www.yogacloak.com/api/twilio-sms-webhook')+
 row('Inbound email URL','https://www.yogacloak.com/api/email-webhook')+
 row('Webhook secret','Use SMS_WEBHOOK_SECRET and EMAIL_WEBHOOK_SECRET in Vercel, then add the same secret to the provider webhook URL or header.')+
 '</tbody></table></section>';
+document.getElementById('exportMessages').addEventListener('click',function(){exportCsv('yogacloak-messages.csv',['customer','channel','direction','message','status','date'],comms.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.channel,row.direction,row.subject||row.body,row.status,row.created_at]}))});
+document.getElementById('exportSmsOptins').addEventListener('click',function(){exportCsv('yogacloak-sms-optins.csv',['customer','phone','status','source','date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,row.created_at]}))});
 }
 
 function renderFinals(){
 var rows=state.reservations||[];
-var summary=['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'].map(function(group){return '<span class="pill">'+esc(group)+' <strong>'+rows.filter(function(row){return row.readiness_group===group}).length+'</strong></span>'}).join('');
-document.getElementById('finals').innerHTML='<div class="bar"><div><div class="section-title">Final balances</div><div class="meta">'+summary+'<span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div><div class="actions"><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun">Dry run</button><button class="btn" id="chargeBatch">Charge ready batch</button></div></div>'+reservationTable(rows,true);
+var totals=state.finalBalanceSummary||{};
+var summary=['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'].map(function(group){return '<span class="pill">'+esc(group)+' <strong>'+rows.filter(function(row){return row.readiness_group===group}).length+'</strong></span>'}).join('')+'<span class="pill">Ready amount <strong>'+money(totals.ready_to_charge_amount||0)+'</strong></span>';
+var order=['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'];
+var grouped=order.map(function(group){
+var groupRows=rows.filter(function(row){return row.readiness_group===group});
+return '<section class="panel"><div class="bar"><div class="section-title">'+esc(group)+'</div><span class="pill">'+groupRows.length+' record(s)</span></div>'+reservationTable(groupRows,true)+'</section>';
+}).join('');
+var disabled=state.batchBusy?' disabled':'';
+document.getElementById('finals').innerHTML='<div class="bar"><div><div class="section-title">Final balances</div><div class="meta">'+summary+'<span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div><div class="actions"><button class="btn quiet" id="selectNeedsNotice">Select needs notice</button><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run</button><button class="btn" id="chargeBatch"'+disabled+'>Charge ready batch</button></div></div>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+grouped;
 document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
+document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('sendNotices').addEventListener('click',sendNotices);
 document.getElementById('dryRun').addEventListener('click',function(){runBatch(true)});
@@ -270,12 +284,32 @@ document.getElementById('mergeBtn').addEventListener('click',async function(){aw
 }
 
 function renderSettings(){
-document.getElementById('settings').innerHTML='<section class="panel"><div class="section-title">Setup checklist</div><table><tbody>'+
-row('Admin access','Uses ADMIN_TOKEN or FINAL_CHARGE_ADMIN_TOKEN.')+
-row('Hidden database','Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then run supabase-schema.sql once in Supabase.')+
-row('Stripe','Keep STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET configured.')+
-row('Email','Keep RESEND_API_KEY and EMAIL_FROM configured for notices and owner summaries.')+
-row('Privacy','This page is noindex,nofollow and is not linked from the public site.')+
+var s=(state.dashboard&&state.dashboard.security_status)||{};
+function yes(value){return value?'<span class="ok">On</span>':'<span class="error">Missing</span>'}
+function bool(value){return value?'<span class="ok">Yes</span>':'<span class="muted">No</span>'}
+document.getElementById('settings').innerHTML='<section class="panel"><div class="section-title">Security status</div><table><tbody>'+
+row('Admin session secret',yes(s.admin_session_secret_configured))+
+row('Admin token',yes(s.admin_token_configured))+
+row('Hidden database',yes(s.supabase_configured))+
+row('Stripe mode',s.stripe_mode||'missing')+
+row('Stripe webhook secret',yes(s.stripe_webhook_secret_configured))+
+row('Live final charging enabled',bool(s.allow_live_final_charges))+
+row('Twilio SMS sending',yes(s.twilio_configured))+
+row('Twilio signature verification',bool(s.twilio_signature_verification))+
+row('SMS webhook secret fallback',bool(s.sms_webhook_secret_configured))+
+row('Email sending',yes(s.email_provider_configured))+
+row('Email webhook secret',yes(s.email_webhook_secret_configured))+
+row('Unsigned email webhook allowed',bool(s.email_unsigned_webhook_allowed))+
+'</tbody></table></section>'+
+'<section class="panel"><div class="section-title">Launch checklist</div><table><tbody>'+
+row('Admin access','Use the private admin login. Do not save admin tokens in the browser.')+
+row('Database lock','Run supabase-schema.sql, then run supabase-rls.sql in Supabase before live traffic.')+
+row('Final charges','Keep ALLOW_LIVE_FINAL_CHARGES=false until one full Stripe test-mode reservation passes.')+
+row('Twilio sender','Use TWILIO_FROM_NUMBER or TWILIO_MESSAGING_SERVICE_SID for outbound texts.')+
+row('Twilio URL','Set TWILIO_WEBHOOK_URL to the exact Twilio webhook URL if signature checks fail behind Vercel.')+
+row('Email webhook','Set EMAIL_WEBHOOK_SECRET or RESEND_WEBHOOK_SECRET before turning on inbound email replies.')+
+row('Pre-deploy check','Run npm run security:check before launch or after security changes.')+
+row('Privacy','This page is noindex,nofollow, no-store, and is not linked from the public site.')+
 '</tbody></table></section>';
 }
 
@@ -283,15 +317,25 @@ function table(headers, rows, allowHtml){
 if(!rows.length)return '<div class="empty">No records yet.</div>';
 return '<div class="table-wrap"><table><thead><tr>'+headers.map(function(h){return '<th>'+esc(h)+'</th>'}).join('')+'</tr></thead><tbody>'+rows.map(function(row){return '<tr>'+row.map(function(cell){return '<td>'+(allowHtml?cell:esc(cell))+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
 }
-function row(a,b){return '<tr><td>'+esc(a)+'</td><td>'+esc(b)+'</td></tr>'}
+function row(a,b){return '<tr><td>'+esc(a)+'</td><td>'+b+'</td></tr>'}
+function reservationLoadNotice(){
+var meta=state.finalBalanceMeta||{};
+if(!meta.records_available)return '';
+if(meta.has_more)return '<div class="empty"><span class="error">Showing '+esc(meta.records_returned)+' of '+esc(meta.records_available)+' reservation records. Narrow the search or increase the backend limit before charging a larger drop.</span></div>';
+return '<div class="meta"><span class="pill">Loaded <strong>'+esc(meta.records_returned)+'</strong> reservation record(s)</span></div>';
+}
 function reservationTable(rows, selectable){
 if(!rows.length)return '<div class="empty">No reservations loaded.</div>';
 return '<div class="table-wrap"><table><thead><tr>'+(selectable?'<th class="select-cell">Pick</th>':'')+'<th>Readiness</th><th>Customer</th><th>Product</th><th>Money</th><th>Timeline</th><th>Record</th></tr></thead><tbody>'+rows.map(function(row){
 var wait=row.notice_wait_remaining_hours>0?'<br><span class="muted">Wait '+Number(row.notice_wait_remaining_hours).toFixed(1)+'h</span>':'';
 var block=row.blocked_reason?'<br><span class="error">'+esc(row.blocked_reason)+'</span>':'';
 var card=row.stripe_payment_method_saved?'<span class="ok">Saved card</span>':'<span class="error">No saved card</span>';
+var eligible=row.charge_eligible?'<br><span class="ok">Charge eligible</span>':'<br><span class="muted">Not charge eligible</span>';
+var attempt=row.final_balance_last_attempt_at?'<br><span class="muted">Last attempt</span> '+esc(row.final_balance_last_attempt_at):'';
+var attemptError=row.final_balance_last_error?'<br><span class="error">'+esc(row.final_balance_last_error)+'</span>':'';
+var finalStatus=row.final_balance_status?'<br><span class="muted">Final status</span> '+esc(row.final_balance_status):'';
 return '<tr>'+(selectable?'<td class="select-cell"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'></td>':'')+
-'<td><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span>'+wait+block+'</td>'+
+'<td><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span><br><span class="muted">'+esc(row.notice_status||'')+'</span>'+eligible+wait+finalStatus+attempt+block+attemptError+'</td>'+
 '<td>'+esc(row.customer_name)+'<br><span class="muted">'+esc(row.email)+'</span></td>'+
 '<td>'+esc(row.product)+'<br><span class="muted">'+esc(row.size)+'</span></td>'+
 '<td>Deposit '+money(row.deposit_amount)+'<br><span class="muted">Final '+money(row.final_balance_total||0)+'</span><br>'+card+'</td>'+
@@ -305,25 +349,81 @@ var rows=state.reservations.filter(function(row){return state.selected.has(row.i
 if(!rows.length){statusText.innerHTML='<span class="error">Select at least one Needs Notice reservation.</span>';return}
 setBusy('Sending notices...');
 var sent=0,failed=[];
-for(var i=0;i<rows.length;i++){try{await post('/api/send-final-balance-notice',{reservation_record_id:rows[i].id});sent++}catch(err){failed.push(rows[i].id+': '+err.message)}}
+var results=[];
+for(var i=0;i<rows.length;i++){try{var notice=await post('/api/send-final-balance-notice',{reservation_record_id:rows[i].id});sent++;results.push({reservation_record_id:rows[i].id,status:notice.already_sent?'already_sent':'sent',amount:notice.amount||rows[i].final_balance_total||0,reason:notice.already_sent?'Notice was already sent.':''})}catch(err){failed.push(rows[i].id+': '+err.message);results.push({reservation_record_id:rows[i].id,status:'failed',amount:rows[i].final_balance_total||0,reason:err.message||'Could not send notice.'})}}
+state.noticeResults={summary:{sent:sent,failed:failed.length},results:results};
 await loadCurrent();
 statusText.innerHTML=failed.length?'<span class="error">Sent '+sent+', failed '+failed.length+'.</span>':'<span class="ok">Sent '+sent+' notice(s).</span>';
 }
 async function runBatch(dryRun){
+if(state.batchBusy){statusText.innerHTML='<span class="muted">Batch request already running.</span>';return}
 var ids=Array.from(state.selected);
 if(!ids.length){statusText.innerHTML='<span class="error">Select at least one reservation.</span>';return}
+if(!dryRun){
+var readyRows=state.reservations.filter(function(row){return state.selected.has(row.id)&&row.charge_eligible&&!row.already_charged});
+var readyCount=readyRows.length;
+var readyAmount=readyRows.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
+if(!readyCount){statusText.innerHTML='<span class="error">No selected reservations are ready to charge. Run a dry run or select ready records first.</span>';return}
+var safety=state.finalBalanceSafety||{};
+var message='Charge final balances for '+readyCount+' ready reservation(s), totaling '+money(readyAmount)+'?\n\nSelected unsafe records will be skipped and reported. Stripe mode: '+(safety.stripe_mode||'unknown')+'. Notice wait: '+(safety.notice_hours||24)+'h.';
+if(!window.confirm(message)){statusText.innerHTML='<span class="muted">Batch charge cancelled.</span>';return}
+}
+state.batchBusy=true;
+renderFinals();
 setBusy(dryRun?'Running dry run...':'Charging selected ready reservations...');
+try{
 var data=await post('/api/batch-final-balance',{reservation_record_ids:ids,dry_run:dryRun});
+state.batchResults=data;
 await loadCurrent();
 var s=data.summary||{};
 statusText.innerHTML='<span class="'+(s.failed?'error':'ok')+'">'+(dryRun?'Dry run':'Batch')+': charged '+(s.charged||0)+', skipped '+(s.skipped||0)+', already '+(s.already_charged||0)+', failed '+(s.failed||0)+'.</span>';
+}catch(err){
+statusText.innerHTML='<span class="error">'+esc(err.message||'Batch request failed.')+'</span>';
+}finally{
+state.batchBusy=false;
+renderFinals();
+}
+}
+function batchResultReport(){
+var data=state.batchResults;
+if(!data||!Array.isArray(data.results)||!data.results.length)return '';
+var s=data.summary||{};
+var email=data.owner_summary_email||{};
+var emailStatus=email.skipped?'Skipped for dry run':(email.sent?'Sent':'Failed');
+var emailClass=email.error?'error':'muted';
+return '<section class="panel"><div class="bar"><div><div class="section-title">'+(data.dry_run?'Dry run results':'Batch charge results')+'</div><div class="meta"><span class="pill">Charged <strong>'+(s.charged||0)+'</strong></span><span class="pill">Skipped <strong>'+(s.skipped||0)+'</strong></span><span class="pill">Already charged <strong>'+(s.already_charged||0)+'</strong></span><span class="pill">Failed <strong>'+(s.failed||0)+'</strong></span><span class="pill">Owner email <strong>'+esc(emailStatus)+'</strong></span></div></div></div>'+
+(email.error?'<p class="'+emailClass+'">Owner summary email failed: '+esc(email.error)+'</p>':'')+
+table(['Reservation','Status','Code','Amount','Stripe status','Payment intent','Reason'],data.results.map(function(row){return [row.reservation_record_id,row.status,row.reason_code||'',money(row.amount||0),row.stripe_status||'',row.payment_intent_id||'',row.reason||'']}))+'</section>';
+}
+function noticeResultReport(){
+var data=state.noticeResults;
+if(!data||!Array.isArray(data.results)||!data.results.length)return '';
+var s=data.summary||{};
+return '<section class="panel"><div class="bar"><div><div class="section-title">Notice send results</div><div class="meta"><span class="pill">Sent <strong>'+(s.sent||0)+'</strong></span><span class="pill">Failed <strong>'+(s.failed||0)+'</strong></span></div></div></div>'+
+table(['Reservation','Status','Final balance','Reason'],data.results.map(function(row){return [row.reservation_record_id,row.status,money(row.amount||0),row.reason||'']}))+'</section>';
+}
+function finalBalanceSafetyPanel(){
+var s=state.finalBalanceSafety;
+if(!s)return '';
+var locked=s.stripe_mode==='live'&&!s.allow_live_final_charges;
+return '<section class="panel"><div class="bar"><div><div class="section-title">Charging safety</div><div class="meta">'+
+'<span class="pill">Stripe mode <strong>'+esc(s.stripe_mode||'missing')+'</strong></span>'+
+'<span class="pill">Live final charges <strong>'+esc(s.allow_live_final_charges?'enabled':'locked')+'</strong></span>'+
+'<span class="pill">Notice wait <strong>'+esc(s.notice_hours||24)+'h</strong></span>'+
+'<span class="pill">Webhook secret <strong>'+esc(s.stripe_webhook_secret_configured?'set':'missing')+'</strong></span>'+
+'</div></div></div>'+
+(locked?'<p class="error">Live final-balance charges are locked until ALLOW_LIVE_FINAL_CHARGES=true.</p>':'<p class="muted">Run one Stripe test-mode reservation end to end before enabling live final charges.</p>')+
+'</section>';
 }
 function exportAccountingCsv(){
 var rows=(state.accounting&&state.accounting.payments||[]).map(function(row){return [row.occurred_at,row.customers&&row.customers.full_name||'',row.payment_type,row.amount,row.status,row.stripe_payment_intent_id]});
-var csv=[['date','customer','type','amount','status','stripe_id']].concat(rows).map(function(row){return row.map(function(cell){return '"'+String(cell||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+exportCsv('yogacloak-accounting.csv',['date','customer','type','amount','status','stripe_id'],rows);
+}
+function exportCsv(filename,headers,rows){
+var csv=[headers].concat(rows).map(function(row){return row.map(function(cell){return '"'+String(cell||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');
 var blob=new Blob([csv],{type:'text/csv'});
 var url=URL.createObjectURL(blob);
-var a=document.createElement('a');a.href=url;a.download='yogacloak-accounting.csv';a.click();URL.revokeObjectURL(url);
+var a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
 }
 
 renderToday();

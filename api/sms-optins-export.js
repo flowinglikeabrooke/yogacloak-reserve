@@ -3,6 +3,7 @@
 
 import {
   TABLES,
+  checkRateLimit,
   listRecords,
   parseNotes,
   requireAdmin
@@ -27,6 +28,7 @@ function fieldOrNote(fields, notes, fieldName, noteName) {
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkRateLimit(req, res, { maxRequests: 10, windowSeconds: 60, keyPrefix: 'sms-optins-export' })) return;
   if (!requireAdmin(req, res)) return;
 
   try {

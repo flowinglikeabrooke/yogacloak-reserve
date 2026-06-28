@@ -1,8 +1,10 @@
 import { updateInquiryStatus } from '../lib/communications.js';
-import { requireAdmin } from '../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest, requireAdmin } from '../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkRateLimit(req, res, { maxRequests: 20, windowSeconds: 60, keyPrefix: 'admin-inquiry-status' })) return;
+  if (rejectLargeRequest(req, res, 8 * 1024)) return;
   if (!requireAdmin(req, res)) return;
 
   try {

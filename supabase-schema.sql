@@ -35,6 +35,10 @@ create unique index if not exists customers_stripe_customer_id_idx
   on customers (stripe_customer_id)
   where stripe_customer_id is not null and stripe_customer_id <> '';
 
+create index if not exists customers_last_seen_at_idx on customers (last_seen_at desc);
+create index if not exists customers_contact_status_idx on customers (contact_status);
+create index if not exists customers_next_follow_up_at_idx on customers (next_follow_up_at);
+
 create table if not exists inquiries (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid references customers(id) on delete set null,
@@ -50,6 +54,11 @@ create table if not exists inquiries (
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+create index if not exists inquiries_status_created_at_idx on inquiries (status, created_at desc);
+create unique index if not exists inquiries_submission_id_idx
+  on inquiries ((metadata->>'submission_id'))
+  where metadata ? 'submission_id';
 
 create table if not exists reservations (
   id uuid primary key default gen_random_uuid(),
@@ -85,6 +94,9 @@ create unique index if not exists reservations_checkout_session_id_idx
   on reservations (checkout_session_id)
   where checkout_session_id is not null and checkout_session_id <> '';
 
+create index if not exists reservations_status_idx on reservations (status);
+create index if not exists reservations_final_balance_notice_idx on reservations (final_balance_notice_sent_at);
+
 create table if not exists payments (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid references customers(id) on delete set null,
@@ -106,6 +118,8 @@ create table if not exists payments (
 create unique index if not exists payments_stripe_payment_intent_id_idx
   on payments (stripe_payment_intent_id)
   where stripe_payment_intent_id is not null and stripe_payment_intent_id <> '';
+
+create index if not exists payments_status_type_occurred_idx on payments (status, payment_type, occurred_at desc);
 
 create table if not exists payment_methods (
   id uuid primary key default gen_random_uuid(),
@@ -150,6 +164,12 @@ create table if not exists communications (
   metadata jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
+
+create unique index if not exists communications_provider_provider_id_idx
+  on communications (provider, provider_id)
+  where provider_id is not null and provider_id <> '';
+
+create index if not exists communications_customer_created_idx on communications (customer_id, created_at desc);
 
 create table if not exists internal_notes (
   id uuid primary key default gen_random_uuid(),

@@ -28,6 +28,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your private service role key
 STRIPE_SECRET_KEY=sk_live_or_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+ALLOW_LIVE_FINAL_CHARGES=false
 ADMIN_TOKEN=make-a-long-random-secret
 FINAL_CHARGE_ADMIN_TOKEN=make-a-long-random-secret
 ADMIN_SESSION_SECRET=make-a-different-long-random-secret
@@ -41,6 +42,9 @@ SMS_CRM_PROVIDER=Klaviyo
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
 TWILIO_FROM_NUMBER=+15555555555
+# Optional instead of TWILIO_FROM_NUMBER:
+TWILIO_MESSAGING_SERVICE_SID=MG...
+TWILIO_WEBHOOK_URL=https://yogacloak.com/api/twilio-sms-webhook
 SMS_WEBHOOK_SECRET=make-a-long-random-secret
 SITE_URL=https://yogacloak.com
 ALLOWED_ORIGIN=https://yogacloak.com
@@ -71,6 +75,8 @@ If `AIRTABLE_SMS_OPTINS_TABLE` is not set, SMS opt-ins fall back to `AIRTABLE_FO
 
 Run `supabase-schema.sql` once in the Supabase SQL editor before using the full CRM hub. It creates customers, inquiries, reservations, payments, communications, and internal notes/follow-up tracking.
 
+Then run `supabase-rls.sql` in the Supabase SQL editor. This turns on Row Level Security for the CRM tables and creates no public browser policies, so the hidden database stays server-only.
+
 Create a Stripe webhook pointing to:
 
 ```text
@@ -86,14 +92,18 @@ checkout.session.completed
 For two-way SMS, create a Twilio Messaging webhook pointing to:
 
 ```text
-https://yogacloak.com/api/twilio-sms-webhook?secret=SMS_WEBHOOK_SECRET
+https://yogacloak.com/api/twilio-sms-webhook
 ```
+
+Twilio requests are verified with `TWILIO_AUTH_TOKEN`. If Twilio signature checks fail because the forwarded URL differs from the public URL, set `TWILIO_WEBHOOK_URL` to the exact webhook URL shown in Twilio.
 
 For inbound email replies, configure your email provider's inbound webhook to:
 
 ```text
 https://yogacloak.com/api/email-webhook?secret=EMAIL_WEBHOOK_SECRET
 ```
+
+Production inbound email requires `EMAIL_WEBHOOK_SECRET` or `RESEND_WEBHOOK_SECRET`. Use `EMAIL_WEBHOOK_ALLOW_UNSIGNED=true` only for local testing.
 
 The code still supports your existing Airtable base, but the branded admin hub is designed around the hidden customer database.
 
@@ -115,6 +125,9 @@ Security layers:
 - Admin APIs accept the secure session cookie.
 - Admin page and admin APIs send `no-store` and `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`.
 - Admin page is blocked from iframes with `X-Frame-Options: DENY`.
+- Admin browser `POST` actions require CSRF protection.
+- Sensitive admin and money endpoints are rate limited.
+- Run `npm run security:check` before deploy to check public files, admin links, core SEO landmarks, and Vercel protection headers.
 - `robots.txt` also disallows the admin URL, but this is only an SEO signal; the real protection is the server-side session.
 
 ## Automatic final-balance charging

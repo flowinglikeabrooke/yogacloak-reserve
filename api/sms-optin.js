@@ -1,7 +1,7 @@
 // Vercel endpoint: /api/sms-optin
 // Saves homepage SMS launch opt-ins to Airtable for later SMS CRM sync.
 
-import { checkRateLimit } from '../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest } from '../lib/yogacloak-ops.js';
 import { findOrCreateCustomer, recordInquiry } from '../lib/customer-identity.js';
 
 const FORMS_TABLE_FALLBACK = 'tblRvWlirlbzlW5Up';
@@ -41,7 +41,8 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60 })) return;
+  if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60, keyPrefix: 'sms-optin' })) return;
+  if (rejectLargeRequest(req, res, 8 * 1024)) return;
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
@@ -58,7 +59,10 @@ export default async function handler(req, res) {
     }
 
     const now = new Date().toISOString();
-    const submissionId = `sms_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    const providedSubmissionId = cleanString(body.submission_id, 120);
+    const submissionId = /^[A-Za-z0-9._:-]{8,120}$/.test(providedSubmissionId)
+      ? providedSubmissionId
+      : `sms_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     const sourcePage = cleanString(body.source_page || body.source || 'Homepage', 100);
     const consentVersion = cleanString(body.consent_language_version || CONSENT_VERSION, 120);
     const consentText = cleanString(body.consent_text || CONSENT_TEXT, 1000);

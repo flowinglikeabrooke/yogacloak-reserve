@@ -1,8 +1,9 @@
 import { recordInboundEmail } from '../lib/communications.js';
+import { checkRateLimit, rejectLargeRequest } from '../lib/yogacloak-ops.js';
 
 function webhookAllowed(req) {
   const secret = process.env.EMAIL_WEBHOOK_SECRET || process.env.RESEND_WEBHOOK_SECRET;
-  if (!secret) return true;
+  if (!secret) return process.env.EMAIL_WEBHOOK_ALLOW_UNSIGNED === 'true';
   const provided = req.headers['x-webhook-secret'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '') || req.query?.secret;
   return provided === secret;
 }
@@ -36,6 +37,8 @@ function extractInboundEmail(payload) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!checkRateLimit(req, res, { maxRequests: 30, windowSeconds: 60, keyPrefix: 'email-webhook' })) return;
+  if (rejectLargeRequest(req, res, 64 * 1024)) return;
   if (!webhookAllowed(req)) return res.status(401).json({ error: 'Unauthorized' });
 
   try {

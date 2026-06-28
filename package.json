@@ -1,5 +1,12 @@
 {
   "name": "yogacloak-site",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "final-balance:check": "node scripts/final-balance-readiness-check.js && node scripts/final-balance-workflow-check.js && node scripts/final-balance-runbook-check.js",
+    "final-balance:readiness-check": "node scripts/final-balance-readiness-check.js",
+    "final-balance:runbook-check": "node scripts/final-balance-runbook-check.js",
+    "final-balance:workflow-check": "node scripts/final-balance-workflow-check.js",
+    "security:check": "node scripts/security-check.js"
+  }
 }
