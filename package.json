@@ -8,6 +8,7 @@
     "final-balance:runbook-check": "node scripts/final-balance-runbook-check.js",
     "final-balance:workflow-check": "node scripts/final-balance-workflow-check.js",
     "api:dispatcher-check": "node scripts/api-dispatcher-check.js && node scripts/api-dispatcher-smoke-check.js",
+    "crm:workflow-check": "node scripts/private-crm-workflow-check.js",
     "security:check": "node scripts/security-check.js",
     "predeploy:check": "node scripts/predeploy-check.js"
   }

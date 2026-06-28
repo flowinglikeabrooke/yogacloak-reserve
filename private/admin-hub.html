@@ -827,7 +827,7 @@ return table(['Type','Interest','Message','Status','Date','Manage'],inquiries.sl
 var raw=String(row.id||'').indexOf('airtable:')===0||row.raw_backup_only;
 var manage=raw?'<span class="muted">Import to edit</span>':'<button class="btn quiet small" data-delete-inquiry="'+esc(row.id)+'">Archive</button>';
 return [
-esc(row.inquiry_type||'inquiry')+'<span class="id-line">'+esc(row.id||row.submission_id||'')+'</span>',
+esc(formatStatus(row.inquiry_type||'inquiry'))+'<span class="id-line">'+esc(row.id||row.submission_id||'')+'</span>',
 esc(row.product_interest||row.source_page||''),
 esc(row.message||''),
 esc(row.status||''),
@@ -858,7 +858,7 @@ return '<div class="timeline-list">'+items.map(function(item){var meta=[date(ite
 }
 
 function renderInquiries(){
-document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.email||row.phone||'Customer'),esc(row.inquiry_type),esc(row.product_interest),esc(row.message),esc(row.status),esc(date(row.created_at))]}),true);
+document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.email||row.phone||'Customer'),esc(formatStatus(row.inquiry_type)),esc(row.product_interest),esc(row.message),esc(row.status),esc(date(row.created_at))]}),true);
 bindCustomerOpeners();
 document.getElementById('exportInquiries').addEventListener('click',function(){exportCsv('yogacloak-inquiries.csv',['customer','type','interest','message','status','date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,row.created_at]}))});
 }

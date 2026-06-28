@@ -6,6 +6,7 @@ const checks = [
   ['scripts/final-balance-readiness-check.js'],
   ['scripts/final-balance-workflow-check.js'],
   ['scripts/final-balance-runbook-check.js'],
+  ['scripts/private-crm-workflow-check.js'],
   ['scripts/security-check.js']
 ];
 
