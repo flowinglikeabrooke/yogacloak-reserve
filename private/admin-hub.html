@@ -202,7 +202,7 @@ var currentTabLabel=document.getElementById('currentTabLabel');
 var csrfToken='__ADMIN_CSRF_TOKEN__';
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
+var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
 document.getElementById('loadBtn').addEventListener('click',loadCurrent);
 document.getElementById('logoutBtn').addEventListener('click',async function(){await fetch('/api/admin-logout',{method:'POST'});location.reload()});
 document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
@@ -289,19 +289,25 @@ if(!data){root.innerHTML='<div class="empty">Load the hub to see today\'s action
 var tasks=data.tasks||[];
 var summary=data.summary||{};
 var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
-var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>These came from the raw backup/source log and are visible here so the CRM does not miss them.</div>':'';
-root.innerHTML=renderCards(summary)+rawNotice+
+var canSyncRaw=data.database_enabled!==false&&rawBackupCount>0;
+var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="syncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'';
+root.innerHTML=renderCards(summary)+rawNotice+rawSyncReport()+
 '<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Type','Task','Customer','Date'],tasks.map(function(row){return [esc(row.type),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at))]}),true)+'</section>'+
 '<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Event','Customer','Details','Date'],(data.recent_events||[]).map(function(row){return [esc(row.title||row.event_type),customerLink(row.customer_id||row.customers&&row.customers.id,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at))]}),true)+'</section>';
 bindCustomerOpeners();
+var syncBtn=document.getElementById('syncRawBackupBtn');
+if(syncBtn){syncBtn.addEventListener('click',syncRawAirtable)}
 }
 
 function renderCustomers(){
 var root=document.getElementById('customers');
 var detail=state.customerDetail;
-root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions"><select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div></div>'+
+var canSync=state.dashboard&&state.dashboard.database_enabled!==false;
+root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'<select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div></div>'+rawSyncReport()+
 '<div class="split"><div>'+table(['Customer','Email','Phone','Source','Contact','Last seen'],state.customers.map(function(row){var source=row.raw_backup_only?'Raw backup only':(row.fallback_source==='airtable_forms'||String(row.id||'').indexOf('airtable:')===0?'Airtable raw':'Private CRM');return [customerLink(row.id,row.full_name||row.email||row.phone||'Customer'),esc(row.email),esc(row.phone),esc(source),esc(row.contact_status||'not_contacted'),esc(date(row.last_seen_at))]}),true)+'</div>'+
 '<aside class="panel detail" id="customerDetail">'+renderCustomerDetail(detail)+'</aside></div>';
+var syncCustomersBtn=document.getElementById('syncRawCustomersBtn');
+if(syncCustomersBtn){syncCustomersBtn.addEventListener('click',syncRawAirtable)}
 document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();var status=document.getElementById('customerContactFilter').value;setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q)+'&contact_status='+encodeURIComponent(status))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
 document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','source','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){var source=row.raw_backup_only?'raw_backup_only':(String(row.id||'').indexOf('airtable:')===0?'airtable_raw':'private_crm');return [row.full_name,row.email,row.phone,source,row.contact_status,row.next_follow_up_at,row.last_seen_at]}))});
 bindCustomerOpeners();
@@ -319,6 +325,29 @@ if(addNote){addNote.addEventListener('click',async function(){await post('/api/a
 var importRaw=document.getElementById('importRawCustomerBtn');
 if(importRaw){importRaw.addEventListener('click',async function(){await importRawCustomer(detail.customer.id)})}
 document.querySelectorAll('[data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
+}
+
+function rawSyncReport(){
+var data=state.rawSyncResults;
+if(!data||!data.summary)return '';
+var s=data.summary;
+return '<div class="notice good"><strong>Raw backup synced.</strong><br>Checked '+esc(s.raw_records_checked||0)+' raw record(s), created '+esc(s.customers_created||0)+' customer(s), updated '+esc(s.customers_updated||0)+' customer(s), and synced '+esc(s.inquiries_synced||0)+' inquiry record(s).</div>';
+}
+
+async function syncRawAirtable(){
+setBusy('Syncing Airtable raw backup into private CRM...');
+try{
+var data=await post('/api/admin-sync-raw-airtable',{limit:500});
+state.rawSyncResults=data.sync||null;
+state.dashboard=await endpoint('/api/admin-dashboard');
+state.customers=(await endpoint('/api/admin-customers')).customers||[];
+if(state.customerDetail&&state.customerDetail.customer&&String(state.customerDetail.customer.id||'').indexOf('airtable:')!==0){
+state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(state.customerDetail.customer.id));
+}
+render();
+var s=(state.rawSyncResults&&state.rawSyncResults.summary)||{};
+statusText.innerHTML='<span class="ok">Raw backup synced: '+esc(s.inquiries_synced||0)+' inquiry record(s) checked into CRM.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not sync raw backup.')+'</span>'}
 }
 
 async function quickContactStatus(customerId,status,followUpDays){
@@ -372,10 +401,18 @@ function renderCustomerDetail(detail){
 if(!detail)return '<div class="muted">Select a customer to see their timeline.</div>';
 var c=detail.customer||{};
 if(c.fallback_source==='airtable_forms'){
+var canImportRaw=state.dashboard&&state.dashboard.database_enabled!==false;
+var rawEmailHref=c.email?'mailto:'+encodeURIComponent(c.email):'';
+var rawSmsHref=c.phone?'sms:'+encodeURIComponent(c.phone):'';
 return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_name||c.email||'Customer')+'</div><p class="muted">'+esc(c.email||'')+'<br>'+esc(c.phone||'')+'</p></div><span class="health warn">Raw backup only</span></div>'+
-'<div class="notice warn"><strong>Raw Airtable view.</strong><br>This customer was assembled from site form submissions. The private CRM database is what unlocks owner notes, contact status, SMS/email history, follow-ups, and customer-level charging here.</div>'+
+'<div class="notice warn"><strong>Raw backup caught this.</strong><br>This profile was assembled from Airtable source records, so you can still see the site activity even if it has not been organized into the private CRM yet.</div>'+
 '<div class="meta"><span class="pill">Raw forms <strong>'+esc(c.form_count||0)+'</strong></span><span class="pill">Source <strong>Airtable</strong></span></div>'+
-'<button class="btn" id="importRawCustomerBtn" style="margin-top:12px">Import to private CRM</button>'+
+'<div class="profile-overview">'+renderProfileOverview(detail)+'</div>'+
+(rawEmailHref||rawSmsHref?'<div class="profile-actions">'+(rawEmailHref?'<a class="btn quiet" href="'+esc(rawEmailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(rawSmsHref?'<a class="btn quiet" href="'+esc(rawSmsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>':'')+
+'<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
+'<div class="detail-block"><div class="section-title">Owner note</div><label>Private note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
+'<div class="detail-block"><div class="section-title">Internal notes</div><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>'+
+(canImportRaw?'<button class="btn" id="importRawCustomerBtn" style="margin-top:12px">Organize into CRM profile</button>':'<div class="notice" style="margin-top:12px"><strong>Organized CRM is not connected yet.</strong><br>Raw records are still visible here. Add the private CRM database when you want notes, contact status, follow-ups, and owner actions to save on this profile.</div>')+
 '<div class="detail-block"><div class="section-title">Site submissions</div>'+renderProfileInquiries(detail.inquiries||[])+'</div>'+
 '<div class="detail-block"><div class="section-title">Raw timeline</div>'+renderTimeline(detail)+'</div>';
 }

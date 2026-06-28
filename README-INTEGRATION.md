@@ -13,6 +13,7 @@ These files are ready for Vercel-style hosting:
 - `/api/stripe-webhook` updates Airtable and the private CRM database after Stripe payment succeeds.
 - `/api/admin-reservations` powers the final-balance tab.
 - `/api/admin-dashboard`, `/api/admin-customers`, `/api/admin-communications`, and related admin endpoints power the branded CRM hub.
+- `/api/admin-sync-raw-airtable` reconciles Airtable raw form/SMS records into the private CRM center of truth.
 - `/api/manage-reservation` handles cancel, refund, and transfer actions.
 - `/api/send-final-balance-notice` emails the customer before the final charge.
 - `/api/charge-final-balance` charges the saved Stripe payment method for the final balance from a protected admin-only request.
@@ -108,6 +109,8 @@ https://yogacloak.com/api/email-webhook?secret=EMAIL_WEBHOOK_SECRET
 Production inbound email requires `EMAIL_WEBHOOK_SECRET` or `RESEND_WEBHOOK_SECRET`. Use `EMAIL_WEBHOOK_ALLOW_UNSIGNED=true` only for local testing.
 
 The branded admin hub is designed around a private CRM database as the organized system. Airtable remains the raw backup/source log and reconciliation safety net, so the admin can still surface Airtable-only records if the CRM misses something.
+
+Inside the admin hub, use `Sync raw backup` to check Airtable raw records against the private CRM. The sync matches by email or phone, creates/updates one customer profile, attaches raw inquiries, and uses submission IDs to avoid duplicate inquiry rows.
 
 ## Private admin security
 

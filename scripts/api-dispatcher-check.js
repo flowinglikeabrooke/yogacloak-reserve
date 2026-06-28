@@ -30,6 +30,7 @@ for (const route of [
   'admin-send-email',
   'admin-send-sms',
   'admin-session',
+  'admin-sync-raw-airtable',
   'admin-update-contact-status',
   'admin-update-customer-note',
   'admin-update-inquiry-status',

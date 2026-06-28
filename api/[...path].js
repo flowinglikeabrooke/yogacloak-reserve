@@ -16,6 +16,7 @@ import adminReservations from '../server/api/admin-reservations.js';
 import adminSendEmail from '../server/api/admin-send-email.js';
 import adminSendSms from '../server/api/admin-send-sms.js';
 import adminSession from '../server/api/admin-session.js';
+import adminSyncRawAirtable from '../server/api/admin-sync-raw-airtable.js';
 import adminUpdateContactStatus from '../server/api/admin-update-contact-status.js';
 import adminUpdateCustomerNote from '../server/api/admin-update-customer-note.js';
 import adminUpdateInquiryStatus from '../server/api/admin-update-inquiry-status.js';
@@ -60,6 +61,7 @@ const routes = {
   'admin-send-email': adminSendEmail,
   'admin-send-sms': adminSendSms,
   'admin-session': adminSession,
+  'admin-sync-raw-airtable': adminSyncRawAirtable,
   'admin-update-contact-status': adminUpdateContactStatus,
   'admin-update-customer-note': adminUpdateCustomerNote,
   'admin-update-inquiry-status': adminUpdateInquiryStatus,
