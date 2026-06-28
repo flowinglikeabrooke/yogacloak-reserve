@@ -20,6 +20,7 @@ Once connected, the admin hub can save and show:
 - internal owner notes
 - contact status
 - next follow-up dates
+- automation rules and automation run logs
 - possible duplicates
 - accounting records
 
@@ -68,6 +69,14 @@ AIRTABLE_PAYMENTS_TABLE
 AIRTABLE_PRODUCTS_TABLE
 ```
 
+Optional for owner text alerts:
+
+```text
+OWNER_SMS_TO
+```
+
+Use your own phone number in E.164 format, for example `+16025551212`. Customer texts still require Twilio setup and customer SMS opt-in.
+
 ## Database Tables
 
 In Supabase, run these SQL files from this repo:
@@ -80,6 +89,8 @@ supabase-rls.sql
 Run `supabase-schema.sql` first. It creates the CRM tables.
 
 Run `supabase-rls.sql` second. It locks the tables so public browser users cannot read or write CRM data.
+
+If the Automations tab says automation storage needs setup, run both files again. They are written with `if not exists`, so rerunning them adds missing tables without deleting existing customer data.
 
 ## After Saving Env Vars
 
@@ -122,6 +133,7 @@ When connected:
 - Customer detail allows owner notes and contact status.
 - Follow-up dates can be saved.
 - SMS/email communications can attach to the customer.
+- Automations can draft or send owner alerts, customer email follow-ups, and SMS follow-ups with opt-in safety checks.
 - Airtable raw records still appear as backup/reconciliation data if something exists there but not in the CRM database.
 - The `Sync raw backup` button checks Airtable and creates/updates CRM customers by email or phone.
 - The sync uses submission IDs so repeated syncs do not create duplicate inquiry rows.

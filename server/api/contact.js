@@ -2,6 +2,7 @@
 // Saves contact modal submissions to Airtable.
 
 import { checkRateLimit, rejectLargeRequest } from '../../lib/yogacloak-ops.js';
+import { runAutomationTrigger } from '../../lib/automations.js';
 import { findOrCreateCustomer, recordInquiry } from '../../lib/customer-identity.js';
 
 export default async function handler(req, res) {
@@ -63,7 +64,7 @@ export default async function handler(req, res) {
       });
       if (identity.customer?.id) {
         databaseSaved = true;
-        await recordInquiry({
+        const inquiry = await recordInquiry({
           customerId: identity.customer.id,
           type: 'contact',
           sourcePage: source || 'unknown',
@@ -71,7 +72,15 @@ export default async function handler(req, res) {
           email,
           status: 'new',
           eventTitle: 'Contact form received',
-          metadata: { submission_id: submissionId }
+          metadata: {
+            submission_id: submissionId,
+            customer_match: identity.created ? 'new_customer' : 'existing_customer',
+            intake_summary: identity.created ? 'New contact created from contact form' : 'Added inquiry to existing contact'
+          }
+        });
+        await runAutomationTrigger('inquiry_created', {
+          customer: identity.customer,
+          inquiry
         });
       }
     } catch (err) {

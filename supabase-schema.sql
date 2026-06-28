@@ -220,3 +220,52 @@ create unique index if not exists airtable_sync_log_record_table_idx
 
 create index if not exists airtable_sync_log_status_synced_idx
   on airtable_sync_log (sync_status, synced_at desc);
+
+create table if not exists automation_rules (
+  id uuid primary key default gen_random_uuid(),
+  key text unique not null,
+  name text not null,
+  description text,
+  trigger_type text not null,
+  target_type text default 'customer',
+  channel text not null,
+  mode text default 'draft',
+  enabled boolean default false,
+  subject_template text,
+  body_template text,
+  conditions jsonb default '{}'::jsonb,
+  safety jsonb default '{}'::jsonb,
+  last_run_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists automation_rules_trigger_enabled_idx
+  on automation_rules (trigger_type, enabled);
+
+create table if not exists automation_runs (
+  id uuid primary key default gen_random_uuid(),
+  automation_id uuid references automation_rules(id) on delete set null,
+  customer_id uuid references customers(id) on delete set null,
+  inquiry_id uuid references inquiries(id) on delete set null,
+  reservation_id uuid references reservations(id) on delete set null,
+  trigger_type text,
+  status text,
+  channel text,
+  target_type text,
+  subject text,
+  body text,
+  reason text,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+create unique index if not exists automation_runs_inquiry_dedupe_idx
+  on automation_runs (automation_id, inquiry_id, trigger_type)
+  where automation_id is not null and inquiry_id is not null;
+
+create index if not exists automation_runs_created_idx
+  on automation_runs (created_at desc);
+
+create index if not exists automation_runs_customer_idx
+  on automation_runs (customer_id, created_at desc);

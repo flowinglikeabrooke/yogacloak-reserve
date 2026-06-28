@@ -1,5 +1,6 @@
 import adminAccounting from '../server/api/admin-accounting.js';
 import adminAddInternalNote from '../server/api/admin-add-internal-note.js';
+import adminAutomations from '../server/api/admin-automations.js';
 import adminCommunications from '../server/api/admin-communications.js';
 import adminCustomerDetail from '../server/api/admin-customer-detail.js';
 import adminCustomers from '../server/api/admin-customers.js';
@@ -16,6 +17,7 @@ import adminMergeInquiries from '../server/api/admin-merge-inquiries.js';
 import adminMoveInquiry from '../server/api/admin-move-inquiry.js';
 import adminPage from '../server/api/admin-page.js';
 import adminPayments from '../server/api/admin-payments.js';
+import adminRecordSmsOptin from '../server/api/admin-record-sms-optin.js';
 import adminReservations from '../server/api/admin-reservations.js';
 import adminSendEmail from '../server/api/admin-send-email.js';
 import adminSendSms from '../server/api/admin-send-sms.js';
@@ -24,6 +26,7 @@ import adminSyncRawAirtable from '../server/api/admin-sync-raw-airtable.js';
 import adminUpdateContactStatus from '../server/api/admin-update-contact-status.js';
 import adminUpdateCustomerProfile from '../server/api/admin-update-customer-profile.js';
 import adminUpdateCustomerNote from '../server/api/admin-update-customer-note.js';
+import adminUpdateAutomation from '../server/api/admin-update-automation.js';
 import adminUpdateInquiryStatus from '../server/api/admin-update-inquiry-status.js';
 import availability from '../server/api/availability.js';
 import batchFinalBalance from '../server/api/batch-final-balance.js';
@@ -50,6 +53,7 @@ export const config = {
 const routes = {
   'admin-accounting': adminAccounting,
   'admin-add-internal-note': adminAddInternalNote,
+  'admin-automations': adminAutomations,
   'admin-communications': adminCommunications,
   'admin-customer-detail': adminCustomerDetail,
   'admin-customers': adminCustomers,
@@ -66,12 +70,14 @@ const routes = {
   'admin-move-inquiry': adminMoveInquiry,
   'admin-page': adminPage,
   'admin-payments': adminPayments,
+  'admin-record-sms-optin': adminRecordSmsOptin,
   'admin-reservations': adminReservations,
   'admin-send-email': adminSendEmail,
   'admin-send-sms': adminSendSms,
   'admin-session': adminSession,
   'admin-sync-raw-airtable': adminSyncRawAirtable,
   'admin-update-contact-status': adminUpdateContactStatus,
+  'admin-update-automation': adminUpdateAutomation,
   'admin-update-customer-profile': adminUpdateCustomerProfile,
   'admin-update-customer-note': adminUpdateCustomerNote,
   'admin-update-inquiry-status': adminUpdateInquiryStatus,

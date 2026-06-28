@@ -123,6 +123,17 @@ tr:last-child td{border-bottom:0}
 .crm-tool strong{display:block;font-size:14px;color:var(--ink);margin-bottom:5px}
 .crm-tool p{font-size:12px;line-height:1.4;margin-bottom:10px}
 .crm-tool.danger{background:rgba(212,148,141,.08);border-color:rgba(130,68,64,.16)}
+.automation-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.automation-card{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:16px;box-shadow:0 20px 60px -42px rgba(0,0,0,.8)}
+.automation-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.automation-card h3{font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.automation-card p{color:rgba(var(--cream),.5);font-size:12px;line-height:1.45;margin-top:6px}
+.automation-card label{margin-top:10px}
+.automation-card textarea{min-height:128px}
+.toggle-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0}
+.toggle-row input[type=checkbox]{width:auto;accent-color:#d8c7a2}
+.automation-card .meta{margin-top:12px}
+.automation-log-body{white-space:pre-wrap;max-width:420px}
 .id-line{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:rgba(30,35,32,.52);word-break:break-all;margin-top:4px}
 .record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .record-grid label:first-child,.record-grid label:last-child{grid-column:1/-1}
@@ -162,7 +173,7 @@ tr:last-child td{border-bottom:0}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
 .section-title{font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 @media(max-width:980px){.shell{padding:20px}.top,.login,.split{display:block;margin-top:64px}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.ops-panel{margin-top:12px}.tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}}
-@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}}
+@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}}
 </style>
 </head>
 <body>
@@ -198,6 +209,7 @@ tr:last-child td{border-bottom:0}
 <button class="tab" data-tab="reservations">Reservations</button>
 <button class="tab" data-tab="payments">Payments</button>
 <button class="tab" data-tab="communications">Comms</button>
+<button class="tab" data-tab="automations">Automations</button>
 <button class="tab" data-tab="finals">Final Balances</button>
 <button class="tab" data-tab="accounting">Accounting</button>
 <button class="tab" data-tab="duplicates">Duplicates</button>
@@ -210,6 +222,7 @@ tr:last-child td{border-bottom:0}
 <section id="reservations" class="view hide"></section>
 <section id="payments" class="view hide"></section>
 <section id="communications" class="view hide"></section>
+<section id="automations" class="view hide"></section>
 <section id="finals" class="view hide"></section>
 <section id="accounting" class="view hide"></section>
 <section id="duplicates" class="view hide"></section>
@@ -224,7 +237,7 @@ var currentTabLabel=document.getElementById('currentTabLabel');
 var csrfToken='__ADMIN_CSRF_TOKEN__';
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
+var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,automations:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
 document.getElementById('loadBtn').addEventListener('click',loadCurrent);
 document.getElementById('logoutBtn').addEventListener('click',async function(){await fetch('/api/admin-logout',{method:'POST'});location.reload()});
 document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
@@ -236,7 +249,7 @@ function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(asyn
 function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
 function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
-function tabLabel(tab){return ({today:'Today',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
+function tabLabel(tab){return ({today:'Today',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',automations:'Automations',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
 function health(value){return value?'<span class="health good">On</span>':'<span class="health bad">Missing</span>'}
 function renderHeroStatus(){
 var d=state.dashboard||{};
@@ -276,6 +289,7 @@ if(activeTab==='inquiries'){setBusy('Loading inquiries...');state.inquiries=(awa
 if(activeTab==='reservations'){setBusy('Loading reservations...');var reservationData=await endpoint('/api/admin-reservations');state.reservations=reservationData.reservations||[];state.finalBalanceSafety=reservationData.final_balance_safety||null;state.finalBalanceSummary=reservationData.final_balance_summary||null;state.finalBalanceMeta={records_available:reservationData.records_available||0,records_returned:reservationData.records_returned||0,record_limit:reservationData.record_limit||0,has_more:!!reservationData.has_more}}
 if(activeTab==='payments'){setBusy('Loading payments...');state.payments=(await endpoint('/api/admin-payments')).payments||[]}
 if(activeTab==='communications'){setBusy('Loading communications...');state.communications=await endpoint('/api/admin-communications')}
+if(activeTab==='automations'){setBusy('Loading automations...');state.automations=await endpoint('/api/admin-automations')}
 if(activeTab==='finals'){setBusy('Loading final balances...');var finalData=await endpoint('/api/admin-reservations');state.reservations=finalData.reservations||[];state.finalBalanceSafety=finalData.final_balance_safety||null;state.finalBalanceSummary=finalData.final_balance_summary||null;state.finalBalanceMeta={records_available:finalData.records_available||0,records_returned:finalData.records_returned||0,record_limit:finalData.record_limit||0,has_more:!!finalData.has_more};state.selected.clear()}
 if(activeTab==='accounting'){setBusy('Loading accounting...');state.accounting=await endpoint('/api/admin-accounting')}
 if(activeTab==='duplicates'){setBusy('Loading duplicates...');state.duplicates=(await endpoint('/api/admin-duplicates')).duplicates||[]}
@@ -299,7 +313,7 @@ heroStatus.innerHTML='<strong>Disconnected preview.</strong><br>This page was op
 document.getElementById('today').innerHTML='<section class="panel"><div class="section-title">Open the real admin hub</div><div class="notice warn"><strong>This local file will always look incomplete.</strong><br>The CRM only works through the protected server page. Use the deployed private admin URL when you want live customers, inquiries, payments, and final-balance tools.</div><div class="meta"><span class="pill">Admin session <strong>not connected</strong></span><span class="pill">CRM APIs <strong>not connected</strong></span><span class="pill">Stripe tools <strong>not connected</strong></span><span class="pill">Airtable sync <strong>not connected</strong></span></div><div class="actions" style="margin-top:16px"><a class="btn" href="https://www.yogacloak.com/yogacloak-admin.html">Open live admin hub</a><a class="btn quiet" href="https://www.yogacloak.com/api/admin-page">Open protected admin route</a></div></section>';
 }
 
-function render(){({today:renderToday,customers:renderCustomers,inquiries:renderInquiries,reservations:renderReservations,payments:renderPayments,communications:renderCommunications,finals:renderFinals,accounting:renderAccounting,duplicates:renderDuplicates,settings:renderSettings}[activeTab]||renderToday)()}
+function render(){({today:renderToday,customers:renderCustomers,inquiries:renderInquiries,reservations:renderReservations,payments:renderPayments,communications:renderCommunications,automations:renderAutomations,finals:renderFinals,accounting:renderAccounting,duplicates:renderDuplicates,settings:renderSettings}[activeTab]||renderToday)()}
 
 function renderCards(summary){
 var items=[
@@ -919,6 +933,87 @@ document.getElementById('exportSmsOptins').addEventListener('click',function(){e
 bindCustomerOpeners();
 }
 
+function automationId(key,field){
+return 'automation_'+String(key||'').replace(/[^a-zA-Z0-9_]/g,'_')+'_'+field;
+}
+
+function triggerName(value){
+return ({inquiry_created:'New inquiry',sms_opt_in_created:'SMS opt-in',reservation_created:'New reservation',payment_failed:'Failed payment',final_balance_ready:'Final balance ready'}[value]||formatStatus(value));
+}
+
+function modeName(value){
+return value==='auto_send'?'Auto-send':'Draft only';
+}
+
+function renderAutomationCard(rule){
+var key=rule.key||rule.id;
+var enabledId=automationId(key,'enabled');
+var modeId=automationId(key,'mode');
+var subjectId=automationId(key,'subject');
+var bodyId=automationId(key,'body');
+var counts=rule.counts||{};
+var autoWarning=rule.channel==='sms'&&rule.target_type==='customer'?'Customer SMS only sends when phone + SMS opt-in exist.':'Auto-send should only be enabled after you approve the exact wording.';
+return '<article class="automation-card">'+
+'<header><div><h3>'+esc(rule.name||'Automation')+'</h3><p>'+esc(rule.description||'')+'</p></div><span class="health '+(rule.enabled?'good':'bad')+'">'+esc(rule.enabled?'On':'Off')+'</span></header>'+
+'<div class="meta"><span class="pill">Trigger <strong>'+esc(triggerName(rule.trigger_type))+'</strong></span><span class="pill">Target <strong>'+esc(formatStatus(rule.target_type))+'</strong></span><span class="pill">Channel <strong>'+esc(String(rule.channel||'').toUpperCase())+'</strong></span></div>'+
+'<div class="toggle-row"><label style="flex-direction:row;align-items:center;margin:0"><input id="'+esc(enabledId)+'" type="checkbox" '+(rule.enabled?'checked':'')+'> Enabled</label><label style="min-width:180px;margin:0">Mode<select id="'+esc(modeId)+'"><option value="draft" '+(rule.mode!=='auto_send'?'selected':'')+'>Draft only</option><option value="auto_send" '+(rule.mode==='auto_send'?'selected':'')+'>Auto-send</option></select></label></div>'+
+'<div class="notice '+(rule.mode==='auto_send'?'warn':'')+'"><strong>'+esc(modeName(rule.mode))+'</strong><br>'+esc(rule.mode==='auto_send'?autoWarning:'Draft mode logs the message for review before anything is sent.')+'</div>'+
+'<label>Subject<input id="'+esc(subjectId)+'" value="'+esc(rule.subject_template||'')+'" placeholder="Only used for email"></label>'+
+'<label>Message template<textarea id="'+esc(bodyId)+'">'+esc(rule.body_template||'')+'</textarea></label>'+
+'<div class="meta"><span class="pill">Drafted <strong>'+esc(counts.drafted||0)+'</strong></span><span class="pill">Sent <strong>'+esc(counts.sent||0)+'</strong></span><span class="pill">Skipped <strong>'+esc(counts.skipped||0)+'</strong></span><span class="pill">Failed <strong>'+esc(counts.failed||0)+'</strong></span></div>'+
+'<div class="actions" style="margin-top:12px"><button class="btn" data-save-automation="'+esc(key)+'" data-automation-id="'+esc(rule.id||'')+'">Save automation</button></div>'+
+'</article>';
+}
+
+function automationMetricCards(items){
+return '<div class="grid">'+items.map(function(item){return '<div class="card"><span>'+esc(item[0])+'</span><strong>'+esc(item[1])+'</strong><small>'+esc(item[2]||'')+'</small></div>'}).join('')+'</div>';
+}
+
+function renderAutomations(){
+var root=document.getElementById('automations');
+var data=state.automations;
+if(!data){root.innerHTML='<div class="empty">Load automations to see CRM workflows.</div>';return}
+var rules=data.automations||[];
+var runs=data.runs||[];
+var enabled=rules.filter(function(rule){return rule.enabled}).length;
+var drafted=runs.filter(function(run){return run.status==='drafted'}).length;
+var sent=runs.filter(function(run){return run.status==='sent'}).length;
+var failed=runs.filter(function(run){return run.status==='failed'}).length;
+var setup=data.setup_required?'<div class="notice warn"><strong>Automation storage needs setup.</strong><br>'+esc(data.setup_message||'Run the latest private CRM database schema to save automation rules and logs.')+'</div>':'';
+var safety='<div class="notice"><strong>Automation safety.</strong><br>Customer SMS is blocked unless the profile has a phone number and SMS opt-in. Draft mode records the message without sending. Auto-send should only be used after Twilio/email setup is tested.</div>';
+root.innerHTML=automationMetricCards([
+['Automation rules',rules.length,'Editable CRM workflows'],
+['Enabled',enabled,'Rules currently listening'],
+['Drafts',drafted,'Created for review'],
+['Sent',sent,'Auto-sent successfully'],
+['Failed',failed,'Needs attention'],
+['SMS sending',data.sms_enabled?'On':'Setup','Twilio outbound status'],
+['Owner SMS',data.owner_sms_configured?'On':'Setup','Optional internal alerts'],
+['Database',data.setup_required?'Setup':'Ready','Rule storage status']
+])+
+setup+safety+
+'<section class="panel"><div class="bar"><div><div class="section-title">Automation recipes</div><p class="muted">Start in draft mode, review the wording, then turn on auto-send only for flows you trust.</p></div><button class="btn quiet" id="reloadAutomations">Refresh</button></div><div class="automation-board">'+rules.map(renderAutomationCard).join('')+'</div></section>'+
+'<section class="panel"><div class="section-title">Recent automation log</div>'+table(['Rule','Customer','Trigger','Status','Channel','Message','Date'],runs.map(function(run){var customerId=run.customer_id||run.customers&&run.customers.id;var ruleName=run.automation_rules&&run.automation_rules.name||run.trigger_type||'Automation';return [esc(ruleName),customerLink(customerId,run.customers&&run.customers.full_name||run.customer_id||'Customer'),esc(triggerName(run.trigger_type)),esc(formatStatus(run.status)),esc(String(run.channel||'').toUpperCase()),'<div class="automation-log-body">'+esc(run.reason||run.subject||run.body||'')+'</div>',esc(date(run.created_at))]}),true)+'</section>';
+document.getElementById('reloadAutomations').addEventListener('click',loadCurrent);
+document.querySelectorAll('[data-save-automation]').forEach(function(btn){btn.addEventListener('click',async function(){await saveAutomation(btn.dataset.saveAutomation,btn.dataset.automationId)})});
+bindCustomerOpeners();
+}
+
+async function saveAutomation(key,id){
+var enabled=document.getElementById(automationId(key,'enabled')).checked;
+var mode=document.getElementById(automationId(key,'mode')).value;
+var subject=document.getElementById(automationId(key,'subject')).value;
+var body=document.getElementById(automationId(key,'body')).value;
+if(mode==='auto_send'&&!window.confirm('Turn on auto-send for this automation? Draft mode is safer until you have tested the wording and provider setup.'))return;
+setBusy('Saving automation...');
+try{
+await post('/api/admin-update-automation',{id:id,key:key,enabled:enabled,mode:mode,subject_template:subject,body_template:body});
+state.automations=await endpoint('/api/admin-automations');
+renderAutomations();
+statusText.innerHTML='<span class="ok">Automation saved.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not save automation.')+'</span>'}
+}
+
 function renderFinals(){
 var rows=state.reservations||[];
 var totals=state.finalBalanceSummary||{};
@@ -966,6 +1061,7 @@ row('Private CRM database',s.supabase_configured?'<span class="ok">Primary</span
 row('Airtable raw backup','<span class="ok">Active when Airtable env vars are set</span>')+
 row('Raw backup sync log',sync.error?'<span class="error">Needs latest schema</span>':(sync.enabled?'<span class="ok">On</span>':'<span class="muted">Waiting for private CRM</span>'))+
 row('Last raw sync',sync.last_synced_at?date(sync.last_synced_at):'<span class="muted">Not recorded yet</span>')+
+row('Automation hub','<span class="ok">Private CRM rules, drafts, and logs</span>')+
 row('Stripe mode',s.stripe_mode||'missing')+
 row('Stripe webhook secret',yes(s.stripe_webhook_secret_configured))+
 row('Live final charging enabled',bool(s.allow_live_final_charges))+

@@ -38,6 +38,8 @@ includes(communications, "markCustomerContacted(customer.id, 'texted')", 'sendin
 for (const route of [
   'admin-delete-customer',
   'admin-delete-inquiry',
+  'admin-automations',
+  'admin-update-automation',
   'admin-merge-inquiries',
   'admin-move-inquiry',
   'admin-sync-raw-airtable'
@@ -48,6 +50,7 @@ for (const route of [
 for (const file of [
   'server/api/admin-delete-customer.js',
   'server/api/admin-delete-inquiry.js',
+  'server/api/admin-update-automation.js',
   'server/api/admin-merge-inquiries.js',
   'server/api/admin-move-inquiry.js',
   'server/api/admin-sync-raw-airtable.js'
@@ -67,5 +70,11 @@ includes(adminHub, '/api/admin-move-inquiry', 'admin hub can move inquiries betw
 includes(adminHub, '/api/admin-update-inquiry-status', 'admin hub can edit inquiry status from the customer profile');
 includes(adminHub, 'data-save-inquiry-status', 'customer profile includes inline inquiry status save controls');
 includes(adminHub, 'formatStatus(row.inquiry_type', 'admin hub renders normalized inquiry types as readable labels');
+includes(adminHub, 'data-tab="automations"', 'admin hub exposes the automations tab');
+includes(adminHub, '/api/admin-automations', 'admin hub loads automation rules and logs');
+includes(adminHub, '/api/admin-update-automation', 'admin hub can save automation rules');
+includes('lib/automations.js', 'runAutomationTrigger', 'automation trigger runner exists');
+includes('server/api/contact.js', "runAutomationTrigger('inquiry_created'", 'contact form triggers CRM automations');
+includes('server/api/sms-optin.js', "runAutomationTrigger('sms_opt_in_created'", 'SMS opt-in triggers CRM automations');
 
 console.log('Private CRM workflow check passed.');

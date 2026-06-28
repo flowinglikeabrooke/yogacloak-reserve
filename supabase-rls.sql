@@ -16,6 +16,8 @@ alter table if exists communications enable row level security;
 alter table if exists internal_notes enable row level security;
 alter table if exists admin_actions enable row level security;
 alter table if exists airtable_sync_log enable row level security;
+alter table if exists automation_rules enable row level security;
+alter table if exists automation_runs enable row level security;
 
 comment on table customers is 'Private yogacloak CRM customers. RLS enabled; server-only access via service role.';
 comment on table inquiries is 'Private customer inquiries. RLS enabled; server-only access via service role.';
@@ -26,3 +28,5 @@ comment on table communications is 'Private inbound/outbound customer communicat
 comment on table internal_notes is 'Private owner CRM notes.';
 comment on table admin_actions is 'Private admin audit trail.';
 comment on table airtable_sync_log is 'Private Airtable raw backup reconciliation log.';
+comment on table automation_rules is 'Private CRM automation rules. RLS enabled; server-only access via service role.';
+comment on table automation_runs is 'Private CRM automation run history and drafts.';

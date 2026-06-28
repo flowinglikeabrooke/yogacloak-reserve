@@ -2,6 +2,7 @@
 // Saves homepage SMS launch opt-ins to Airtable for later SMS CRM sync.
 
 import { checkRateLimit, rejectLargeRequest } from '../../lib/yogacloak-ops.js';
+import { runAutomationTrigger } from '../../lib/automations.js';
 import { findOrCreateCustomer, recordInquiry } from '../../lib/customer-identity.js';
 
 const FORMS_TABLE_FALLBACK = 'tblRvWlirlbzlW5Up';
@@ -94,7 +95,7 @@ export default async function handler(req, res) {
       });
       if (identity.customer?.id) {
         databaseSaved = true;
-        await recordInquiry({
+        const inquiry = await recordInquiry({
           customerId: identity.customer.id,
           type: 'sms_opt_in',
           sourcePage,
@@ -103,7 +104,16 @@ export default async function handler(req, res) {
           message: consentText,
           status: 'subscribed',
           eventTitle: 'SMS opt-in received',
-          metadata: { submission_id: submissionId, consent: consentDetails }
+          metadata: {
+            submission_id: submissionId,
+            consent: consentDetails,
+            customer_match: identity.created ? 'new_customer' : 'existing_customer',
+            intake_summary: identity.created ? 'New contact created from SMS opt-in' : 'SMS opt-in added to existing contact'
+          }
+        });
+        await runAutomationTrigger('sms_opt_in_created', {
+          customer: identity.customer,
+          inquiry
         });
       }
     } catch (err) {
