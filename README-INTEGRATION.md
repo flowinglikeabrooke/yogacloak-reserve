@@ -5,12 +5,12 @@ These files are ready for Vercel-style hosting:
 - `/yogacloak-admin.html` is the private branded CRM, sales, charging, communications, and accounting hub.
 - Public API URLs stay under `/api/...`, but Vercel deploys them through one catch-all function at `/api/[...path].js` so the project fits the Hobby plan function limit.
 - The actual endpoint handlers live in `server/api/`.
-- `/api/contact` saves contact form messages to the hidden customer database first, then Airtable if configured.
-- `/api/sms-optin` saves SMS consent to the customer CRM first, then Airtable if configured.
+- `/api/contact` saves contact form messages to the private CRM database when connected, and keeps Airtable as the raw backup/source log.
+- `/api/sms-optin` saves SMS consent to the private CRM database when connected, and keeps Airtable as the raw backup/source log.
 - `/api/sms-optins-export` exports subscribed SMS opt-ins for CRM import/sync.
 - `/api/reserve` creates an Airtable reservation, then opens Stripe Checkout.
 - `/api/availability` reads Airtable reservations to show remaining spots.
-- `/api/stripe-webhook` updates Airtable and the hidden CRM database after Stripe payment succeeds.
+- `/api/stripe-webhook` updates Airtable and the private CRM database after Stripe payment succeeds.
 - `/api/admin-reservations` powers the final-balance tab.
 - `/api/admin-dashboard`, `/api/admin-customers`, `/api/admin-communications`, and related admin endpoints power the branded CRM hub.
 - `/api/manage-reservation` handles cancel, refund, and transfer actions.
@@ -73,6 +73,8 @@ AIRTABLE_SMS_OPTINS_TABLE=your SMS Opt-Ins table ID
 
 If `AIRTABLE_SMS_OPTINS_TABLE` is not set, SMS opt-ins fall back to `AIRTABLE_FORMS_TABLE` so the popup keeps working.
 
+For the full private CRM database setup, see `PRIVATE-CRM-DATABASE-SETUP.md`.
+
 Run `supabase-schema.sql` once in the Supabase SQL editor before using the full CRM hub. It creates customers, inquiries, reservations, payments, communications, and internal notes/follow-up tracking.
 
 Then run `supabase-rls.sql` in the Supabase SQL editor. This turns on Row Level Security for the CRM tables and creates no public browser policies, so the hidden database stays server-only.
@@ -105,7 +107,7 @@ https://yogacloak.com/api/email-webhook?secret=EMAIL_WEBHOOK_SECRET
 
 Production inbound email requires `EMAIL_WEBHOOK_SECRET` or `RESEND_WEBHOOK_SECRET`. Use `EMAIL_WEBHOOK_ALLOW_UNSIGNED=true` only for local testing.
 
-The code still supports your existing Airtable base, but the branded admin hub is designed around the hidden customer database.
+The branded admin hub is designed around a private CRM database as the organized system. Airtable remains the raw backup/source log and reconciliation safety net, so the admin can still surface Airtable-only records if the CRM misses something.
 
 ## Private admin security
 
