@@ -287,11 +287,15 @@ render();
 }
 
 function renderDirectFileNotice(){
-statusText.innerHTML='<span class="error">This is the raw local file preview. Open the private admin URL instead.</span>';
-storageText.textContent='Use https://www.yogacloak.com/yogacloak-admin.html after deploy, or /api/admin-page on a local server.';
+activeTab='today';
+currentTabLabel.textContent='Disconnected preview';
+document.querySelectorAll('.tab').forEach(function(btn){btn.classList.toggle('active',btn.dataset.tab==='today')});
+document.querySelectorAll('.view').forEach(function(view){view.classList.toggle('hide',view.id!=='today')});
+statusText.innerHTML='<span class="error">This is the raw local file preview, not the live CRM.</span>';
+storageText.textContent='Open the deployed private admin page so the hub can use its secure session and live APIs.';
 heroStatus.className='notice warn';
-heroStatus.innerHTML='<strong>Raw file preview is not connected.</strong><br>The real hub must load through the protected server page so it can use your admin session, CSRF security token, and live CRM APIs.';
-document.getElementById('today').innerHTML='<div class="notice warn"><strong>This page was opened as a file, so live data cannot load.</strong><br>Open the admin hub through <code>/yogacloak-admin.html</code> on the deployed site. The direct file view will always look incomplete because it has no server session.</div>';
+heroStatus.innerHTML='<strong>Disconnected preview.</strong><br>This page was opened from your computer files, so it cannot load customers, Airtable sync, Stripe readiness, CSRF security, or admin session data.';
+document.getElementById('today').innerHTML='<section class="panel"><div class="section-title">Open the real admin hub</div><div class="notice warn"><strong>This local file will always look incomplete.</strong><br>The CRM only works through the protected server page. Use the deployed private admin URL when you want live customers, inquiries, payments, and final-balance tools.</div><div class="meta"><span class="pill">Admin session <strong>not connected</strong></span><span class="pill">CRM APIs <strong>not connected</strong></span><span class="pill">Stripe tools <strong>not connected</strong></span><span class="pill">Airtable sync <strong>not connected</strong></span></div><div class="actions" style="margin-top:16px"><a class="btn" href="https://www.yogacloak.com/yogacloak-admin.html">Open live admin hub</a><a class="btn quiet" href="https://www.yogacloak.com/api/admin-page">Open protected admin route</a></div></section>';
 }
 
 function render(){({today:renderToday,customers:renderCustomers,inquiries:renderInquiries,reservations:renderReservations,payments:renderPayments,communications:renderCommunications,finals:renderFinals,accounting:renderAccounting,duplicates:renderDuplicates,settings:renderSettings}[activeTab]||renderToday)()}

@@ -15,11 +15,16 @@ const adminHub = 'private/admin-hub.html';
 const dispatcher = 'api/[...path].js';
 
 includes(adminData, "return 'sms_opt_in'", 'Airtable SMS opt-ins normalize to the CRM SMS opt-in type');
+includes(adminData, "notesLookStructured ? '' : rawNotes", 'raw Airtable inquiry messages do not show CRM metadata JSON');
+includes(adminData, 'status: activeCustomer({ status: admin.status }) ? formStatus(fields) : admin.status', 'raw inquiries inherit archived/deleted customer state');
 includes(adminData, 'const allDatabaseCustomers = databaseCustomers || []', 'raw backup customer matching sees inactive CRM records');
 includes(adminData, 'const seen = new Set(allDatabaseCustomers', 'archived/merged CRM customers block raw fallback duplicates');
 includes(adminData, 'const allDatabaseInquiries = databaseInquiries || []', 'raw backup inquiry matching sees inactive CRM records');
 includes(adminData, 'const seen = new Set(allDatabaseInquiries', 'deleted/merged CRM inquiries block raw fallback duplicates');
 includes(adminData, 'sync will not reactivate it', 'Airtable raw sync does not reactivate archived or merged CRM customers');
+includes(adminData, 'const primaryRecord = records[0]', 'raw Airtable customer edits choose one primary record for notes');
+includes(adminData, 'for (const record of records)', 'raw Airtable customer profile edits are written across all grouped raw records');
+includes(adminData, 'delete sharedPatch.add_note', 'raw Airtable internal notes are not duplicated across every grouped raw record');
 includes(identity, "['deleted', 'merged'].includes(existingStatus) ? existing.status : row.status", 'submission replay does not reactivate deleted or merged inquiries');
 
 for (const route of [
