@@ -62,7 +62,8 @@ for (const file of publicFiles) {
 
 for (const file of publicHtml) {
   const text = read(file);
-  if (/yogacloak-admin\.html|\/api\/admin-page|private\/admin-hub/i.test(text)) {
+  const isAdminEntry = rel(file) === 'yogacloak-admin.html';
+  if (!isAdminEntry && /yogacloak-admin\.html|\/api\/admin-page|private\/admin-hub/i.test(text)) {
     fail(`${rel(file)} appears to link or refer to the private admin area.`);
   }
   const mainCount = (text.match(/<main\b/gi) || []).length;

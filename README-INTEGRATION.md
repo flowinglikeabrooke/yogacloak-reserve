@@ -115,7 +115,36 @@ The public admin URL is:
 https://yogacloak.com/yogacloak-admin.html
 ```
 
-That URL is routed through `/api/admin-page`. The real CRM page lives in `/private/admin-hub.html` and is only served after a valid admin session cookie is created.
+That URL opens the protected admin login. If the pretty URL ever has trouble, use the direct protected URL:
+
+```text
+https://www.yogacloak.com/api/admin-page
+```
+
+The real CRM page lives in `/private/admin-hub.html` and is only served after a valid admin session cookie is created.
+
+To log in online, set `ADMIN_TOKEN` in Vercel first:
+
+1. Open Vercel project settings.
+2. Go to Environment Variables.
+3. Add or edit `ADMIN_TOKEN`.
+4. Paste a long private password, at least 32 characters.
+5. Select Production, and optionally Preview/Development.
+6. Save it, then redeploy the site.
+7. Open `https://www.yogacloak.com/yogacloak-admin.html` and paste that same value into the login form.
+
+If `https://www.yogacloak.com/yogacloak-admin.html` shows `{"error":"Not found"}`, that is not a wrong password. Try `https://www.yogacloak.com/api/admin-page`. If that direct URL works, the admin backend is live and only the pretty doorway/rewrite needs a redeploy.
+
+Fix it in this order:
+
+1. Make sure the latest code is pushed to GitHub.
+2. Open the Vercel project.
+3. Go to Deployments.
+4. Redeploy the newest deployment.
+5. Wait until Vercel says the deployment is successful.
+6. Open `https://www.yogacloak.com/yogacloak-admin.html` again.
+
+If the page opens but asks for a login, the admin route is working. Use the exact `ADMIN_TOKEN` value saved in Vercel Production.
 
 Security layers:
 

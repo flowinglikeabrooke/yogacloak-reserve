@@ -14,18 +14,19 @@
 <style>
 :root{--ink:#1e2320;--panel:#151719;--panel2:#101214;--bone:#fbf8f0;--sage:#7c8c82;--line:rgba(251,248,240,.1);--muted:rgba(251,248,240,.52);--soft:rgba(251,248,240,.07);--cream:251,248,240}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--ink);color:var(--bone);font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:30px}
+body{background:radial-gradient(circle at 18% 0,rgba(124,140,130,.18),transparent 32%),var(--ink);color:var(--bone);font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:22px}
 a{color:inherit}
 button,input,select,textarea{font:inherit}
 button{border:0;cursor:pointer}
-.shell{max-width:1380px;margin:0 auto}
-.top{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;margin-bottom:24px}
+.shell{max-width:1440px;margin:0 auto}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,430px);gap:18px;align-items:stretch;margin-bottom:16px}
+.hero,.ops-panel{background:rgba(16,18,20,.58);border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:20px}
 .wordmark{font-family:'Hanken Grotesk',sans-serif;font-size:26px;letter-spacing:-.02em;text-decoration:none}.wordmark strong{font-weight:700}.wordmark span{font-weight:400}
-.eyebrow{display:block;margin:26px 0 10px;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700}
-h1{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.04em;line-height:.95}
-.sub{color:var(--muted);font-size:14px;line-height:1.5;margin-top:12px;max-width:660px}
+.eyebrow{display:block;margin:20px 0 10px;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700}
+h1{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(34px,4vw,54px);font-weight:500;letter-spacing:-.04em;line-height:.96}
+.sub{color:var(--muted);font-size:14px;line-height:1.55;margin-top:10px;max-width:680px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
-.login{display:grid;grid-template-columns:1.1fr auto auto auto;gap:10px;align-items:end}
+.login{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
 label{display:flex;flex-direction:column;gap:7px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.46);font-weight:700}
 input,select,textarea{width:100%;background:rgba(var(--cream),.055);border:1px solid rgba(var(--cream),.12);color:var(--bone);border-radius:8px;padding:12px 13px;outline:none}
 textarea{min-height:92px;resize:vertical;line-height:1.45}
@@ -33,13 +34,14 @@ select option{background:#151719;color:var(--bone)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--bone);color:var(--ink);border-radius:999px;padding:12px 16px;font-weight:700;font-size:12px;white-space:nowrap}
 .btn.quiet{background:transparent;color:rgba(var(--cream),.72);border:1px solid rgba(var(--cream),.15)}
 .btn.warn{background:#d4948d;color:#1e2320}
-.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 18px;position:sticky;top:0;background:linear-gradient(var(--ink) 74%,rgba(30,35,32,0));z-index:3}
+.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 16px;position:sticky;top:0;background:linear-gradient(var(--ink) 76%,rgba(30,35,32,0));z-index:3}
 .tab{background:rgba(var(--cream),.055);color:rgba(var(--cream),.62);border:1px solid rgba(var(--cream),.1);border-radius:999px;padding:10px 13px;font-size:12px;font-weight:700;white-space:nowrap}
 .tab.active{background:var(--bone);color:var(--ink)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;min-height:92px}
+.card{background:linear-gradient(180deg,rgba(var(--cream),.04),rgba(var(--cream),.015)),var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;min-height:92px}
 .card span{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700}
 .card strong{display:block;font-family:'Hanken Grotesk',sans-serif;font-size:30px;font-weight:500;letter-spacing:-.03em;margin-top:12px}
+.card small{display:block;margin-top:8px;color:rgba(var(--cream),.42);line-height:1.35}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .meta{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
@@ -55,30 +57,54 @@ tr:last-child td{border-bottom:0}
 .ok{color:#9aaa88}.error{color:#d4948d}.money{color:#dbba7b}.link{color:#b9c5ad;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .status{display:inline-block;border:1px solid rgba(var(--cream),.13);border-radius:999px;padding:5px 8px;color:rgba(var(--cream),.78);white-space:nowrap}
 .ready{border-color:rgba(154,170,136,.38);color:#9aaa88}.needs{border-color:rgba(219,186,123,.35);color:#dbba7b}.waiting{border-color:rgba(138,164,192,.35);color:#9bb6ce}.blocked{border-color:rgba(212,148,141,.35);color:#d4948d}.charged{color:rgba(var(--cream),.55)}
+.notice{border:1px solid rgba(var(--cream),.1);border-radius:8px;padding:14px 15px;background:rgba(var(--cream),.035);color:rgba(var(--cream),.66);line-height:1.5;margin-bottom:14px}
+.notice strong{color:var(--bone)}
+.notice.warn{border-color:rgba(212,148,141,.28);background:rgba(212,148,141,.08)}
+.notice.good{border-color:rgba(154,170,136,.28);background:rgba(154,170,136,.08)}
+.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.mini{border:1px solid rgba(var(--cream),.1);border-radius:8px;padding:12px;background:rgba(var(--cream),.025)}
+.mini span{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700}
+.mini strong{display:block;margin-top:8px;font-size:17px}
+.setup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.setup-card{border:1px solid rgba(var(--cream),.1);border-radius:8px;padding:15px;background:rgba(var(--cream),.025)}
+.setup-card strong{display:block;font-size:15px;margin:8px 0}
+.setup-card p{color:rgba(var(--cream),.5);font-size:12px;line-height:1.45}
+.health{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:700;border:1px solid rgba(var(--cream),.12);color:rgba(var(--cream),.72)}
+.health.good{color:#9aaa88;border-color:rgba(154,170,136,.35)}
+.health.warn{color:#dbba7b;border-color:rgba(219,186,123,.35)}
+.health.bad{color:#d4948d;border-color:rgba(212,148,141,.35)}
 .split{display:grid;grid-template-columns:1fr 420px;gap:14px}
 .detail{position:sticky;top:70px;align-self:start}
 .hide{display:none!important}
 .select-cell{width:42px}.select-cell input{width:auto}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
 .section-title{font-family:'Hanken Grotesk',sans-serif;font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
-@media(max-width:980px){body{padding:20px}.top,.login,.split{display:block}.login>*{margin-bottom:10px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}}
+@media(max-width:980px){body{padding:20px}.top,.login,.split{display:block}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.ops-panel{margin-top:12px}}
 @media(max-width:620px){.grid{grid-template-columns:1fr}h1{font-size:38px}body{padding:16px}}
 </style>
 </head>
 <body>
 <main id="main-content" class="shell">
 <div class="top">
-<div>
+<div class="hero">
 <a href="/" class="wordmark"><span>yoga</span><strong>cloak</strong></a>
 <span class="eyebrow">Private admin hub</span>
-<h1>Owner dashboard.</h1>
-<p class="sub">Customers, inquiries, reservations, payments, final balances, duplicates, and accounting in one branded place.</p>
+<h1>Owner command center.</h1>
+<p class="sub">Track customers, inquiries, reservations, payments, final balances, messages, follow-ups, and launch readiness from one private yogacloak workspace.</p>
 </div>
+<aside class="ops-panel">
+<div class="section-title">Hub status</div>
+<div id="heroStatus" class="notice">Load the hub to see live counts and setup warnings.</div>
+<div class="mini-grid">
+<div class="mini"><span>Current tab</span><strong id="currentTabLabel">Today</strong></div>
+<div class="mini"><span>Session</span><strong>Private</strong></div>
+</div>
+</aside>
 </div>
 
 <section class="panel">
 <div class="login">
-<button class="btn" id="loadBtn">Load hub</button>
+<button class="btn" id="loadBtn">Refresh current tab</button>
 <button class="btn quiet" id="logoutBtn">Log out</button>
 </div>
 <div class="meta"><span id="statusText">Ready.</span><span id="storageText"></span></div>
@@ -112,6 +138,8 @@ tr:last-child td{border-bottom:0}
 <script>
 var statusText=document.getElementById('statusText');
 var storageText=document.getElementById('storageText');
+var heroStatus=document.getElementById('heroStatus');
+var currentTabLabel=document.getElementById('currentTabLabel');
 var csrfToken='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
 var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
@@ -126,9 +154,29 @@ function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(asyn
 function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
 function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
+function tabLabel(tab){return ({today:'Today',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
+function health(value){return value?'<span class="health good">On</span>':'<span class="health bad">Missing</span>'}
+function renderHeroStatus(){
+var d=state.dashboard||{};
+var s=d.security_status||{};
+var summary=d.summary||{};
+var warnings=[];
+if(s.admin_session_secret_configured===false)warnings.push('Add ADMIN_SESSION_SECRET so admin sessions stay secure across deploys.');
+if(s.supabase_configured===false)warnings.push('Airtable raw fallback is active. Connect the private CRM database when you want database-first tracking.');
+if(s.stripe_mode==='live'&&!s.allow_live_final_charges)warnings.push('Stripe is live, but final-balance batch charging is locked.');
+if(s.stripe_mode==='missing')warnings.push('Add Stripe keys before payment testing.');
+var ready=Number(summary.ready_to_charge||0);
+var needs=Number(summary.needs_notice||0);
+var className=warnings.length?'notice warn':'notice good';
+var message=warnings.length?warnings[0]:'Private CRM database is connected and admin access is working.';
+heroStatus.className=className;
+heroStatus.innerHTML='<strong>'+esc(message)+'</strong><div class="meta"><span class="pill">Needs notice <strong>'+esc(needs)+'</strong></span><span class="pill">Ready to charge <strong>'+esc(ready)+'</strong></span><span class="pill">Stripe <strong>'+esc(s.stripe_mode||'unknown')+'</strong></span><span class="pill">Raw backup <strong>Airtable</strong></span></div>';
+currentTabLabel.textContent=tabLabel(activeTab);
+}
 
 function setTab(tab){
 activeTab=tab;
+currentTabLabel.textContent=tabLabel(tab);
 document.querySelectorAll('.tab').forEach(function(btn){btn.classList.toggle('active',btn.dataset.tab===tab)});
 document.querySelectorAll('.view').forEach(function(view){view.classList.toggle('hide',view.id!==tab)});
 render();
@@ -148,7 +196,8 @@ if(activeTab==='accounting'){setBusy('Loading accounting...');state.accounting=a
 if(activeTab==='duplicates'){setBusy('Loading duplicates...');state.duplicates=(await endpoint('/api/admin-duplicates')).duplicates||[]}
 if(activeTab==='settings'){state.dashboard=state.dashboard||await endpoint('/api/admin-dashboard')}
 statusText.innerHTML='<span class="ok">Loaded '+activeTab+'.</span>';
-storageText.textContent=state.dashboard&&state.dashboard.database_enabled===false?'Hidden database not configured yet.':'';
+storageText.textContent=state.dashboard&&state.dashboard.database_enabled===false?'Airtable raw fallback active. Private CRM database not connected yet.':'Private CRM database connected. Airtable remains the raw backup.';
+renderHeroStatus();
 render();
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message)+'</span>';render()}
 }
@@ -177,10 +226,10 @@ function renderCustomers(){
 var root=document.getElementById('customers');
 var detail=state.customerDetail;
 root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions"><select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div></div>'+
-'<div class="split"><div>'+table(['Customer','Email','Phone','Contact','Follow-up','Last seen'],state.customers.map(function(row){return ['<span class="link" data-customer="'+esc(row.id)+'">'+esc(row.full_name||row.email||row.phone||'Customer')+'</span>',row.email,row.phone,row.contact_status||'not_contacted',date(row.next_follow_up_at),date(row.last_seen_at)]}),true)+'</div>'+
+'<div class="split"><div>'+table(['Customer','Email','Phone','Source','Contact','Last seen'],state.customers.map(function(row){var source=row.raw_backup_only?'Raw backup only':(row.fallback_source==='airtable_forms'||String(row.id||'').indexOf('airtable:')===0?'Airtable raw':'Private CRM');return ['<span class="link" data-customer="'+esc(row.id)+'">'+esc(row.full_name||row.email||row.phone||'Customer')+'</span>',row.email,row.phone,source,row.contact_status||'not_contacted',date(row.last_seen_at)]}),true)+'</div>'+
 '<aside class="panel detail" id="customerDetail">'+renderCustomerDetail(detail)+'</aside></div>';
 document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();var status=document.getElementById('customerContactFilter').value;setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q)+'&contact_status='+encodeURIComponent(status))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
-document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){return [row.full_name,row.email,row.phone,row.contact_status,row.next_follow_up_at,row.last_seen_at]}))});
+document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','source','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){var source=row.raw_backup_only?'raw_backup_only':(String(row.id||'').indexOf('airtable:')===0?'airtable_raw':'private_crm');return [row.full_name,row.email,row.phone,source,row.contact_status,row.next_follow_up_at,row.last_seen_at]}))});
 document.querySelectorAll('[data-customer]').forEach(function(el){el.addEventListener('click',async function(){setBusy('Loading customer...');state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(el.dataset.customer));renderCustomers();statusText.innerHTML='<span class="ok">Customer loaded.</span>'})});
 var save=document.getElementById('saveNoteBtn');
 if(save){save.addEventListener('click',async function(){await post('/api/admin-update-customer-note',{customer_id:detail.customer.id,note:document.getElementById('ownerNote').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Note saved.</span>'})}
@@ -197,6 +246,13 @@ if(addNote){addNote.addEventListener('click',async function(){await post('/api/a
 function renderCustomerDetail(detail){
 if(!detail)return '<div class="muted">Select a customer to see their timeline.</div>';
 var c=detail.customer||{};
+if(c.fallback_source==='airtable_forms'){
+return '<div class="section-title">'+esc(c.full_name||c.email||'Customer')+'</div><p class="muted">'+esc(c.email||'')+'<br>'+esc(c.phone||'')+'</p>'+
+'<div class="notice warn"><strong>Raw Airtable view.</strong><br>This customer was assembled from site form submissions. Connect the private CRM database to add owner notes, contact status, SMS/email history, and follow-up tracking here.</div>'+
+'<div class="meta"><span class="pill">Raw forms <strong>'+esc(c.form_count||0)+'</strong></span><span class="pill">Source <strong>Airtable</strong></span></div>'+
+'<div class="section-title" style="margin-top:22px">Site submissions</div>'+table(['Type','Source','Message','Date'],(detail.inquiries||[]).slice(0,20).map(function(row){return [row.inquiry_type,row.source_page,row.message,date(row.created_at)]}))+
+'<div class="section-title" style="margin-top:22px">Timeline</div>'+table(['Event','Details','Date'],(detail.events||[]).slice(0,20).map(function(row){return [row.title||row.event_type,row.details,date(row.occurred_at)]}));
+}
 return '<div class="section-title">'+esc(c.full_name||c.email||'Customer')+'</div><p class="muted">'+esc(c.email||'')+'<br>'+esc(c.phone||'')+'</p>'+
 '<div class="meta"><span class="pill">Inquiries <strong>'+((detail.inquiries||[]).length)+'</strong></span><span class="pill">Reservations <strong>'+((detail.reservations||[]).length)+'</strong></span><span class="pill">Payments <strong>'+((detail.payments||[]).length)+'</strong></span></div>'+
 '<div class="section-title" style="margin-top:18px">Contact tracking</div><label>Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button>'+
@@ -290,7 +346,8 @@ function bool(value){return value?'<span class="ok">Yes</span>':'<span class="mu
 document.getElementById('settings').innerHTML='<section class="panel"><div class="section-title">Security status</div><table><tbody>'+
 row('Admin session secret',yes(s.admin_session_secret_configured))+
 row('Admin token',yes(s.admin_token_configured))+
-row('Hidden database',yes(s.supabase_configured))+
+row('Private CRM database',s.supabase_configured?'<span class="ok">Primary</span>':'<span class="muted">Not connected; using Airtable raw fallback</span>')+
+row('Airtable raw backup','<span class="ok">Active when Airtable env vars are set</span>')+
 row('Stripe mode',s.stripe_mode||'missing')+
 row('Stripe webhook secret',yes(s.stripe_webhook_secret_configured))+
 row('Live final charging enabled',bool(s.allow_live_final_charges))+
@@ -303,7 +360,7 @@ row('Unsigned email webhook allowed',bool(s.email_unsigned_webhook_allowed))+
 '</tbody></table></section>'+
 '<section class="panel"><div class="section-title">Launch checklist</div><table><tbody>'+
 row('Admin access','Use the private admin login. Do not save admin tokens in the browser.')+
-row('Database lock','Run supabase-schema.sql, then run supabase-rls.sql in Supabase before live traffic.')+
+row('Data flow','Website writes raw records to Airtable, and the admin hub packages them into customers/inquiries. Private CRM database can be connected as the primary system when ready.')+
 row('Final charges','Keep ALLOW_LIVE_FINAL_CHARGES=false until one full Stripe test-mode reservation passes.')+
 row('Twilio sender','Use TWILIO_FROM_NUMBER or TWILIO_MESSAGING_SERVICE_SID for outbound texts.')+
 row('Twilio URL','Set TWILIO_WEBHOOK_URL to the exact Twilio webhook URL if signature checks fail behind Vercel.')+

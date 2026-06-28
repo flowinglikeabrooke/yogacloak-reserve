@@ -19,9 +19,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing reservation_record_id' });
     }
 
-    const result = await chargeFinalBalanceReservation(reservationId, {
-      overrideNoticeWait: req.body?.override_notice_wait === true
-    });
+    const result = await chargeFinalBalanceReservation(reservationId);
 
     return res.status(200).json(result);
   } catch (err) {

@@ -56,10 +56,10 @@ document.getElementById('token').addEventListener('keydown',function(e){if(e.key
 async function login(){
 var msg=document.getElementById('msg');
 msg.textContent='';
-var res=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:document.getElementById('token').value})});
+var res=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:document.getElementById('token').value.trim()})});
 if(res.ok){location.reload();return}
 var data=await res.json().catch(function(){return {}});
-msg.textContent=data.error||'Could not log in.';
+msg.textContent=(data.error||'Could not log in.')+' If you just changed ADMIN_TOKEN in Vercel, redeploy Production and refresh this page.';
 }
 </script>
 </body>

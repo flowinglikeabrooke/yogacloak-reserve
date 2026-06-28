@@ -29,15 +29,14 @@ function resultReasonCode(result) {
   return 'stripe_status_not_succeeded';
 }
 
-function isUnsafeSkip(errorMessage = '') {
-  return [
-    'Reservation is ',
-    'Missing saved future-charge authorization.',
-    'Missing saved Stripe customer or payment method.',
-    'Final balance amount is invalid.',
-    'Send final-balance notice before charging.',
-    'Final-balance notice must be at least'
-  ].some((message) => errorMessage.includes(message));
+function skipReasonCode(errorMessage = '') {
+  if (errorMessage.includes('Reservation is ')) return 'blocked_status';
+  if (errorMessage.includes('Missing saved future-charge authorization.')) return 'missing_future_charge_authorization';
+  if (errorMessage.includes('Missing saved Stripe customer or payment method.')) return 'missing_payment_method';
+  if (errorMessage.includes('Final balance amount is invalid.')) return 'invalid_final_balance_amount';
+  if (errorMessage.includes('Send final-balance notice before charging.')) return 'notice_required';
+  if (errorMessage.includes('Final-balance notice must be at least')) return 'waiting_period';
+  return '';
 }
 
 function summaryRows(results) {
@@ -122,11 +121,11 @@ export default async function handler(req, res) {
       });
     } catch (err) {
       const message = err.message || 'Could not charge final balance.';
-      const unsafe = isUnsafeSkip(message);
+      const skipCode = skipReasonCode(message);
       results.push({
         reservation_record_id: reservationId,
-        status: unsafe ? 'skipped' : 'failed',
-        reason_code: unsafe ? 'unsafe_skip' : 'charge_failed',
+        status: skipCode ? 'skipped' : 'failed',
+        reason_code: skipCode || 'charge_failed',
         reason: message
       });
     }

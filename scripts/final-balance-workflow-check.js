@@ -64,6 +64,7 @@ includes(finalBalance, '!notes.future_charge_authorized', 'future charge authori
 includes(finalBalance, 'Missing saved Stripe customer or payment method.', 'saved Stripe customer/payment method is required');
 includes(finalBalance, 'Send final-balance notice before charging.', 'notice is required before charging');
 includes(finalBalance, 'notice_wait_remaining_hours > 0', 'notice waiting period is enforced');
+notIncludes(finalBalance, 'overrideNoticeWait', 'final-balance charging must not bypass the notice waiting period');
 includes(finalBalance, "'Idempotency-Key': `final_balance_${reservationId}`", 'Stripe idempotency key is stable per reservation');
 notIncludes(finalBalance, "'Idempotency-Key': `final_balance_${reservationId}_${readiness.amount_cents}`", 'Stripe idempotency key must not change when the amount changes');
 includes(finalBalance, 'findPaymentByTransactionId(paymentIntent.id)', 'Airtable payment duplication is checked');
@@ -72,6 +73,7 @@ includes(finalBalance, "'Final Checkout Status': paid ? 'Completed' : 'Failed'",
 notIncludes(finalBalance, "'Final Checkout Status': paid ? 'Completed' : 'Sent'", 'non-succeeded Stripe final-balance attempts must not look sent');
 includes(finalBalance, "'Reservation Status': paid ? 'Converted to Order'", 'Airtable reservation status is updated after successful charge');
 includes(finalBalance, 'const attemptedAt = new Date().toISOString();', 'Stripe final-balance attempts use one timestamp per attempt');
+includes(finalBalance, 'const noticeSentAt = new Date().toISOString();', 'final-balance notices use one timestamp for Airtable and CRM sync');
 includes(finalBalance, 'final_balance_last_attempt_at: attemptedAt', 'Stripe final-balance attempts record last attempt time');
 includes(finalBalance, 'final_balance_last_error: stripeStatusReason', 'non-succeeded Stripe final-balance attempts record status reason');
 includes(finalBalance, "...(paid ? { final_balance_charged_at: attemptedAt } : {})", 'final-balance charged timestamp is written only after Stripe succeeds');
@@ -91,13 +93,23 @@ includes(apiDispatcher, 'bodyParser: false', 'API dispatcher preserves raw-body 
 includes(apiDispatcher, "name === 'stripe-webhook'", 'API dispatcher does not pre-parse Stripe webhook raw body');
 notIncludes(batchEndpoint, "stripeRequest('payment_intents'", 'batch endpoint must not duplicate Stripe charge logic');
 includes(batchEndpoint, 'requireAdmin(req, res)', 'batch endpoint requires admin authorization');
-includes(batchEndpoint, "const unsafe = isUnsafeSkip(message)", 'unsafe records are identified before reporting');
-notIncludes(batchEndpoint, "const unsafe = dryRun || isUnsafeSkip(message)", 'dry runs must not hide true backend failures as skipped records');
-includes(batchEndpoint, "status: unsafe ? 'skipped' : 'failed'", 'unsafe records are skipped instead of treated as charged');
+includes(batchEndpoint, "const skipCode = skipReasonCode(message)", 'unsafe records are classified before reporting');
+notIncludes(batchEndpoint, "dryRun ||", 'dry runs must not hide true backend failures as skipped records');
+includes(batchEndpoint, "status: skipCode ? 'skipped' : 'failed'", 'unsafe records are skipped instead of treated as charged');
 includes(batchEndpoint, "status === 'already_charged'", 'already charged records are reported separately');
 includes(batchEndpoint, 'Already charged; no new charge created.', 'already-charged batch result explains no new charge happened');
 includes(batchEndpoint, 'reason_code: resultReasonCode(result)', 'batch result includes normalized reason code');
-includes(batchEndpoint, "reason_code: unsafe ? 'unsafe_skip' : 'charge_failed'", 'batch errors include normalized skip/failure reason code');
+includes(batchEndpoint, "reason_code: skipCode || 'charge_failed'", 'batch errors include normalized skip/failure reason code');
+for (const code of [
+  'blocked_status',
+  'missing_future_charge_authorization',
+  'missing_payment_method',
+  'invalid_final_balance_amount',
+  'notice_required',
+  'waiting_period'
+]) {
+  includes(batchEndpoint, code, `batch endpoint reports ${code} skip reason`);
+}
 includes(batchEndpoint, 'sendOwnerSummary({ dryRun, results })', 'owner summary email is sent after real batch');
 includes(batchEndpoint, 'if (dryRun) return;', 'dry runs do not email owner summary or charge');
 includes(batchEndpoint, 'owner_summary_email: ownerSummaryEmail', 'batch response reports owner summary email status');
