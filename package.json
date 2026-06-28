@@ -9,6 +9,6 @@
     "final-balance:workflow-check": "node scripts/final-balance-workflow-check.js",
     "api:dispatcher-check": "node scripts/api-dispatcher-check.js && node scripts/api-dispatcher-smoke-check.js",
     "security:check": "node scripts/security-check.js",
-    "predeploy:check": "npm run api:dispatcher-check && npm run final-balance:check && npm run security:check"
+    "predeploy:check": "node scripts/predeploy-check.js"
   }
 }
