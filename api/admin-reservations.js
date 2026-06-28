@@ -13,6 +13,7 @@ import {
   requireAdmin,
   statusFormula
 } from '../lib/yogacloak-ops.js';
+import { readinessForFields } from '../lib/final-balance.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -30,6 +31,7 @@ export default async function handler(req, res) {
     for (const record of records.slice(0, 100)) {
       const fields = record.fields || {};
       const notes = parseNotes(fields.Notes);
+      const readiness = readinessForFields(fields);
       const contact = await contactForReservation(fields);
       const email = contactEmail(contact);
       if (emailSearch && !email.includes(emailSearch)) continue;
@@ -50,7 +52,16 @@ export default async function handler(req, res) {
         paid_at: notes.paid_at || '',
         abandoned_email_sent_at: notes.abandoned_email_sent_at || '',
         final_balance_notice_sent_at: notes.final_balance_notice_sent_at || '',
+        notice_required: readiness.notice_required,
+        notice_wait_remaining_hours: readiness.notice_wait_remaining_hours,
+        charge_eligible: readiness.charge_eligible,
+        readiness_group: readiness.readiness_group,
+        blocked_reason: readiness.blocked_reason,
+        stripe_payment_method_saved: readiness.stripe_payment_method_saved,
+        future_charge_authorized: readiness.future_charge_authorized,
+        already_charged: readiness.already_charged,
         stripe_customer_id: notes.stripe_customer_id || '',
+        stripe_payment_method_id: notes.stripe_payment_method_id || '',
         stripe_checkout_session_id: notes.stripe_checkout_session_id || ''
       });
     }
