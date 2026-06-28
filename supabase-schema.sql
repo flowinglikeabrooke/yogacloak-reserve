@@ -12,6 +12,7 @@ create table if not exists customers (
   stripe_customer_id text,
   status text default 'lead',
   contact_status text default 'not_contacted',
+  tags text[] default '{}'::text[],
   last_contacted_at timestamptz,
   next_follow_up_at timestamptz,
   source text,
@@ -38,6 +39,11 @@ create unique index if not exists customers_stripe_customer_id_idx
 create index if not exists customers_last_seen_at_idx on customers (last_seen_at desc);
 create index if not exists customers_contact_status_idx on customers (contact_status);
 create index if not exists customers_next_follow_up_at_idx on customers (next_follow_up_at);
+
+alter table if exists customers
+  add column if not exists tags text[] default '{}'::text[];
+
+create index if not exists customers_tags_idx on customers using gin (tags);
 
 create table if not exists inquiries (
   id uuid primary key default gen_random_uuid(),
@@ -201,6 +207,16 @@ create table if not exists airtable_sync_log (
   airtable_record_id text,
   sync_status text,
   error text,
+  metadata jsonb default '{}'::jsonb,
   synced_at timestamptz,
   created_at timestamptz default now()
 );
+
+alter table if exists airtable_sync_log
+  add column if not exists metadata jsonb default '{}'::jsonb;
+
+create unique index if not exists airtable_sync_log_record_table_idx
+  on airtable_sync_log (airtable_table, airtable_record_id, local_table);
+
+create index if not exists airtable_sync_log_status_synced_idx
+  on airtable_sync_log (sync_status, synced_at desc);

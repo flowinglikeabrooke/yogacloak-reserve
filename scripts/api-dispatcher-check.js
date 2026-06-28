@@ -32,6 +32,7 @@ for (const route of [
   'admin-session',
   'admin-sync-raw-airtable',
   'admin-update-contact-status',
+  'admin-update-customer-profile',
   'admin-update-customer-note',
   'admin-update-inquiry-status',
   'availability',

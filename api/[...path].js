@@ -18,6 +18,7 @@ import adminSendSms from '../server/api/admin-send-sms.js';
 import adminSession from '../server/api/admin-session.js';
 import adminSyncRawAirtable from '../server/api/admin-sync-raw-airtable.js';
 import adminUpdateContactStatus from '../server/api/admin-update-contact-status.js';
+import adminUpdateCustomerProfile from '../server/api/admin-update-customer-profile.js';
 import adminUpdateCustomerNote from '../server/api/admin-update-customer-note.js';
 import adminUpdateInquiryStatus from '../server/api/admin-update-inquiry-status.js';
 import availability from '../server/api/availability.js';
@@ -63,6 +64,7 @@ const routes = {
   'admin-session': adminSession,
   'admin-sync-raw-airtable': adminSyncRawAirtable,
   'admin-update-contact-status': adminUpdateContactStatus,
+  'admin-update-customer-profile': adminUpdateCustomerProfile,
   'admin-update-customer-note': adminUpdateCustomerNote,
   'admin-update-inquiry-status': adminUpdateInquiryStatus,
   availability,

@@ -25,3 +25,4 @@ comment on table payment_methods is 'Non-card payment method references only. No
 comment on table communications is 'Private inbound/outbound customer communication history.';
 comment on table internal_notes is 'Private owner CRM notes.';
 comment on table admin_actions is 'Private admin audit trail.';
+comment on table airtable_sync_log is 'Private Airtable raw backup reconciliation log.';
