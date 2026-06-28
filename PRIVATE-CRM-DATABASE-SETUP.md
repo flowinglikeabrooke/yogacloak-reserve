@@ -93,6 +93,27 @@ After adding or changing Vercel env vars:
 6. Refresh Customers and Inquiries in the admin hub.
 7. If the hub shows Airtable-only records, click `Sync raw backup`.
 
+## Live CRM Smoke Test
+
+After Production is redeployed, run this from the project folder if you have the admin token available locally:
+
+```text
+YOGACLOAK_ADMIN_TOKEN=your-admin-token npm run crm:live-smoke
+```
+
+The smoke test submits one test contact form to the live site, then checks:
+
+- the private CRM database is connected
+- exactly one customer profile was created
+- the inquiry is attached to that customer
+- owner note saving works
+- contact status saving works
+- the customer timeline updates
+- Airtable raw backup sync sees the same person
+- sync does not create a duplicate customer or duplicate inquiry
+
+If this passes, the website, private CRM, admin hub, and Airtable backup are connected for the contact-form path.
+
 ## Expected Behavior
 
 When connected:

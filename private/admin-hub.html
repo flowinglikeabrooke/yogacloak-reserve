@@ -243,6 +243,7 @@ var d=state.dashboard||{};
 var s=d.security_status||{};
 var summary=d.summary||{};
 var warnings=[];
+if(d.database_error)warnings.push(d.database_error);
 if(s.admin_session_secret_configured===false)warnings.push('Add ADMIN_SESSION_SECRET so admin sessions stay secure across deploys.');
 if(s.supabase_configured===false)warnings.push('Airtable raw fallback is active. Connect the private CRM database when you want database-first tracking.');
 if(s.stripe_mode==='live'&&!s.allow_live_final_charges)warnings.push('Stripe is live, but final-balance batch charging is locked.');
@@ -280,7 +281,7 @@ if(activeTab==='accounting'){setBusy('Loading accounting...');state.accounting=a
 if(activeTab==='duplicates'){setBusy('Loading duplicates...');state.duplicates=(await endpoint('/api/admin-duplicates')).duplicates||[]}
 if(activeTab==='settings'){state.dashboard=state.dashboard||await endpoint('/api/admin-dashboard')}
 statusText.innerHTML='<span class="ok">Loaded '+activeTab+'.</span>';
-storageText.textContent=state.dashboard&&state.dashboard.database_enabled===false?'Airtable raw fallback active. Private CRM database not connected yet.':'Private CRM database connected. Airtable remains the raw backup.';
+storageText.textContent=state.dashboard&&state.dashboard.database_error?'Private CRM needs database setup. Airtable raw fallback is still available.':(state.dashboard&&state.dashboard.database_enabled===false?'Airtable raw fallback active. Private CRM database not connected yet.':'Private CRM database connected. Airtable remains the raw backup.');
 renderHeroStatus();
 render();
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message)+'</span>';render()}
@@ -317,7 +318,8 @@ var summary=data.summary||{};
 var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
 var canSyncRaw=data.database_enabled!==false&&rawBackupCount>0;
 var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="syncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'';
-root.innerHTML=renderCards(summary)+syncStatusNotice()+rawNotice+rawSyncReport()+
+var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
+root.innerHTML=renderCards(summary)+syncStatusNotice()+databaseNotice+rawNotice+rawSyncReport()+
 '<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Type','Task','Customer','Date'],tasks.map(function(row){return [esc(row.type),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at))]}),true)+'</section>'+
 '<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Event','Customer','Details','Date'],(data.recent_events||[]).map(function(row){return [esc(row.title||row.event_type),customerLink(row.customer_id||row.customers&&row.customers.id,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at))]}),true)+'</section>';
 bindCustomerOpeners();
@@ -369,6 +371,7 @@ var mergeInquiryBtn=document.getElementById('mergeInquiryBtn');
 if(mergeInquiryBtn){mergeInquiryBtn.addEventListener('click',async function(){await mergeInquiryFromProfile(detail)})}
 var moveInquiryBtn=document.getElementById('moveInquiryBtn');
 if(moveInquiryBtn){moveInquiryBtn.addEventListener('click',async function(){await moveInquiryFromProfile(detail)})}
+document.querySelectorAll('[data-save-inquiry-status]').forEach(function(btn){btn.addEventListener('click',async function(){await saveInquiryStatusFromProfile(btn.dataset.saveInquiryStatus,detail.customer.id)})});
 document.querySelectorAll('[data-delete-inquiry]').forEach(function(btn){btn.addEventListener('click',async function(){await archiveInquiryFromProfile(btn.dataset.deleteInquiry,detail.customer.id)})});
 var importRaw=document.getElementById('importRawCustomerBtn');
 if(importRaw){importRaw.addEventListener('click',async function(){await importRawCustomer(detail.customer.id)})}
@@ -478,6 +481,17 @@ try{
 await post('/api/admin-delete-inquiry',{inquiry_id:inquiryId,reason:'Archived from customer profile.'});
 await refreshCustomerProfile(customerId,'Inquiry archived from active CRM.');
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not archive inquiry.')+'</span>'}
+}
+
+async function saveInquiryStatusFromProfile(inquiryId,customerId){
+if(!inquiryId||!customerId)return;
+var select=Array.from(document.querySelectorAll('[data-inquiry-status]')).find(function(el){return el.dataset.inquiryStatus===inquiryId});
+if(!select){statusText.innerHTML='<span class="error">Inquiry status control was not found.</span>';return}
+setBusy('Saving inquiry status...');
+try{
+await post('/api/admin-update-inquiry-status',{inquiry_id:inquiryId,status:select.value});
+await refreshCustomerProfile(customerId,'Inquiry status saved.');
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not update inquiry status.')+'</span>'}
 }
 
 async function mergeInquiryFromProfile(detail){
@@ -829,16 +843,25 @@ function renderProfileInquiries(inquiries){
 if(!inquiries.length)return '<div class="empty">No inquiries yet.</div>';
 return table(['Type','Interest','Message','Status','Date','Manage'],inquiries.slice(0,12).map(function(row){
 var raw=String(row.id||'').indexOf('airtable:')===0||row.raw_backup_only;
-var manage=raw?'<span class="muted">Import to edit</span>':'<button class="btn quiet small" data-delete-inquiry="'+esc(row.id)+'">Archive</button>';
+var statusControl=raw?esc(row.status||''):'<select data-inquiry-status="'+esc(row.id)+'">'+inquiryStatusOptions(row.status||'new')+'</select>';
+var manage=raw?'<span class="muted">Import to edit</span>':'<div class="actions"><button class="btn quiet small" data-save-inquiry-status="'+esc(row.id)+'">Save status</button><button class="btn quiet small" data-delete-inquiry="'+esc(row.id)+'">Archive</button></div>';
 return [
 esc(formatStatus(row.inquiry_type||'inquiry'))+'<span class="id-line">'+esc(row.id||row.submission_id||'')+'</span>',
 esc(row.product_interest||row.source_page||''),
 esc(row.message||''),
-esc(row.status||''),
+statusControl,
 esc(date(row.created_at)),
 manage
 ];
 }),true);
+}
+
+function inquiryStatusOptions(value){
+var options=[['new','New'],['needs_reply','Needs reply'],['in_progress','In progress'],['waiting_on_customer','Waiting on customer'],['subscribed','Subscribed'],['closed','Closed'],['deleted','Deleted']];
+var current=String(value||'new');
+var known=options.some(function(option){return option[0]===current});
+if(!known&&current)options.unshift([current,formatStatus(current)]);
+return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===current?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
 }
 
 function timelineItems(detail){

@@ -1,4 +1,5 @@
 import { updateInquiryStatus } from '../../lib/communications.js';
+import { auditAdminAction } from '../../lib/admin-audit.js';
 import { checkRateLimit, rejectLargeRequest, requireAdmin } from '../../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
@@ -12,6 +13,13 @@ export default async function handler(req, res) {
     const status = String(req.body?.status || '').trim();
     if (!inquiryId || !status) return res.status(400).json({ error: 'Inquiry and status are required.' });
     const inquiry = await updateInquiryStatus(inquiryId, status);
+    await auditAdminAction(req, {
+      actionType: 'update_inquiry_status',
+      title: 'Admin updated inquiry status',
+      customerId: inquiry?.customer_id || null,
+      details: status,
+      metadata: { inquiry_id: inquiryId }
+    });
     return res.status(200).json({ ok: true, inquiry });
   } catch (err) {
     console.error('Admin update inquiry status error:', err);
