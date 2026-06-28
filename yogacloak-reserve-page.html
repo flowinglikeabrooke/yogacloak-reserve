@@ -24,8 +24,6 @@
 <link rel="stylesheet" href="/footer.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/hanken-grotesk-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"></noscript>
 <script type="application/ld+json">
@@ -478,7 +476,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 <div class="product-grid">
 <div class="pcard" data-product="cloak" id="pcardCloak" role="button" tabindex="0" aria-label="Reserve The Cloak">
 <div class="pcard-thumb" id="thumbCloak" data-action="select-product" data-product="cloak">
-<img src="cloak-card.jpg" alt="The Cloak, hooded open-front drape" loading="lazy" decoding="async">
+<img src="cloak-card.jpg" srcset="assets/optimized/cloak-card-560.jpg 560w, assets/optimized/cloak-card-760.jpg 760w, cloak-card.jpg 1120w" sizes="(max-width: 760px) calc(100vw - 80px), 560px" alt="The Cloak hooded after-yoga cover-up for hot yoga, mats, towels, and the drive home" loading="lazy" decoding="async" width="1120" height="1400">
 <div class="pcard-hover-overlay">
 <span class="pcard-hover-cta" id="ctaCloak">I'll Take the Cloak</span>
 </div>
@@ -499,7 +497,7 @@ body{background:var(--ink);color:var(--bone);overflow-x:hidden}
 </div>
 <div class="pcard" data-product="wrap" id="pcardWrap" role="button" tabindex="0" aria-label="Reserve The Wrap">
 <div class="pcard-thumb" id="thumbWrap" data-action="select-product" data-product="wrap">
-<img src="wrap-card.jpg" alt="The Wrap, oversized rectangular drape" loading="lazy" decoding="async">
+<img src="wrap-card.jpg" srcset="assets/optimized/wrap-card-560.jpg 560w, assets/optimized/wrap-card-760.jpg 760w, wrap-card.jpg 1120w" sizes="(max-width: 760px) calc(100vw - 80px), 560px" alt="The Wrap oversized after-yoga layer and yoga towel alternative for leaving class" loading="lazy" decoding="async" width="1120" height="1400">
 <div class="pcard-hover-overlay">
 <span class="pcard-hover-cta" id="ctaWrap">I'll Take the Wrap</span>
 </div>
@@ -620,8 +618,8 @@ Back
 <script>
 const TOTAL = 100;
 const PRODUCTS = {
-cloak: { name:'The Cloak', deposit:20, price:98, img:'cloak-card.jpg', desc:'Hooded, open-front, mid-thigh.' },
-wrap: { name:'The Wrap', deposit:15, price:68, img:'wrap-card.jpg', desc:'Oversized rectangular drape. Packs down to nothing.' }
+cloak: { name:'The Cloak', deposit:20, price:98, img:'cloak-card.jpg', alt:'The Cloak hooded after-yoga cover-up for hot yoga, mats, towels, and the drive home', desc:'Hooded, open-front, mid-thigh.' },
+wrap: { name:'The Wrap', deposit:15, price:68, img:'wrap-card.jpg', alt:'The Wrap oversized after-yoga layer and yoga towel alternative for leaving class', desc:'Oversized rectangular drape. Packs down to nothing.' }
 };
 const TRAY_KEY = 'yc_reservation_tray_v1';
 const TRAY_TTL = 1000 * 60 * 60 * 24 * 14;
@@ -859,7 +857,7 @@ const addonAvail = availability[addonKey];
 if (addonAvail > 0) {
 const addon = PRODUCTS[addonKey];
 document.getElementById('addonImg').src = addon.img;
-document.getElementById('addonImg').alt = addon.name;
+document.getElementById('addonImg').alt = addon.alt;
 document.getElementById('addonName').textContent = addon.name;
 document.getElementById('addonDesc').textContent = addon.desc;
 document.getElementById('addonPrice').textContent = '$' + addon.price + ' full · $' + addon.deposit + ' today';
