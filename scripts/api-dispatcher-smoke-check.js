@@ -125,6 +125,29 @@ const profileMissingCustomer = await call({
 assert.equal(profileMissingCustomer.statusCode, 400);
 assert.deepEqual(profileMissingCustomer.body, { error: 'Missing customer id.' });
 
+for (const route of ['admin-delete-customer', 'admin-delete-inquiry', 'admin-merge-inquiries', 'admin-move-inquiry']) {
+  const unauthorized = await call({
+    method: 'POST',
+    route,
+    body: '{}',
+    headers: { 'content-type': 'application/json' }
+  });
+  assert.equal(unauthorized.statusCode, 401, `${route} should require admin access`);
+  assert.deepEqual(unauthorized.body, { error: 'Unauthorized' });
+}
+
+const deleteCustomerMissing = await call({
+  method: 'POST',
+  route: 'admin-delete-customer',
+  body: '{}',
+  headers: {
+    'content-type': 'application/json',
+    'x-admin-token': process.env.ADMIN_TOKEN
+  }
+});
+assert.equal(deleteCustomerMissing.statusCode, 400);
+assert.deepEqual(deleteCustomerMissing.body, { error: 'Missing customer id.' });
+
 const syncUnauthorized = await call({
   method: 'POST',
   route: 'admin-sync-raw-airtable',

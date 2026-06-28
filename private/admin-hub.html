@@ -93,6 +93,9 @@ tr:last-child td{border-bottom:0}
 .health.bad{color:#d4948d;border-color:rgba(212,148,141,.35)}
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(500px,620px);gap:16px}
 .detail{position:sticky;top:92px;align-self:start;max-height:calc(100vh - 110px);overflow:auto;background:var(--bone);color:var(--ink);border-color:rgba(30,35,32,.12);box-shadow:0 40px 90px -46px rgba(0,0,0,.72)}
+.customer-page{position:static;max-height:none;overflow:visible;margin-top:12px}
+.customer-page .profile-head{border-bottom-color:rgba(30,35,32,.1)}
+.customer-page-shell{max-width:1180px;margin:0 auto}
 .detail .section-title,.detail .timeline-item strong{color:var(--ink)}
 .detail .muted,.detail p{color:rgba(30,35,32,.58)}
 .detail label{color:rgba(30,35,32,.55)}
@@ -115,12 +118,21 @@ tr:last-child td{border-bottom:0}
 .detail .link{color:var(--ink);border-bottom-color:rgba(30,35,32,.22)}
 .detail-block{border:1px solid rgba(30,35,32,.09);border-radius:8px;padding:14px;margin-top:14px;background:rgba(30,35,32,.025)}
 .detail-block .section-title{font-size:18px;margin-bottom:10px}
+.crm-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.crm-tool{border:1px solid rgba(30,35,32,.1);border-radius:8px;padding:12px;background:rgba(30,35,32,.03)}
+.crm-tool strong{display:block;font-size:14px;color:var(--ink);margin-bottom:5px}
+.crm-tool p{font-size:12px;line-height:1.4;margin-bottom:10px}
+.crm-tool.danger{background:rgba(212,148,141,.08);border-color:rgba(130,68,64,.16)}
+.id-line{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:rgba(30,35,32,.52);word-break:break-all;margin-top:4px}
 .record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .record-grid label:first-child,.record-grid label:last-child{grid-column:1/-1}
 .record-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
 .record-actions .muted{font-size:12px;line-height:1.35}
 .detail .table-wrap{margin-top:8px}
 .detail table{min-width:620px}
+.btn.small{padding:8px 10px;font-size:10.5px}
+.btn.danger{background:#d4948d;color:#1e2320}
+.detail .btn.danger{background:#d4948d;color:#1e2320}
 .profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid rgba(var(--cream),.08);padding-bottom:14px;margin-bottom:12px}
 .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .profile-overview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
@@ -313,14 +325,25 @@ function renderCustomers(){
 var root=document.getElementById('customers');
 var detail=state.customerDetail;
 var canSync=state.dashboard&&state.dashboard.database_enabled!==false;
+if(detail&&detail.customer){
+root.innerHTML='<div class="customer-page-shell"><div class="bar"><div><button class="btn quiet" id="backToCustomers">Back to customers</button></div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'</div></div>'+rawSyncReport()+'<section class="panel detail customer-page" id="customerDetail">'+renderCustomerDetail(detail)+'</section></div>';
+var back=document.getElementById('backToCustomers');
+if(back){back.addEventListener('click',function(){state.customerDetail=null;renderCustomers();statusText.innerHTML='<span class="ok">Customer list opened.</span>'})}
+bindCustomerProfileActions(detail);
+return;
+}
 root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'<select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div></div>'+rawSyncReport()+
-'<div class="split"><div>'+table(['Customer','Email','Phone','Source','Contact','Last seen'],state.customers.map(function(row){var source=row.raw_backup_only?'Raw backup only':(row.fallback_source==='airtable_forms'||String(row.id||'').indexOf('airtable:')===0?'Airtable raw':'Private CRM');return [customerLink(row.id,row.full_name||row.email||row.phone||'Customer'),esc(row.email),esc(row.phone),esc(source),esc(row.contact_status||'not_contacted'),esc(date(row.last_seen_at))]}),true)+'</div>'+
-'<aside class="panel detail" id="customerDetail">'+renderCustomerDetail(detail)+'</aside></div>';
+'<div>'+table(['Customer','Email','Phone','Source','Contact','Last seen'],state.customers.map(function(row){var source=row.raw_backup_only?'Raw backup only':(row.fallback_source==='airtable_forms'||String(row.id||'').indexOf('airtable:')===0?'Airtable raw':'Private CRM');return [customerLink(row.id,row.full_name||row.email||row.phone||'Customer'),esc(row.email),esc(row.phone),esc(source),esc(row.contact_status||'not_contacted'),esc(date(row.last_seen_at))]}),true)+'</div>';
 var syncCustomersBtn=document.getElementById('syncRawCustomersBtn');
 if(syncCustomersBtn){syncCustomersBtn.addEventListener('click',syncRawAirtable)}
 document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();var status=document.getElementById('customerContactFilter').value;setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q)+'&contact_status='+encodeURIComponent(status))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
 document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','source','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){var source=row.raw_backup_only?'raw_backup_only':(String(row.id||'').indexOf('airtable:')===0?'airtable_raw':'private_crm');return [row.full_name,row.email,row.phone,source,row.contact_status,row.next_follow_up_at,row.last_seen_at]}))});
 bindCustomerOpeners();
+}
+
+function bindCustomerProfileActions(detail){
+var syncCustomersBtn=document.getElementById('syncRawCustomersBtn');
+if(syncCustomersBtn){syncCustomersBtn.addEventListener('click',syncRawAirtable)}
 var saveProfile=document.getElementById('saveProfileBtn');
 if(saveProfile){saveProfile.addEventListener('click',async function(){var customerId=detail&&detail.customer&&detail.customer.id;if(!customerId)return;setBusy('Saving customer profile...');var tags=document.getElementById('profileTags').value.split(',').map(function(item){return item.trim()}).filter(Boolean);await post('/api/admin-update-customer-profile',{customer_id:customerId,full_name:document.getElementById('profileName').value,email:document.getElementById('profileEmail').value,phone:document.getElementById('profilePhone').value,status:document.getElementById('profileStatus').value,tags:tags});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(customerId));state.customers=(await endpoint('/api/admin-customers')).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Customer record saved.</span>'})}
 var save=document.getElementById('saveNoteBtn');
@@ -334,6 +357,15 @@ if(saveContact){saveContact.addEventListener('click',async function(){await post
 document.querySelectorAll('[data-quick-status]').forEach(function(btn){btn.addEventListener('click',async function(){await quickContactStatus(detail.customer.id,btn.dataset.quickStatus,btn.dataset.followUpDays)})});
 var addNote=document.getElementById('addInternalNoteBtn');
 if(addNote){addNote.addEventListener('click',async function(){await post('/api/admin-add-internal-note',{customer_id:detail.customer.id,note_type:document.getElementById('noteType').value,contact_status:document.getElementById('contactStatus').value,next_follow_up_at:document.getElementById('nextFollowUp').value,body:document.getElementById('internalNoteBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Internal note added.</span>'})}
+var archiveCustomerBtn=document.getElementById('archiveCustomerBtn');
+if(archiveCustomerBtn){archiveCustomerBtn.addEventListener('click',async function(){await archiveCustomerFromProfile(detail)})}
+var mergeCustomerBtn=document.getElementById('mergeThisCustomerBtn');
+if(mergeCustomerBtn){mergeCustomerBtn.addEventListener('click',async function(){await mergeCustomerFromProfile(detail)})}
+var mergeInquiryBtn=document.getElementById('mergeInquiryBtn');
+if(mergeInquiryBtn){mergeInquiryBtn.addEventListener('click',async function(){await mergeInquiryFromProfile(detail)})}
+var moveInquiryBtn=document.getElementById('moveInquiryBtn');
+if(moveInquiryBtn){moveInquiryBtn.addEventListener('click',async function(){await moveInquiryFromProfile(detail)})}
+document.querySelectorAll('[data-delete-inquiry]').forEach(function(btn){btn.addEventListener('click',async function(){await archiveInquiryFromProfile(btn.dataset.deleteInquiry,detail.customer.id)})});
 var importRaw=document.getElementById('importRawCustomerBtn');
 if(importRaw){importRaw.addEventListener('click',async function(){await importRawCustomer(detail.customer.id)})}
 document.querySelectorAll('[data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
@@ -400,6 +432,78 @@ statusText.innerHTML='<span class="ok">Imported raw customer with '+esc(imported
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not import raw customer.')+'</span>'}
 }
 
+async function refreshCustomerProfile(customerId,message){
+state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(customerId));
+state.customers=(await endpoint('/api/admin-customers')).customers||[];
+renderCustomers();
+if(message)statusText.innerHTML='<span class="ok">'+esc(message)+'</span>';
+}
+
+async function archiveCustomerFromProfile(detail){
+var c=detail&&detail.customer||{};
+if(!c.id)return;
+if(!window.confirm('Archive this contact from the active CRM view? Payment and timeline history will be preserved.'))return;
+setBusy('Archiving contact...');
+try{
+await post('/api/admin-delete-customer',{customer_id:c.id,reason:'Archived from customer profile.'});
+state.customerDetail=null;
+state.customers=(await endpoint('/api/admin-customers')).customers||[];
+renderCustomers();
+statusText.innerHTML='<span class="ok">Contact archived from active CRM.</span>';
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not archive contact.')+'</span>'}
+}
+
+async function mergeCustomerFromProfile(detail){
+var c=detail&&detail.customer||{};
+var target=document.getElementById('mergeTargetCustomer')&&document.getElementById('mergeTargetCustomer').value.trim();
+if(!c.id||!target){statusText.innerHTML='<span class="error">Paste the customer ID you want to keep.</span>';return}
+if(target===c.id){statusText.innerHTML='<span class="error">Choose a different target customer.</span>';return}
+if(!window.confirm('Merge this contact into the target customer? All linked inquiries, notes, messages, payments, and reservations will move to the target profile.'))return;
+setBusy('Merging customer records...');
+try{
+await post('/api/admin-merge-customer',{source_customer_id:c.id,target_customer_id:target});
+await refreshCustomerProfile(target,'Customer records merged.');
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not merge customers.')+'</span>'}
+}
+
+async function archiveInquiryFromProfile(inquiryId,customerId){
+if(!inquiryId||!customerId)return;
+if(!window.confirm('Archive this inquiry from the active profile?'))return;
+setBusy('Archiving inquiry...');
+try{
+await post('/api/admin-delete-inquiry',{inquiry_id:inquiryId,reason:'Archived from customer profile.'});
+await refreshCustomerProfile(customerId,'Inquiry archived from active CRM.');
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not archive inquiry.')+'</span>'}
+}
+
+async function mergeInquiryFromProfile(detail){
+var customerId=detail&&detail.customer&&detail.customer.id;
+var source=document.getElementById('mergeInquirySource')&&document.getElementById('mergeInquirySource').value;
+var target=document.getElementById('mergeInquiryTarget')&&document.getElementById('mergeInquiryTarget').value;
+if(!source||!target){statusText.innerHTML='<span class="error">Choose two inquiry records.</span>';return}
+if(source===target){statusText.innerHTML='<span class="error">Choose two different inquiries.</span>';return}
+if(!window.confirm('Merge the source inquiry into the one you chose to keep?'))return;
+setBusy('Merging inquiry records...');
+try{
+await post('/api/admin-merge-inquiries',{source_inquiry_id:source,target_inquiry_id:target});
+await refreshCustomerProfile(customerId,'Inquiry records merged.');
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not merge inquiries.')+'</span>'}
+}
+
+async function moveInquiryFromProfile(detail){
+var customerId=detail&&detail.customer&&detail.customer.id;
+var inquiryId=document.getElementById('moveInquiryId')&&document.getElementById('moveInquiryId').value;
+var target=document.getElementById('moveInquiryCustomerId')&&document.getElementById('moveInquiryCustomerId').value.trim();
+if(!inquiryId||!target){statusText.innerHTML='<span class="error">Choose an inquiry and paste the target customer ID.</span>';return}
+if(target===customerId){statusText.innerHTML='<span class="error">That inquiry is already on this customer.</span>';return}
+if(!window.confirm('Move this inquiry to the target customer profile?'))return;
+setBusy('Moving inquiry...');
+try{
+await post('/api/admin-move-inquiry',{inquiry_id:inquiryId,customer_id:target});
+await refreshCustomerProfile(customerId,'Inquiry moved to another customer.');
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not move inquiry.')+'</span>'}
+}
+
 async function runCustomerFinalAction(action,reservationId){
 if(!reservationId){statusText.innerHTML='<span class="error">This reservation is missing its Airtable reservation ID.</span>';return}
 var customerId=state.customerDetail&&state.customerDetail.customer&&state.customerDetail.customer.id;
@@ -441,6 +545,39 @@ return '<div class="detail-block"><div class="section-title">Editable customer r
 '</div><div class="record-actions"><span class="muted">Edit the customer once here; the timeline, notes, inquiries, reservations, and payment history stay attached.</span><button class="btn" id="saveProfileBtn">Save customer record</button></div></div>';
 }
 
+function isRawProfile(c){
+return Boolean(c&&(String(c.id||'').indexOf('airtable:')===0||c.fallback_source==='airtable_forms'));
+}
+
+function crmInquiryRows(inquiries){
+return (inquiries||[]).filter(function(row){return row.id&&String(row.id).indexOf('airtable:')!==0});
+}
+
+function inquiryLabel(row){
+return String(row.inquiry_type||'Inquiry')+' · '+String(row.product_interest||row.source_page||row.message||row.id||'').slice(0,48);
+}
+
+function inquiryOptions(inquiries){
+var rows=crmInquiryRows(inquiries);
+if(!rows.length)return '<option value="">No private CRM inquiries yet</option>';
+return rows.map(function(row){return '<option value="'+esc(row.id)+'">'+esc(inquiryLabel(row))+'</option>'}).join('');
+}
+
+function renderCrmManagement(detail){
+var c=detail.customer||{};
+var raw=isRawProfile(c);
+var inquiries=detail.inquiries||[];
+var privateInquiryCount=crmInquiryRows(inquiries).length;
+return '<div class="detail-block"><div class="section-title">CRM cleanup</div>'+
+'<div class="notice"><strong>Use this to keep one true customer record.</strong><br>Archive removes a record from your active workspace. Merge and move keep the timeline connected to the right person.</div>'+
+'<div class="crm-tools">'+
+'<div class="crm-tool danger"><strong>Archive/delete contact</strong><p>Hide this person from active CRM lists while preserving payment, opt-in, and timeline history.</p><span class="id-line">'+esc(c.id||'No customer ID')+'</span><button class="btn danger small" id="archiveCustomerBtn" style="margin-top:10px">Archive contact</button></div>'+
+'<div class="crm-tool"><strong>Merge this contact</strong><p>Move this profile into another customer profile when the same person has two records.</p><label>Target customer ID<input id="mergeTargetCustomer" placeholder="Paste the customer ID to keep" '+(raw?'disabled':'')+'></label><button class="btn quiet small" id="mergeThisCustomerBtn" '+(raw?'disabled':'')+' style="margin-top:10px">Merge into target</button>'+(raw?'<p class="muted">Import raw profile first to merge.</p>':'')+'</div>'+
+'<div class="crm-tool"><strong>Merge duplicate inquiries</strong><p>Combine two inquiries on this profile when they are the same conversation.</p><label>Source inquiry<select id="mergeInquirySource" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label style="margin-top:8px">Keep inquiry<select id="mergeInquiryTarget" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><button class="btn quiet small" id="mergeInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Merge inquiries</button></div>'+
+'<div class="crm-tool"><strong>Move inquiry to another contact</strong><p>Use this when an inquiry landed on the wrong customer.</p><label>Inquiry<select id="moveInquiryId" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label style="margin-top:8px">Target customer ID<input id="moveInquiryCustomerId" placeholder="Paste target customer ID" '+(!privateInquiryCount?'disabled':'')+'></label><button class="btn quiet small" id="moveInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Move inquiry</button></div>'+
+'</div></div>';
+}
+
 function sumPayments(rows){
 return (rows||[]).filter(function(row){return ['paid','Paid','succeeded'].includes(row.status)}).reduce(function(sum,row){return sum+Number(row.amount||0)},0);
 }
@@ -476,12 +613,14 @@ return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_n
 '<div class="meta"><span class="pill">Raw forms <strong>'+esc(c.form_count||0)+'</strong></span><span class="pill">Source <strong>Airtable</strong></span></div>'+
 '<div class="profile-overview">'+renderProfileOverview(detail)+'</div>'+
 renderProfileHubs(detail)+
-(renderEditableCustomerRecord(c))+
+'<div class="next-action">'+renderRawNextAction(detail,rawEmailHref,rawSmsHref,canImportRaw)+'</div>'+
+renderEditableCustomerRecord(c)+
+renderCrmManagement(detail)+
 (rawEmailHref||rawSmsHref?'<div class="profile-actions">'+(rawEmailHref?'<a class="btn quiet" href="'+esc(rawEmailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(rawSmsHref?'<a class="btn quiet" href="'+esc(rawSmsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>':'')+
 '<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
 '<div class="detail-block"><div class="section-title">Owner note</div><label>Private note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
 '<div class="detail-block"><div class="section-title">Internal notes</div><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>'+
-(canImportRaw?'<button class="btn" id="importRawCustomerBtn" style="margin-top:12px">Organize into CRM profile</button>':'<div class="notice" style="margin-top:12px"><strong>Organized CRM is not connected yet.</strong><br>Raw records are still visible here. Add the private CRM database when you want notes, contact status, follow-ups, and owner actions to save on this profile.</div>')+
+(!canImportRaw?'<div class="notice" style="margin-top:12px"><strong>Organized CRM is not connected yet.</strong><br>Raw records are still visible here. Add the private CRM database when you want notes, contact status, follow-ups, and owner actions to save on this profile.</div>':'')+
 '<div class="detail-block"><div class="section-title">Site submissions</div>'+renderProfileInquiries(detail.inquiries||[])+'</div>'+
 '<div class="detail-block"><div class="section-title">Raw timeline</div>'+renderTimeline(detail)+'</div>';
 }
@@ -493,6 +632,7 @@ return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_n
 renderProfileHubs(detail)+
 '<div class="next-action">'+renderNextAction(detail,emailHref,smsHref)+'</div>'+
 renderEditableCustomerRecord(c)+
+renderCrmManagement(detail)+
 '<div class="profile-actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>'+
 '<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
 '<div class="detail-block"><div class="section-title">Send from hub</div><label>Email subject<input id="emailSubject" value="A note from yogacloak"></label><label style="margin-top:8px">Email message<textarea id="emailBody"></textarea></label><button class="btn quiet" id="sendEmailBtn" style="margin-top:10px">Send email</button><label style="margin-top:14px">SMS message<textarea id="smsBody" maxlength="1000"></textarea></label><button class="btn quiet" id="sendSmsBtn" style="margin-top:10px">Send SMS</button></div></div>'+
@@ -523,13 +663,28 @@ return '<div class="profile-stat"><span>Contact status</span><strong>'+esc(forma
 function renderNextAction(detail,emailHref,smsHref){
 var c=detail.customer||{};
 var reservations=detail.reservations||[];
+var payments=detail.payments||[];
+var followUpDue=c.next_follow_up_at&&Date.parse(c.next_follow_up_at)<=Date.now();
+var failedPayment=payments.find(function(row){return ['failed','requires_payment_method','requires_action'].includes(row.status)});
+var readyToCharge=reservations.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
 var needsNotice=reservations.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id&&reservationChargeId(row)});
-var waiting=reservations.find(function(row){return row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id});
+var waiting=reservations.find(function(row){return row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id&&!finalBalanceReady(row)});
 var hasActivity=timelineItems(detail).length>0;
 var actions='';
+if(failedPayment){
+actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email customer</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Text customer</a>':'');
+return '<span>Next best move</span><strong>Payment needs attention</strong><p>A Stripe payment is marked '+esc(formatStatus(failedPayment.status))+'. Reach out before trying any new charge.</p><div class="actions">'+actions+'</div>';
+}
 if(c.contact_status==='needs_reply'){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Reply by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Reply by text</a>':'');
 return '<span>Next best move</span><strong>Reply needed</strong><p>This contact is marked as needing a response.</p><div class="actions">'+actions+'</div>';
+}
+if(followUpDue){
+actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Follow up by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Follow up by text</a>':'')+'<button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Move to tomorrow</button>';
+return '<span>Next best move</span><strong>Follow-up is due</strong><p>This customer has a follow-up date set for '+esc(date(c.next_follow_up_at))+'.</p><div class="actions">'+actions+'</div>';
+}
+if(readyToCharge){
+return '<span>Next best move</span><strong>Ready for final-balance check</strong><p>The notice wait appears complete. Run a dry run first, then charge only if the backend confirms eligibility.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Charge</button></div>';
 }
 if(needsNotice){
 return '<span>Next best move</span><strong>Send final-balance notice</strong><p>This customer has a reservation that needs the required notice before any final charge.</p><div class="actions"><button class="btn" data-final-action="notice" data-reservation-id="'+esc(reservationChargeId(needsNotice))+'">Send notice</button></div>';
@@ -541,7 +696,34 @@ if(!hasActivity){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Start email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Start text</a>':'');
 return '<span>Next best move</span><strong>Start the relationship</strong><p>No timeline activity is linked yet.</p><div class="actions">'+actions+'</div>';
 }
+if(c.contact_status==='not_contacted'){
+actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Text</a>':'')+'<button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button>';
+return '<span>Next best move</span><strong>First follow-up needed</strong><p>This customer has activity but has not been marked contacted.</p><div class="actions">'+actions+'</div>';
+}
 return '<span>Next best move</span><strong>Keep relationship warm</strong><p>Use follow-up status, notes, or messages to keep this customer moving cleanly.</p><div class="actions"><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div>';
+}
+
+function renderRawNextAction(detail,emailHref,smsHref,canImportRaw){
+var c=detail.customer||{};
+var actions='';
+if(c.contact_status==='needs_reply'){
+actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Reply by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Reply by text</a>':'');
+return '<span>Next best move</span><strong>Reply needed</strong><p>This raw-backup customer is marked as needing a response.</p><div class="actions">'+actions+'</div>';
+}
+if(canImportRaw){
+return '<span>Next best move</span><strong>Organize into CRM</strong><p>Airtable caught the raw activity. Import this person so notes, follow-ups, messages, reservations, and payments live on one CRM profile.</p><div class="actions"><button class="btn" id="importRawCustomerBtn">Organize into CRM profile</button></div>';
+}
+actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'');
+return '<span>Next best move</span><strong>Raw activity captured</strong><p>The private CRM database is not connected yet, so this profile is editable in Airtable backup metadata for now.</p><div class="actions">'+actions+'</div>';
+}
+
+function finalBalanceReady(row){
+if(!row.final_balance_notice_sent_at||row.final_balance_payment_intent_id)return false;
+var noticeMs=Date.parse(row.final_balance_notice_sent_at);
+if(!noticeMs)return false;
+var safety=state.finalBalanceSafety||{};
+var hours=Number(safety.notice_hours||24);
+return (Date.now()-noticeMs)/(1000*60*60)>=hours;
 }
 
 function formatStatus(value){
@@ -641,7 +823,18 @@ return table(['Saved method','Brand','Last 4','Future charge','Updated'],methods
 
 function renderProfileInquiries(inquiries){
 if(!inquiries.length)return '<div class="empty">No inquiries yet.</div>';
-return table(['Type','Interest','Message','Status','Date'],inquiries.slice(0,12).map(function(row){return [row.inquiry_type||'inquiry',row.product_interest||row.source_page||'',row.message||'',row.status||'',date(row.created_at)]}));
+return table(['Type','Interest','Message','Status','Date','Manage'],inquiries.slice(0,12).map(function(row){
+var raw=String(row.id||'').indexOf('airtable:')===0||row.raw_backup_only;
+var manage=raw?'<span class="muted">Import to edit</span>':'<button class="btn quiet small" data-delete-inquiry="'+esc(row.id)+'">Archive</button>';
+return [
+esc(row.inquiry_type||'inquiry')+'<span class="id-line">'+esc(row.id||row.submission_id||'')+'</span>',
+esc(row.product_interest||row.source_page||''),
+esc(row.message||''),
+esc(row.status||''),
+esc(date(row.created_at)),
+manage
+];
+}),true);
 }
 
 function timelineItems(detail){
@@ -665,17 +858,20 @@ return '<div class="timeline-list">'+items.map(function(item){var meta=[date(ite
 }
 
 function renderInquiries(){
-document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,date(row.created_at)]}));
+document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.email||row.phone||'Customer'),esc(row.inquiry_type),esc(row.product_interest),esc(row.message),esc(row.status),esc(date(row.created_at))]}),true);
+bindCustomerOpeners();
 document.getElementById('exportInquiries').addEventListener('click',function(){exportCsv('yogacloak-inquiries.csv',['customer','type','interest','message','status','date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,row.created_at]}))});
 }
 
 function renderReservations(){
 document.getElementById('reservations').innerHTML='<div class="bar"><div class="section-title">Reservations</div><button class="btn quiet" id="refreshReservations">Refresh</button></div>'+reservationLoadNotice()+reservationTable(state.reservations,false);
 document.getElementById('refreshReservations').addEventListener('click',loadCurrent);
+bindCustomerOpeners();
 }
 
 function renderPayments(){
-document.getElementById('payments').innerHTML='<div class="bar"><div class="section-title">Payments</div></div>'+table(['Customer','Type','Amount','Status','Stripe ID','Date'],state.payments.map(function(row){return [row.customers&&row.customers.full_name||row.stripe_customer_id,row.payment_type,money(row.amount),row.status,row.stripe_payment_intent_id,date(row.occurred_at)]}));
+document.getElementById('payments').innerHTML='<div class="bar"><div class="section-title">Payments</div></div>'+table(['Customer','Type','Amount','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
+bindCustomerOpeners();
 }
 
 function renderCommunications(){
@@ -684,8 +880,8 @@ if(!data){document.getElementById('communications').innerHTML='<div class="empty
 var optins=data.sms_optins||[];
 var comms=data.communications||[];
 document.getElementById('communications').innerHTML='<div class="grid"><div class="card"><span>SMS sending</span><strong>'+esc(data.sms_enabled?'On':'Setup')+'</strong></div><div class="card"><span>SMS opt-ins</span><strong>'+optins.length+'</strong></div><div class="card"><span>Messages</span><strong>'+comms.length+'</strong></div><div class="card"><span>Inbound</span><strong>'+comms.filter(function(row){return row.direction==='inbound'}).length+'</strong></div></div>'+
-'<section class="panel"><div class="bar"><div class="section-title">Message inbox and outbox</div><button class="btn quiet" id="exportMessages">Export CSV</button></div>'+table(['Customer','Channel','Direction','Subject / Message','Status','Date'],comms.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.channel,row.direction,row.subject||row.body,row.status,date(row.created_at)]}))+'</section>'+
-'<section class="panel"><div class="bar"><div class="section-title">SMS opt-ins</div><button class="btn quiet" id="exportSmsOptins">Export CSV</button></div>'+table(['Customer','Phone','Status','Source','Date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,date(row.created_at)]}))+'</section>'+
+'<section class="panel"><div class="bar"><div class="section-title">Message inbox and outbox</div><button class="btn quiet" id="exportMessages">Export CSV</button></div>'+table(['Customer','Channel','Direction','Subject / Message','Status','Date'],comms.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.customer_id||'Customer'),esc(row.channel),esc(row.direction),esc(row.subject||row.body),esc(row.status),esc(date(row.created_at))]}),true)+'</section>'+
+'<section class="panel"><div class="bar"><div class="section-title">SMS opt-ins</div><button class="btn quiet" id="exportSmsOptins">Export CSV</button></div>'+table(['Customer','Phone','Status','Source','Date'],optins.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.phone||'Customer'),esc(row.phone),esc(row.status),esc(row.source_page),esc(date(row.created_at))]}),true)+'</section>'+
 '<section class="panel"><div class="section-title">Receiving setup</div><table><tbody>'+
 row('Inbound SMS URL','https://www.yogacloak.com/api/twilio-sms-webhook')+
 row('Inbound email URL','https://www.yogacloak.com/api/email-webhook')+
@@ -693,6 +889,7 @@ row('Webhook secret','Use SMS_WEBHOOK_SECRET and EMAIL_WEBHOOK_SECRET in Vercel,
 '</tbody></table></section>';
 document.getElementById('exportMessages').addEventListener('click',function(){exportCsv('yogacloak-messages.csv',['customer','channel','direction','message','status','date'],comms.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.channel,row.direction,row.subject||row.body,row.status,row.created_at]}))});
 document.getElementById('exportSmsOptins').addEventListener('click',function(){exportCsv('yogacloak-sms-optins.csv',['customer','phone','status','source','date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,row.created_at]}))});
+bindCustomerOpeners();
 }
 
 function renderFinals(){
@@ -712,6 +909,7 @@ document.getElementById('selectReady').addEventListener('click',function(){rows.
 document.getElementById('sendNotices').addEventListener('click',sendNotices);
 document.getElementById('dryRun').addEventListener('click',function(){runBatch(true)});
 document.getElementById('chargeBatch').addEventListener('click',function(){runBatch(false)});
+bindCustomerOpeners();
 }
 
 function renderAccounting(){
@@ -724,7 +922,8 @@ document.getElementById('exportCsv').addEventListener('click',exportAccountingCs
 }
 
 function renderDuplicates(){
-document.getElementById('duplicates').innerHTML='<section class="panel"><div class="section-title">Possible duplicates</div>'+table(['Customer','Details','Date'],state.duplicates.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.details,date(row.occurred_at)]}))+'</section><section class="panel"><div class="section-title">Merge customers</div><div class="login"><label>Source customer ID<input id="sourceCustomer"></label><label>Target customer ID<input id="targetCustomer"></label><button class="btn warn" id="mergeBtn">Merge</button></div></section>';
+document.getElementById('duplicates').innerHTML='<section class="panel"><div class="section-title">Possible duplicates</div>'+table(['Customer','Details','Date'],state.duplicates.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.customer_id||'Customer'),esc(row.details),esc(date(row.occurred_at))]}),true)+'</section><section class="panel"><div class="section-title">Merge customers</div><div class="login"><label>Source customer ID<input id="sourceCustomer"></label><label>Target customer ID<input id="targetCustomer"></label><button class="btn warn" id="mergeBtn">Merge</button></div></section>';
+bindCustomerOpeners();
 document.getElementById('mergeBtn').addEventListener('click',async function(){await post('/api/admin-merge-customer',{source_customer_id:document.getElementById('sourceCustomer').value.trim(),target_customer_id:document.getElementById('targetCustomer').value.trim()});statusText.innerHTML='<span class="ok">Customers merged.</span>';loadCurrent()});
 }
 
@@ -786,7 +985,7 @@ var attemptError=row.final_balance_last_error?'<br><span class="error">'+esc(row
 var finalStatus=row.final_balance_status?'<br><span class="muted">Final status</span> '+esc(row.final_balance_status):'';
 return '<tr>'+(selectable?'<td class="select-cell"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'></td>':'')+
 '<td><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span><br><span class="muted">'+esc(row.notice_status||'')+'</span>'+eligible+wait+finalStatus+attempt+block+attemptError+'</td>'+
-'<td>'+esc(row.customer_name)+'<br><span class="muted">'+esc(row.email)+'</span></td>'+
+'<td>'+customerLink(row.customer_id,row.customer_name||row.email||'Customer')+'<br><span class="muted">'+esc(row.email)+'</span></td>'+
 '<td>'+esc(row.product)+'<br><span class="muted">'+esc(row.size)+'</span></td>'+
 '<td>Deposit '+money(row.deposit_amount)+'<br><span class="muted">Final '+money(row.final_balance_total||0)+'</span><br>'+card+'</td>'+
 '<td><span class="muted">Started</span> '+esc(row.checkout_started_at||row.reservation_date)+'<br><span class="muted">Paid</span> '+esc(row.paid_at)+'<br><span class="muted">Notice</span> '+esc(row.final_balance_notice_sent_at)+'</td>'+

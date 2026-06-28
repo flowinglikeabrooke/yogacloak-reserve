@@ -4,12 +4,16 @@ import adminCommunications from '../server/api/admin-communications.js';
 import adminCustomerDetail from '../server/api/admin-customer-detail.js';
 import adminCustomers from '../server/api/admin-customers.js';
 import adminDashboard from '../server/api/admin-dashboard.js';
+import adminDeleteCustomer from '../server/api/admin-delete-customer.js';
+import adminDeleteInquiry from '../server/api/admin-delete-inquiry.js';
 import adminDuplicates from '../server/api/admin-duplicates.js';
 import adminImportRawCustomer from '../server/api/admin-import-raw-customer.js';
 import adminInquiries from '../server/api/admin-inquiries.js';
 import adminLogin from '../server/api/admin-login.js';
 import adminLogout from '../server/api/admin-logout.js';
 import adminMergeCustomer from '../server/api/admin-merge-customer.js';
+import adminMergeInquiries from '../server/api/admin-merge-inquiries.js';
+import adminMoveInquiry from '../server/api/admin-move-inquiry.js';
 import adminPage from '../server/api/admin-page.js';
 import adminPayments from '../server/api/admin-payments.js';
 import adminReservations from '../server/api/admin-reservations.js';
@@ -50,12 +54,16 @@ const routes = {
   'admin-customer-detail': adminCustomerDetail,
   'admin-customers': adminCustomers,
   'admin-dashboard': adminDashboard,
+  'admin-delete-customer': adminDeleteCustomer,
+  'admin-delete-inquiry': adminDeleteInquiry,
   'admin-duplicates': adminDuplicates,
   'admin-import-raw-customer': adminImportRawCustomer,
   'admin-inquiries': adminInquiries,
   'admin-login': adminLogin,
   'admin-logout': adminLogout,
   'admin-merge-customer': adminMergeCustomer,
+  'admin-merge-inquiries': adminMergeInquiries,
+  'admin-move-inquiry': adminMoveInquiry,
   'admin-page': adminPage,
   'admin-payments': adminPayments,
   'admin-reservations': adminReservations,
