@@ -2,6 +2,13 @@
 // Configure this URL in Stripe and listen for checkout.session.completed.
 
 import crypto from 'crypto';
+import {
+  findOrCreateCustomer,
+  recordPayment,
+  updateReservationByAirtableId,
+  upsertPaymentMethod,
+  upsertReservation
+} from '../lib/customer-identity.js';
 
 export const config = {
   api: {
@@ -146,6 +153,14 @@ export default async function handler(req, res) {
         ? await stripeRequest(`payment_intents/${session.payment_intent}`)
         : null;
       const savedPaymentMethod = paymentIntent?.payment_method || '';
+      let paymentMethodDetails = null;
+      if (savedPaymentMethod) {
+        try {
+          paymentMethodDetails = await stripeRequest(`payment_methods/${savedPaymentMethod}`);
+        } catch (err) {
+          console.warn('Could not load Stripe payment method details:', err.message);
+        }
+      }
       const transactionId = session.payment_intent || session.id;
       const reservation = metadata.reservation_record_id
         ? await airtableRequest(`${TABLES.reservations}/${metadata.reservation_record_id}`)
@@ -196,6 +211,86 @@ export default async function handler(req, res) {
       await updateRecord(TABLES.reservations, metadata.reservation_record_id, {
         Payment: [...new Set([...existingPayments, payment.id])]
       });
+
+      try {
+        const identity = await findOrCreateCustomer({
+          fullName: session.customer_details?.name || '',
+          email: session.customer_details?.email || metadata.email || '',
+          phone: session.customer_details?.phone || '',
+          stripeCustomerId: session.customer || '',
+          status: 'reserved',
+          source: 'Stripe Checkout',
+          reason: 'Stripe confirmed the deposit checkout.'
+        });
+        const customerId = identity.customer?.id || '';
+        if (customerId) {
+          const databaseReservations = await updateReservationByAirtableId(metadata.reservation_record_id, {
+            status: 'Reserved',
+            payment_intent_id: session.payment_intent || '',
+            stripe_customer_id: session.customer || '',
+            stripe_payment_method_id: savedPaymentMethod,
+            future_charge_authorized: metadata.future_charge_authorized === 'true',
+            notes: {
+              products: reservedProducts,
+              product_selection: reservedProducts.join(' + '),
+              cloak_size: metadata.cloak_size || '',
+              deposit_total: Number(metadata.deposit_total || amountPaid || 0),
+              full_price_total: Number(metadata.full_price_total || 0),
+              final_balance_total: Number(metadata.final_balance_total || 0),
+              paid_at: new Date().toISOString(),
+              shipping: session.shipping_details || null
+            }
+          });
+          const databaseReservation = databaseReservations[0] || await upsertReservation({
+            customerId,
+            airtableReservationId: metadata.reservation_record_id,
+            airtableContactId: metadata.contact_record_id,
+            status: 'Reserved',
+            products: reservedProducts,
+            size: metadata.cloak_size || '',
+            depositAmount: Number(metadata.deposit_total || amountPaid || 0),
+            finalRetailTotal: Number(metadata.full_price_total || 0),
+            finalBalanceTotal: Number(metadata.final_balance_total || 0),
+            checkoutSessionId: session.id,
+            paymentIntentId: session.payment_intent || '',
+            stripeCustomerId: session.customer || '',
+            stripePaymentMethodId: savedPaymentMethod,
+            futureChargeAuthorized: metadata.future_charge_authorized === 'true',
+            eventTitle: 'Deposit payment confirmed',
+            eventDetails: `Deposit paid for ${reservedProducts.join(' + ') || 'reservation'}.`,
+            metadata: { checkout_session: session.id, shipping: session.shipping_details || null }
+          });
+
+          await recordPayment({
+            customerId,
+            reservationId: databaseReservation?.id || null,
+            stripePaymentIntentId: transactionId,
+            stripeCustomerId: session.customer || '',
+            amount: amountPaid,
+            paymentType: 'deposit',
+            status: session.payment_status === 'paid' ? 'paid' : 'pending',
+            occurredAt: paymentIntent?.created ? new Date(paymentIntent.created * 1000).toISOString() : new Date().toISOString(),
+            metadata: {
+              checkout_session_id: session.id,
+              airtable_payment_id: payment.id,
+              airtable_reservation_id: metadata.reservation_record_id
+            }
+          });
+
+          await upsertPaymentMethod({
+            customerId,
+            stripeCustomerId: session.customer || '',
+            stripePaymentMethodId: savedPaymentMethod,
+            brand: paymentMethodDetails?.card?.brand || '',
+            last4: paymentMethodDetails?.card?.last4 || '',
+            expMonth: paymentMethodDetails?.card?.exp_month || null,
+            expYear: paymentMethodDetails?.card?.exp_year || null,
+            futureChargeAuthorized: metadata.future_charge_authorized === 'true'
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase Stripe webhook save failed; Airtable was already updated:', err.message);
+      }
     }
 
     return res.status(200).json({ received: true });

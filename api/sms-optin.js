@@ -2,6 +2,7 @@
 // Saves homepage SMS launch opt-ins to Airtable for later SMS CRM sync.
 
 import { checkRateLimit } from '../lib/yogacloak-ops.js';
+import { findOrCreateCustomer, recordInquiry } from '../lib/customer-identity.js';
 
 const FORMS_TABLE_FALLBACK = 'tblRvWlirlbzlW5Up';
 const CONSENT_TEXT = 'By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.';
@@ -56,18 +57,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Valid phone number required' });
     }
 
-    const pat = process.env.AIRTABLE_PAT;
-    const baseId = process.env.AIRTABLE_BASE_ID;
-    const tableId = process.env.AIRTABLE_SMS_OPTINS_TABLE
-      || process.env.AIRTABLE_SMS_TABLE
-      || process.env.AIRTABLE_FORMS_TABLE
-      || FORMS_TABLE_FALLBACK;
-
-    if (!pat || !baseId || !tableId) {
-      console.error('Missing Airtable SMS opt-in env vars');
-      return res.status(500).json({ error: 'Server configuration error' });
-    }
-
     const now = new Date().toISOString();
     const submissionId = `sms_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     const sourcePage = cleanString(body.source_page || body.source || 'Homepage', 100);
@@ -89,6 +78,46 @@ export default async function handler(req, res) {
       crm_provider: process.env.SMS_CRM_PROVIDER || '',
       tags
     };
+
+    let databaseSaved = false;
+    try {
+      const identity = await findOrCreateCustomer({
+        firstName,
+        phone,
+        status: 'lead',
+        source: 'SMS Opt-In',
+        reason: 'Customer joined SMS launch updates.'
+      });
+      if (identity.customer?.id) {
+        databaseSaved = true;
+        await recordInquiry({
+          customerId: identity.customer.id,
+          type: 'sms_opt_in',
+          sourcePage,
+          phone,
+          productInterest: 'Launch updates',
+          message: consentText,
+          status: 'subscribed',
+          eventTitle: 'SMS opt-in received',
+          metadata: { submission_id: submissionId, consent: consentDetails }
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase SMS opt-in save failed; continuing with Airtable:', err.message);
+    }
+
+    const pat = process.env.AIRTABLE_PAT;
+    const baseId = process.env.AIRTABLE_BASE_ID;
+    const tableId = process.env.AIRTABLE_SMS_OPTINS_TABLE
+      || process.env.AIRTABLE_SMS_TABLE
+      || process.env.AIRTABLE_FORMS_TABLE
+      || FORMS_TABLE_FALLBACK;
+
+    if (!pat || !baseId || !tableId) {
+      if (databaseSaved) return res.status(200).json({ ok: true, database_only: true });
+      console.error('Missing Airtable SMS opt-in env vars');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
 
     const richFields = {
       'Submission ID': submissionId,

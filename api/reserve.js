@@ -3,6 +3,7 @@
 // then starts Stripe Checkout for the reservation deposit.
 
 import { checkRateLimit } from '../lib/yogacloak-ops.js';
+import { findOrCreateCustomer, recordInquiry, upsertReservation } from '../lib/customer-identity.js';
 
 const TABLES = {
   contacts: process.env.AIRTABLE_CONTACTS_TABLE || 'tbl6mXGzw0Q9GZ3R3',
@@ -312,6 +313,7 @@ async function createCheckoutSession(payload) {
   appendCheckoutLineItems(params, payload.products);
 
   const metadata = {
+    database_customer_id: payload.databaseCustomerId || '',
     contact_record_id: payload.contactRecordId,
     form_record_id: payload.formRecordId,
     reservation_record_id: payload.reservationRecordId,
@@ -398,7 +400,38 @@ export default async function handler(req, res) {
     }
 
     const depositTotal = products.reduce((sum, product) => sum + PRODUCT_CONFIG[product].deposit, 0);
+    const finalRetailTotal = products.reduce((sum, product) => sum + PRODUCT_CONFIG[product].retail, 0);
+    const finalBalanceTotal = finalRetailTotal - depositTotal;
     const productNames = products.map((product) => PRODUCT_CONFIG[product].name).join(' + ');
+    let databaseCustomerId = '';
+
+    try {
+      const identity = await findOrCreateCustomer({
+        firstName,
+        lastName,
+        email,
+        status: 'lead',
+        source: 'Reservation Checkout',
+        reason: 'Customer started a reservation checkout.'
+      });
+      databaseCustomerId = identity.customer?.id || '';
+      if (databaseCustomerId) {
+        await recordInquiry({
+          customerId: databaseCustomerId,
+          type: 'reservation_interest',
+          sourcePage: 'Reserve Page',
+          productInterest: productNames,
+          sizeInterest: products.includes('cloak') ? sizeLabel(size) : 'Not Applicable',
+          email,
+          status: 'converted',
+          eventTitle: 'Reservation checkout started',
+          metadata: { products, cloak_size: size || '', deposit_total: depositTotal }
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase reservation customer save failed; continuing with Airtable:', err.message);
+    }
+
     const formRecord = await createWebsiteForm({ firstName, lastName, email, products, size });
     const contactRecord = await createOrUpdateContact({
       firstName,
@@ -425,6 +458,7 @@ export default async function handler(req, res) {
       contactRecordId: contactRecord.id,
       formRecordId: formRecord.id,
       reservationRecordId: reservationRecord.id,
+      databaseCustomerId,
       firstName,
       lastName,
       email,
@@ -444,14 +478,38 @@ export default async function handler(req, res) {
       })
     });
 
+    try {
+      if (databaseCustomerId) {
+        await upsertReservation({
+          customerId: databaseCustomerId,
+          airtableReservationId: reservationRecord.id,
+          airtableContactId: contactRecord.id,
+          status: 'Pending Payment',
+          products,
+          size,
+          depositAmount: depositTotal,
+          finalRetailTotal,
+          finalBalanceTotal,
+          checkoutSessionId: checkout.id,
+          checkoutUrl: checkout.url || '',
+          futureChargeAuthorized: true,
+          eventTitle: 'Reservation checkout ready',
+          eventDetails: `Checkout opened for ${productNames}.`,
+          metadata: {
+            form_record_id: formRecord.id,
+            checkout_started_at: new Date().toISOString()
+          }
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase reservation save failed:', err.message);
+    }
+
     return res.status(200).json({ ok: true, url: checkout.url });
   } catch (err) {
     console.error('Reserve endpoint error:', err);
-    // TEMP DIAGNOSTIC: surface the underlying error so we can see why checkout fails.
-    // Remove the `detail` field once the root cause is fixed.
     return res.status(500).json({
-      error: 'Could not start checkout. Please try again.',
-      detail: String(err && err.message ? err.message : err).slice(0, 600)
+      error: 'Could not start checkout. Please try again.'
     });
   }
 }

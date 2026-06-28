@@ -1,34 +1,47 @@
-# yogacloak Airtable + Stripe setup
+# yogacloak Admin Hub + Stripe setup
 
 These files are ready for Vercel-style hosting:
 
-- `/api/contact.js` saves contact form messages to Airtable.
-- `/api/sms-optin.js` saves SMS consent into a dedicated SMS opt-in table when configured.
+- `/yogacloak-admin.html` is the private branded CRM, sales, charging, communications, and accounting hub.
+- `/api/contact.js` saves contact form messages to the hidden customer database first, then Airtable if configured.
+- `/api/sms-optin.js` saves SMS consent to the customer CRM first, then Airtable if configured.
 - `/api/sms-optins-export.js` exports subscribed SMS opt-ins for CRM import/sync.
 - `/api/reserve.js` creates an Airtable reservation, then opens Stripe Checkout.
 - `/api/availability.js` reads Airtable reservations to show remaining spots.
-- `/api/stripe-webhook.js` updates Airtable after Stripe payment succeeds.
+- `/api/stripe-webhook.js` updates Airtable and the hidden CRM database after Stripe payment succeeds.
 - `/api/send-abandoned-reservations.js` sends abandoned reservation reminders.
 - `/api/cleanup-pending-checkouts.js` releases unpaid checkout holds.
-- `/api/admin-reservations.js` powers the private admin status page.
+- `/api/admin-reservations.js` powers the final-balance tab.
+- `/api/admin-dashboard.js`, `/api/admin-customers.js`, `/api/admin-communications.js`, and related admin endpoints power the branded CRM hub.
 - `/api/manage-reservation.js` handles cancel, refund, and transfer actions.
 - `/api/send-final-balance-notice.js` emails the customer before the final charge.
 - `/api/charge-final-balance.js` charges the saved Stripe payment method for the final balance from a protected admin-only request.
+- `/api/twilio-sms-webhook.js` receives inbound SMS replies from opted-in customers.
+- `/api/email-webhook.js` receives inbound email replies from an email provider webhook.
 
 Set these environment variables in your host:
 
 ```text
 AIRTABLE_PAT=your Airtable personal access token
 AIRTABLE_BASE_ID=app2c6G7n666P0UI2
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your private service role key
 STRIPE_SECRET_KEY=sk_live_or_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ADMIN_TOKEN=make-a-long-random-secret
 FINAL_CHARGE_ADMIN_TOKEN=make-a-long-random-secret
+ADMIN_SESSION_SECRET=make-a-different-long-random-secret
+ADMIN_SESSION_SECONDS=28800
 CRON_SECRET=make-a-long-random-secret
 RESEND_API_KEY=re_...
 EMAIL_FROM=yogacloak <hello@yogacloak.com>
+EMAIL_WEBHOOK_SECRET=make-a-long-random-secret
 AIRTABLE_SMS_OPTINS_TABLE=tbl...
 SMS_CRM_PROVIDER=Klaviyo
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_FROM_NUMBER=+15555555555
+SMS_WEBHOOK_SECRET=make-a-long-random-secret
 SITE_URL=https://yogacloak.com
 ALLOWED_ORIGIN=https://yogacloak.com
 DROP_TOTAL=100
@@ -56,6 +69,8 @@ AIRTABLE_SMS_OPTINS_TABLE=your SMS Opt-Ins table ID
 
 If `AIRTABLE_SMS_OPTINS_TABLE` is not set, SMS opt-ins fall back to `AIRTABLE_FORMS_TABLE` so the popup keeps working.
 
+Run `supabase-schema.sql` once in the Supabase SQL editor before using the full CRM hub. It creates customers, inquiries, reservations, payments, communications, and internal notes/follow-up tracking.
+
 Create a Stripe webhook pointing to:
 
 ```text
@@ -68,7 +83,39 @@ Listen for:
 checkout.session.completed
 ```
 
-The code now matches your existing Airtable base: Contacts, Website Forms, First-Run Reservations, Payments, and Products.
+For two-way SMS, create a Twilio Messaging webhook pointing to:
+
+```text
+https://yogacloak.com/api/twilio-sms-webhook?secret=SMS_WEBHOOK_SECRET
+```
+
+For inbound email replies, configure your email provider's inbound webhook to:
+
+```text
+https://yogacloak.com/api/email-webhook?secret=EMAIL_WEBHOOK_SECRET
+```
+
+The code still supports your existing Airtable base, but the branded admin hub is designed around the hidden customer database.
+
+## Private admin security
+
+The public admin URL is:
+
+```text
+https://yogacloak.com/yogacloak-admin.html
+```
+
+That URL is routed through `/api/admin-page`. The real CRM page lives in `/private/admin-hub.html` and is only served after a valid admin session cookie is created.
+
+Security layers:
+
+- Admin token is submitted only to `/api/admin-login`.
+- The browser receives an `HttpOnly`, `SameSite=Strict`, secure session cookie.
+- The admin token is not stored in `localStorage`.
+- Admin APIs accept the secure session cookie.
+- Admin page and admin APIs send `no-store` and `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`.
+- Admin page is blocked from iframes with `X-Frame-Options: DENY`.
+- `robots.txt` also disallows the admin URL, but this is only an SEO signal; the real protection is the server-side session.
 
 ## Automatic final-balance charging
 

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Hub · yogacloak</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1e2320;--panel:#151719;--panel2:#101214;--bone:#fbf8f0;--sage:#7c8c82;--line:rgba(251,248,240,.1);--muted:rgba(251,248,240,.52);--soft:rgba(251,248,240,.07);--cream:251,248,240}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--bone);font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:30px}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer}
+.shell{max-width:1380px;margin:0 auto}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;margin-bottom:24px}
+.wordmark{font-family:'Hanken Grotesk',sans-serif;font-size:26px;letter-spacing:-.02em;text-decoration:none}.wordmark strong{font-weight:700}.wordmark span{font-weight:400}
+.eyebrow{display:block;margin:26px 0 10px;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700}
+h1{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.04em;line-height:.95}
+.sub{color:var(--muted);font-size:14px;line-height:1.5;margin-top:12px;max-width:660px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
+.login{display:grid;grid-template-columns:1.1fr auto auto auto;gap:10px;align-items:end}
+label{display:flex;flex-direction:column;gap:7px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.46);font-weight:700}
+input,select,textarea{width:100%;background:rgba(var(--cream),.055);border:1px solid rgba(var(--cream),.12);color:var(--bone);border-radius:8px;padding:12px 13px;outline:none}
+textarea{min-height:92px;resize:vertical;line-height:1.45}
+select option{background:#151719;color:var(--bone)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--bone);color:var(--ink);border-radius:999px;padding:12px 16px;font-weight:700;font-size:12px;white-space:nowrap}
+.btn.quiet{background:transparent;color:rgba(var(--cream),.72);border:1px solid rgba(var(--cream),.15)}
+.btn.warn{background:#d4948d;color:#1e2320}
+.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 18px;position:sticky;top:0;background:linear-gradient(var(--ink) 74%,rgba(30,35,32,0));z-index:3}
+.tab{background:rgba(var(--cream),.055);color:rgba(var(--cream),.62);border:1px solid rgba(var(--cream),.1);border-radius:999px;padding:10px 13px;font-size:12px;font-weight:700;white-space:nowrap}
+.tab.active{background:var(--bone);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;min-height:92px}
+.card span{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700}
+.card strong{display:block;font-family:'Hanken Grotesk',sans-serif;font-size:30px;font-weight:500;letter-spacing:-.03em;margin-top:12px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.meta{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(var(--cream),.11);border-radius:999px;padding:7px 10px;font-size:11px;color:rgba(var(--cream),.62);background:rgba(var(--cream),.025)}
+.pill strong{color:var(--bone)}
+.table-wrap{overflow:auto;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
+table{width:100%;border-collapse:collapse;min-width:960px}
+th,td{text-align:left;border-bottom:1px solid rgba(var(--cream),.07);padding:13px 14px;font-size:12px;vertical-align:top}
+th{font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:700;background:rgba(var(--cream),.025)}
+td{color:rgba(var(--cream),.72);line-height:1.4}
+tr:last-child td{border-bottom:0}
+.muted{color:rgba(var(--cream),.42)}
+.ok{color:#9aaa88}.error{color:#d4948d}.money{color:#dbba7b}.link{color:#b9c5ad;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.status{display:inline-block;border:1px solid rgba(var(--cream),.13);border-radius:999px;padding:5px 8px;color:rgba(var(--cream),.78);white-space:nowrap}
+.ready{border-color:rgba(154,170,136,.38);color:#9aaa88}.needs{border-color:rgba(219,186,123,.35);color:#dbba7b}.waiting{border-color:rgba(138,164,192,.35);color:#9bb6ce}.blocked{border-color:rgba(212,148,141,.35);color:#d4948d}.charged{color:rgba(var(--cream),.55)}
+.split{display:grid;grid-template-columns:1fr 420px;gap:14px}
+.detail{position:sticky;top:70px;align-self:start}
+.hide{display:none!important}
+.select-cell{width:42px}.select-cell input{width:auto}
+.empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
+.section-title{font-family:'Hanken Grotesk',sans-serif;font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
+@media(max-width:980px){body{padding:20px}.top,.login,.split{display:block}.login>*{margin-bottom:10px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}}
+@media(max-width:620px){.grid{grid-template-columns:1fr}h1{font-size:38px}body{padding:16px}}
+</style>
+</head>
+<body>
+<main id="main-content" class="shell">
+<div class="top">
+<div>
+<a href="/" class="wordmark"><span>yoga</span><strong>cloak</strong></a>
+<span class="eyebrow">Private admin hub</span>
+<h1>Owner dashboard.</h1>
+<p class="sub">Customers, inquiries, reservations, payments, final balances, duplicates, and accounting in one branded place.</p>
+</div>
+</div>
+
+<section class="panel">
+<div class="login">
+<button class="btn" id="loadBtn">Load hub</button>
+<button class="btn quiet" id="logoutBtn">Log out</button>
+</div>
+<div class="meta"><span id="statusText">Ready.</span><span id="storageText"></span></div>
+</section>
+
+<nav class="tabs" aria-label="Admin sections">
+<button class="tab active" data-tab="today">Today</button>
+<button class="tab" data-tab="customers">Customers</button>
+<button class="tab" data-tab="inquiries">Inquiries</button>
+<button class="tab" data-tab="reservations">Reservations</button>
+<button class="tab" data-tab="payments">Payments</button>
+<button class="tab" data-tab="communications">Comms</button>
+<button class="tab" data-tab="finals">Final Balances</button>
+<button class="tab" data-tab="accounting">Accounting</button>
+<button class="tab" data-tab="duplicates">Duplicates</button>
+<button class="tab" data-tab="settings">Settings</button>
+</nav>
+
+<section id="today" class="view"></section>
+<section id="customers" class="view hide"></section>
+<section id="inquiries" class="view hide"></section>
+<section id="reservations" class="view hide"></section>
+<section id="payments" class="view hide"></section>
+<section id="communications" class="view hide"></section>
+<section id="finals" class="view hide"></section>
+<section id="accounting" class="view hide"></section>
+<section id="duplicates" class="view hide"></section>
+<section id="settings" class="view hide"></section>
+</main>
+
+<script>
+var statusText=document.getElementById('statusText');
+var storageText=document.getElementById('storageText');
+var activeTab='today';
+var state={dashboard:null,customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,accounting:null,duplicates:[],selected:new Set()};
+document.getElementById('loadBtn').addEventListener('click',loadCurrent);
+document.getElementById('logoutBtn').addEventListener('click',async function(){await fetch('/api/admin-logout',{method:'POST'});location.reload()});
+document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
+
+function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]})}
+function money(value){return '$'+Number(value||0).toFixed(0)}
+function date(value){return value?String(value).slice(0,10):''}
+function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok)throw new Error(data.error||'Could not load');return data})}
+function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
+function setBusy(text){statusText.textContent=text}
+function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
+
+function setTab(tab){
+activeTab=tab;
+document.querySelectorAll('.tab').forEach(function(btn){btn.classList.toggle('active',btn.dataset.tab===tab)});
+document.querySelectorAll('.view').forEach(function(view){view.classList.toggle('hide',view.id!==tab)});
+render();
+loadCurrent();
+}
+
+async function loadCurrent(){
+try{
+if(activeTab==='today'){setBusy('Loading dashboard...');state.dashboard=await endpoint('/api/admin-dashboard')}
+if(activeTab==='customers'){setBusy('Loading customers...');state.customers=(await endpoint('/api/admin-customers')).customers||[]}
+if(activeTab==='inquiries'){setBusy('Loading inquiries...');state.inquiries=(await endpoint('/api/admin-inquiries')).inquiries||[]}
+if(activeTab==='reservations'){setBusy('Loading reservations...');state.reservations=(await endpoint('/api/admin-reservations')).reservations||[]}
+if(activeTab==='payments'){setBusy('Loading payments...');state.payments=(await endpoint('/api/admin-payments')).payments||[]}
+if(activeTab==='communications'){setBusy('Loading communications...');state.communications=await endpoint('/api/admin-communications')}
+if(activeTab==='finals'){setBusy('Loading final balances...');state.reservations=(await endpoint('/api/admin-reservations')).reservations||[];state.selected.clear()}
+if(activeTab==='accounting'){setBusy('Loading accounting...');state.accounting=await endpoint('/api/admin-accounting')}
+if(activeTab==='duplicates'){setBusy('Loading duplicates...');state.duplicates=(await endpoint('/api/admin-duplicates')).duplicates||[]}
+if(activeTab==='settings'){state.dashboard=state.dashboard||await endpoint('/api/admin-dashboard')}
+statusText.innerHTML='<span class="ok">Loaded '+activeTab+'.</span>';
+storageText.textContent=state.dashboard&&state.dashboard.database_enabled===false?'Hidden database not configured yet.':'';
+render();
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message)+'</span>';render()}
+}
+
+function render(){({today:renderToday,customers:renderCustomers,inquiries:renderInquiries,reservations:renderReservations,payments:renderPayments,communications:renderCommunications,finals:renderFinals,accounting:renderAccounting,duplicates:renderDuplicates,settings:renderSettings}[activeTab]||renderToday)()}
+
+function renderCards(summary){
+var items=[
+['Customers',summary.customers],['New inquiries',summary.new_inquiries],['Needs notice',summary.needs_notice],['Ready to charge',summary.ready_to_charge],
+['Not contacted',summary.not_contacted],['Follow-ups due',summary.follow_ups_due],['Failed payments',summary.failed_payments],['Duplicates',summary.possible_duplicates]
+];
+return '<div class="grid">'+items.map(function(item){return '<div class="card"><span>'+esc(item[0])+'</span><strong>'+esc(item[1]===undefined?0:item[1])+'</strong></div>'}).join('')+'</div>';
+}
+
+function renderToday(){
+var root=document.getElementById('today');
+var data=state.dashboard;
+if(!data){root.innerHTML='<div class="empty">Load the hub to see today\'s action list.</div>';return}
+var tasks=data.tasks||[];
+root.innerHTML=renderCards(data.summary||{})+
+'<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Type','Task','Customer','Date'],tasks.map(function(row){return [row.type,row.title,row.detail,date(row.created_at)]}))+'</section>'+
+'<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Event','Customer','Details','Date'],(data.recent_events||[]).map(function(row){return [row.title||row.event_type,row.customers&&row.customers.full_name||'',row.details||'',date(row.occurred_at)]}))+'</section>';
+}
+
+function renderCustomers(){
+var root=document.getElementById('customers');
+var detail=state.customerDetail;
+root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions"><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button></div></div>'+
+'<div class="split"><div>'+table(['Customer','Email','Phone','Contact','Follow-up','Last seen'],state.customers.map(function(row){return ['<span class="link" data-customer="'+esc(row.id)+'">'+esc(row.full_name||row.email||row.phone||'Customer')+'</span>',row.email,row.phone,row.contact_status||'not_contacted',date(row.next_follow_up_at),date(row.last_seen_at)]}),true)+'</div>'+
+'<aside class="panel detail" id="customerDetail">'+renderCustomerDetail(detail)+'</aside></div>';
+document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
+document.querySelectorAll('[data-customer]').forEach(function(el){el.addEventListener('click',async function(){setBusy('Loading customer...');state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(el.dataset.customer));renderCustomers();statusText.innerHTML='<span class="ok">Customer loaded.</span>'})});
+var save=document.getElementById('saveNoteBtn');
+if(save){save.addEventListener('click',async function(){await post('/api/admin-update-customer-note',{customer_id:detail.customer.id,note:document.getElementById('ownerNote').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Note saved.</span>'})}
+var sendEmail=document.getElementById('sendEmailBtn');
+if(sendEmail){sendEmail.addEventListener('click',async function(){await post('/api/admin-send-email',{customer_id:detail.customer.id,subject:document.getElementById('emailSubject').value,body:document.getElementById('emailBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Email sent and logged.</span>'})}
+var sendSms=document.getElementById('sendSmsBtn');
+if(sendSms){sendSms.addEventListener('click',async function(){await post('/api/admin-send-sms',{customer_id:detail.customer.id,body:document.getElementById('smsBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">SMS sent and logged.</span>'})}
+var saveContact=document.getElementById('saveContactStatusBtn');
+if(saveContact){saveContact.addEventListener('click',async function(){await post('/api/admin-update-contact-status',{customer_id:detail.customer.id,contact_status:document.getElementById('contactStatus').value,next_follow_up_at:document.getElementById('nextFollowUp').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Contact status saved.</span>'})}
+var addNote=document.getElementById('addInternalNoteBtn');
+if(addNote){addNote.addEventListener('click',async function(){await post('/api/admin-add-internal-note',{customer_id:detail.customer.id,note_type:document.getElementById('noteType').value,contact_status:document.getElementById('contactStatus').value,next_follow_up_at:document.getElementById('nextFollowUp').value,body:document.getElementById('internalNoteBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Internal note added.</span>'})}
+}
+
+function renderCustomerDetail(detail){
+if(!detail)return '<div class="muted">Select a customer to see their timeline.</div>';
+var c=detail.customer||{};
+return '<div class="section-title">'+esc(c.full_name||c.email||'Customer')+'</div><p class="muted">'+esc(c.email||'')+'<br>'+esc(c.phone||'')+'</p>'+
+'<div class="meta"><span class="pill">Inquiries <strong>'+((detail.inquiries||[]).length)+'</strong></span><span class="pill">Reservations <strong>'+((detail.reservations||[]).length)+'</strong></span><span class="pill">Payments <strong>'+((detail.payments||[]).length)+'</strong></span></div>'+
+'<div class="section-title" style="margin-top:18px">Contact tracking</div><label>Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button>'+
+'<label style="margin-top:14px">Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">Internal note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+
+'<label style="margin-top:16px">Owner note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button>'+
+'<div class="section-title" style="margin-top:22px">Internal notes</div>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+
+'<div class="section-title" style="margin-top:22px">Send message</div><label>Email subject<input id="emailSubject" value="A note from yogacloak"></label><label style="margin-top:8px">Email message<textarea id="emailBody"></textarea></label><button class="btn quiet" id="sendEmailBtn" style="margin-top:10px">Send email</button><label style="margin-top:14px">SMS message<textarea id="smsBody" maxlength="1000"></textarea></label><button class="btn quiet" id="sendSmsBtn" style="margin-top:10px">Send SMS</button>'+
+'<div class="section-title" style="margin-top:22px">Messages</div>'+table(['Channel','Direction','Message','Date'],(detail.communications||[]).slice(0,8).map(function(row){return [row.channel,row.direction,row.subject||row.body,date(row.created_at)]}))+
+'<div class="section-title" style="margin-top:22px">Timeline</div>'+table(['Event','Details','Date'],(detail.events||[]).slice(0,12).map(function(row){return [row.title||row.event_type,row.details,date(row.occurred_at)]}));
+}
+
+function contactOptions(value){
+var options=[['not_contacted','Not contacted'],['needs_reply','Needs reply'],['emailed','Emailed'],['texted','Texted'],['spoke_to_customer','Spoke to customer'],['waiting_on_customer','Waiting on customer'],['closed','Closed']];
+return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===value?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
+}
+function datetimeLocal(value){
+if(!value)return '';
+var d=new Date(value);
+if(Number.isNaN(d.getTime()))return '';
+return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}
+
+function renderInquiries(){
+document.getElementById('inquiries').innerHTML='<div class="bar"><div class="section-title">Inquiries</div></div>'+table(['Customer','Type','Interest','Message','Status','Date'],state.inquiries.map(function(row){return [row.customers&&row.customers.full_name||row.email||row.phone,row.inquiry_type,row.product_interest,row.message,row.status,date(row.created_at)]}));
+}
+
+function renderReservations(){
+document.getElementById('reservations').innerHTML='<div class="bar"><div class="section-title">Reservations</div><button class="btn quiet" onclick="loadCurrent()">Refresh</button></div>'+reservationTable(state.reservations,false);
+}
+
+function renderPayments(){
+document.getElementById('payments').innerHTML='<div class="bar"><div class="section-title">Payments</div></div>'+table(['Customer','Type','Amount','Status','Stripe ID','Date'],state.payments.map(function(row){return [row.customers&&row.customers.full_name||row.stripe_customer_id,row.payment_type,money(row.amount),row.status,row.stripe_payment_intent_id,date(row.occurred_at)]}));
+}
+
+function renderCommunications(){
+var data=state.communications;
+if(!data){document.getElementById('communications').innerHTML='<div class="empty">Load communications to see email and SMS history.</div>';return}
+var optins=data.sms_optins||[];
+var comms=data.communications||[];
+document.getElementById('communications').innerHTML='<div class="grid"><div class="card"><span>SMS sending</span><strong>'+esc(data.sms_enabled?'On':'Setup')+'</strong></div><div class="card"><span>SMS opt-ins</span><strong>'+optins.length+'</strong></div><div class="card"><span>Messages</span><strong>'+comms.length+'</strong></div><div class="card"><span>Inbound</span><strong>'+comms.filter(function(row){return row.direction==='inbound'}).length+'</strong></div></div>'+
+'<section class="panel"><div class="section-title">Message inbox and outbox</div>'+table(['Customer','Channel','Direction','Subject / Message','Status','Date'],comms.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.channel,row.direction,row.subject||row.body,row.status,date(row.created_at)]}))+'</section>'+
+'<section class="panel"><div class="section-title">SMS opt-ins</div>'+table(['Customer','Phone','Status','Source','Date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,date(row.created_at)]}))+'</section>'+
+'<section class="panel"><div class="section-title">Receiving setup</div><table><tbody>'+
+row('Inbound SMS URL','https://www.yogacloak.com/api/twilio-sms-webhook')+
+row('Inbound email URL','https://www.yogacloak.com/api/email-webhook')+
+row('Webhook secret','Use SMS_WEBHOOK_SECRET and EMAIL_WEBHOOK_SECRET in Vercel, then add the same secret to the provider webhook URL or header.')+
+'</tbody></table></section>';
+}
+
+function renderFinals(){
+var rows=state.reservations||[];
+var summary=['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'].map(function(group){return '<span class="pill">'+esc(group)+' <strong>'+rows.filter(function(row){return row.readiness_group===group}).length+'</strong></span>'}).join('');
+document.getElementById('finals').innerHTML='<div class="bar"><div><div class="section-title">Final balances</div><div class="meta">'+summary+'<span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div><div class="actions"><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun">Dry run</button><button class="btn" id="chargeBatch">Charge ready batch</button></div></div>'+reservationTable(rows,true);
+document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
+document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
+document.getElementById('sendNotices').addEventListener('click',sendNotices);
+document.getElementById('dryRun').addEventListener('click',function(){runBatch(true)});
+document.getElementById('chargeBatch').addEventListener('click',function(){runBatch(false)});
+}
+
+function renderAccounting(){
+var data=state.accounting;
+if(!data){document.getElementById('accounting').innerHTML='<div class="empty">Load accounting to see totals.</div>';return}
+var t=data.totals||{};
+document.getElementById('accounting').innerHTML=renderCards({customers:t.unpaid_reservations,inquiries:t.failed_payments,needs_notice:t.unfulfilled,ready_to_charge:t.fulfilled_or_converted,deposits_collected:t.deposits_collected,final_balances_collected:t.final_balances_collected,failed_payments:money(t.outstanding_balances),possible_duplicates:money(t.estimated_net_collected)})+
+'<section class="panel"><div class="bar"><div class="section-title">Accounting export</div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Estimated Stripe fees',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Outstanding balances',money(t.outstanding_balances)]])+'</section>';
+document.getElementById('exportCsv').addEventListener('click',exportAccountingCsv);
+}
+
+function renderDuplicates(){
+document.getElementById('duplicates').innerHTML='<section class="panel"><div class="section-title">Possible duplicates</div>'+table(['Customer','Details','Date'],state.duplicates.map(function(row){return [row.customers&&row.customers.full_name||row.customer_id,row.details,date(row.occurred_at)]}))+'</section><section class="panel"><div class="section-title">Merge customers</div><div class="login"><label>Source customer ID<input id="sourceCustomer"></label><label>Target customer ID<input id="targetCustomer"></label><button class="btn warn" id="mergeBtn">Merge</button></div></section>';
+document.getElementById('mergeBtn').addEventListener('click',async function(){await post('/api/admin-merge-customer',{source_customer_id:document.getElementById('sourceCustomer').value.trim(),target_customer_id:document.getElementById('targetCustomer').value.trim()});statusText.innerHTML='<span class="ok">Customers merged.</span>';loadCurrent()});
+}
+
+function renderSettings(){
+document.getElementById('settings').innerHTML='<section class="panel"><div class="section-title">Setup checklist</div><table><tbody>'+
+row('Admin access','Uses ADMIN_TOKEN or FINAL_CHARGE_ADMIN_TOKEN.')+
+row('Hidden database','Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then run supabase-schema.sql once in Supabase.')+
+row('Stripe','Keep STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET configured.')+
+row('Email','Keep RESEND_API_KEY and EMAIL_FROM configured for notices and owner summaries.')+
+row('Privacy','This page is noindex,nofollow and is not linked from the public site.')+
+'</tbody></table></section>';
+}
+
+function table(headers, rows, allowHtml){
+if(!rows.length)return '<div class="empty">No records yet.</div>';
+return '<div class="table-wrap"><table><thead><tr>'+headers.map(function(h){return '<th>'+esc(h)+'</th>'}).join('')+'</tr></thead><tbody>'+rows.map(function(row){return '<tr>'+row.map(function(cell){return '<td>'+(allowHtml?cell:esc(cell))+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
+}
+function row(a,b){return '<tr><td>'+esc(a)+'</td><td>'+esc(b)+'</td></tr>'}
+function reservationTable(rows, selectable){
+if(!rows.length)return '<div class="empty">No reservations loaded.</div>';
+return '<div class="table-wrap"><table><thead><tr>'+(selectable?'<th class="select-cell">Pick</th>':'')+'<th>Readiness</th><th>Customer</th><th>Product</th><th>Money</th><th>Timeline</th><th>Record</th></tr></thead><tbody>'+rows.map(function(row){
+var wait=row.notice_wait_remaining_hours>0?'<br><span class="muted">Wait '+Number(row.notice_wait_remaining_hours).toFixed(1)+'h</span>':'';
+var block=row.blocked_reason?'<br><span class="error">'+esc(row.blocked_reason)+'</span>':'';
+var card=row.stripe_payment_method_saved?'<span class="ok">Saved card</span>':'<span class="error">No saved card</span>';
+return '<tr>'+(selectable?'<td class="select-cell"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'></td>':'')+
+'<td><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span>'+wait+block+'</td>'+
+'<td>'+esc(row.customer_name)+'<br><span class="muted">'+esc(row.email)+'</span></td>'+
+'<td>'+esc(row.product)+'<br><span class="muted">'+esc(row.size)+'</span></td>'+
+'<td>Deposit '+money(row.deposit_amount)+'<br><span class="muted">Final '+money(row.final_balance_total||0)+'</span><br>'+card+'</td>'+
+'<td><span class="muted">Started</span> '+esc(row.checkout_started_at||row.reservation_date)+'<br><span class="muted">Paid</span> '+esc(row.paid_at)+'<br><span class="muted">Notice</span> '+esc(row.final_balance_notice_sent_at)+'</td>'+
+'<td><code>'+esc(row.id)+'</code></td></tr>';
+}).join('')+'</tbody></table></div>';
+}
+
+async function sendNotices(){
+var rows=state.reservations.filter(function(row){return state.selected.has(row.id)&&row.notice_required});
+if(!rows.length){statusText.innerHTML='<span class="error">Select at least one Needs Notice reservation.</span>';return}
+setBusy('Sending notices...');
+var sent=0,failed=[];
+for(var i=0;i<rows.length;i++){try{await post('/api/send-final-balance-notice',{reservation_record_id:rows[i].id});sent++}catch(err){failed.push(rows[i].id+': '+err.message)}}
+await loadCurrent();
+statusText.innerHTML=failed.length?'<span class="error">Sent '+sent+', failed '+failed.length+'.</span>':'<span class="ok">Sent '+sent+' notice(s).</span>';
+}
+async function runBatch(dryRun){
+var ids=Array.from(state.selected);
+if(!ids.length){statusText.innerHTML='<span class="error">Select at least one reservation.</span>';return}
+setBusy(dryRun?'Running dry run...':'Charging selected ready reservations...');
+var data=await post('/api/batch-final-balance',{reservation_record_ids:ids,dry_run:dryRun});
+await loadCurrent();
+var s=data.summary||{};
+statusText.innerHTML='<span class="'+(s.failed?'error':'ok')+'">'+(dryRun?'Dry run':'Batch')+': charged '+(s.charged||0)+', skipped '+(s.skipped||0)+', already '+(s.already_charged||0)+', failed '+(s.failed||0)+'.</span>';
+}
+function exportAccountingCsv(){
+var rows=(state.accounting&&state.accounting.payments||[]).map(function(row){return [row.occurred_at,row.customers&&row.customers.full_name||'',row.payment_type,row.amount,row.status,row.stripe_payment_intent_id]});
+var csv=[['date','customer','type','amount','status','stripe_id']].concat(rows).map(function(row){return row.map(function(cell){return '"'+String(cell||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+var blob=new Blob([csv],{type:'text/csv'});
+var url=URL.createObjectURL(blob);
+var a=document.createElement('a');a.href=url;a.download='yogacloak-accounting.csv';a.click();URL.revokeObjectURL(url);
+}
+
+renderToday();
+</script>
+</body>
+</html>

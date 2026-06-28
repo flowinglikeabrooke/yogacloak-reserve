@@ -2,6 +2,7 @@
 // Saves contact modal submissions to Airtable.
 
 import { checkRateLimit } from '../lib/yogacloak-ops.js';
+import { findOrCreateCustomer, recordInquiry } from '../lib/customer-identity.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || 'https://yogacloak.com');
@@ -26,15 +27,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid email' });
     }
 
-    const pat = process.env.AIRTABLE_PAT;
-    const baseId = process.env.AIRTABLE_BASE_ID;
-    const tableId = process.env.AIRTABLE_FORMS_TABLE;
-
-    if (!pat || !baseId || !tableId) {
-      console.error('Missing Airtable contact env vars');
-      return res.status(500).json({ error: 'Server configuration error' });
-    }
-
     const trimmedName = name.trim().replace(/\s+/g, ' ');
     const parts = trimmedName.split(' ');
     const firstName = parts.shift() || '';
@@ -54,6 +46,44 @@ export default async function handler(req, res) {
       'Lead Source': 'Website'
     };
 
+    let databaseSaved = false;
+    try {
+      const identity = await findOrCreateCustomer({
+        firstName,
+        lastName,
+        fullName: trimmedName,
+        email,
+        status: 'lead',
+        source: 'Website Contact',
+        reason: 'Customer submitted the contact form.'
+      });
+      if (identity.customer?.id) {
+        databaseSaved = true;
+        await recordInquiry({
+          customerId: identity.customer.id,
+          type: 'contact',
+          sourcePage: source || 'unknown',
+          message,
+          email,
+          status: 'new',
+          eventTitle: 'Contact form received',
+          metadata: { submission_id: submissionId }
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase contact save failed; continuing with Airtable:', err.message);
+    }
+
+    const pat = process.env.AIRTABLE_PAT;
+    const baseId = process.env.AIRTABLE_BASE_ID;
+    const tableId = process.env.AIRTABLE_FORMS_TABLE;
+
+    if (!pat || !baseId || !tableId) {
+      if (databaseSaved) return res.status(200).json({ ok: true, database_only: true });
+      console.error('Missing Airtable contact env vars');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
     const airtableRes = await fetch(`https://api.airtable.com/v0/${baseId}/${tableId}`, {
       method: 'POST',
       headers: {
@@ -66,6 +96,7 @@ export default async function handler(req, res) {
     if (!airtableRes.ok) {
       const errText = await airtableRes.text();
       console.error('Airtable contact error:', airtableRes.status, errText);
+      if (databaseSaved) return res.status(200).json({ ok: true, database_only: true, airtable_error: true });
       return res.status(502).json({ error: 'Failed to save submission' });
     }
 
