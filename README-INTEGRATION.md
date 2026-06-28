@@ -127,7 +127,7 @@ Security layers:
 - Admin page is blocked from iframes with `X-Frame-Options: DENY`.
 - Admin browser `POST` actions require CSRF protection.
 - Sensitive admin and money endpoints are rate limited.
-- Run `npm run security:check` before deploy to check public files, admin links, core SEO landmarks, and Vercel protection headers.
+- Run `npm run predeploy:check` before deploy. It checks the single Vercel API dispatcher, final-balance workflow, public files, admin links, SEO landmarks, and protected-route headers.
 - `robots.txt` also disallows the admin URL, but this is only an SEO signal; the real protection is the server-side session.
 
 ## Automatic final-balance charging
