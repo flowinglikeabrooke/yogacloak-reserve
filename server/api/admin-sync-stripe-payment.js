@@ -53,6 +53,18 @@ function metadataFrom(paymentIntent, checkoutSession) {
   };
 }
 
+function numberFrom(...values) {
+  for (const value of values) {
+    const number = Number(value || 0);
+    if (Number.isFinite(number) && number > 0) return number;
+  }
+  return 0;
+}
+
+function futureChargeAuthorized(paymentIntent, metadata) {
+  return metadata.future_charge_authorized === 'true' || paymentIntent.setup_future_usage === 'off_session';
+}
+
 async function checkoutSessionForPaymentIntent(paymentIntentId) {
   try {
     const sessions = await stripeRequest(`checkout/sessions?payment_intent=${encodeURIComponent(paymentIntentId)}&limit=1`);
@@ -187,6 +199,9 @@ export default async function handler(req, res) {
     );
     const checkoutSession = await checkoutSessionForPaymentIntent(paymentIntent.id);
     const metadata = metadataFrom(paymentIntent, checkoutSession);
+    const finalBalanceTotal = numberFrom(metadata.final_balance_total, req.body?.final_balance_total);
+    const depositTotal = numberFrom(metadata.deposit_total, dollars(paymentIntent.amount_received || paymentIntent.amount || checkoutSession?.amount_total || 0));
+    const futureAuthorized = futureChargeAuthorized(paymentIntent, metadata);
     const stripeCustomerId = objectId(paymentIntent.customer) || objectId(checkoutSession?.customer);
     const stripeCustomer = typeof paymentIntent.customer === 'object' ? paymentIntent.customer : await customerFromStripe(stripeCustomerId);
     const paymentMethodId = objectId(paymentIntent.payment_method);
@@ -221,14 +236,14 @@ export default async function handler(req, res) {
         payment_intent_id: paymentIntent.id,
         stripe_customer_id: stripeCustomerId,
         stripe_payment_method_id: paymentMethodId,
-        future_charge_authorized: metadata.future_charge_authorized === 'true',
+        future_charge_authorized: futureAuthorized,
         notes: {
           products: String(metadata.products || '').split(',').map((item) => item.trim()).filter(Boolean),
           product_selection: String(metadata.products || '').split(',').map((item) => item.trim()).filter(Boolean).join(' + '),
           cloak_size: metadata.cloak_size || '',
-          deposit_total: Number(metadata.deposit_total || amount || 0),
+          deposit_total: depositTotal,
           full_price_total: Number(metadata.full_price_total || 0),
-          final_balance_total: Number(metadata.final_balance_total || 0),
+          final_balance_total: finalBalanceTotal,
           recovered_from_stripe_at: new Date().toISOString()
         }
       });
@@ -243,14 +258,14 @@ export default async function handler(req, res) {
         status: status === 'paid' ? 'Reserved' : 'Pending Payment',
         products: String(metadata.products || '').split(',').map((item) => item.trim()).filter(Boolean),
         size: metadata.cloak_size || '',
-        depositAmount: Number(metadata.deposit_total || amount || 0),
+        depositAmount: depositTotal,
         finalRetailTotal: Number(metadata.full_price_total || 0),
-        finalBalanceTotal: Number(metadata.final_balance_total || 0),
+        finalBalanceTotal,
         checkoutSessionId: checkoutSession?.id || '',
         paymentIntentId: paymentIntent.id,
         stripeCustomerId,
         stripePaymentMethodId: paymentMethodId,
-        futureChargeAuthorized: metadata.future_charge_authorized === 'true',
+        futureChargeAuthorized: futureAuthorized,
         eventTitle: 'Stripe payment recovered',
         eventDetails: 'Existing Stripe payment was imported into the CRM.',
         metadata: { checkout_session: checkoutSession?.id || '', recovered_from_stripe: true }
@@ -282,7 +297,7 @@ export default async function handler(req, res) {
         last4: paymentMethod?.card?.last4 || '',
         expMonth: paymentMethod?.card?.exp_month || null,
         expYear: paymentMethod?.card?.exp_year || null,
-        futureChargeAuthorized: metadata.future_charge_authorized === 'true'
+        futureChargeAuthorized: futureAuthorized
       });
     }
 
@@ -299,13 +314,25 @@ export default async function handler(req, res) {
       }
     });
 
-    const airtable = await mirrorAirtable({ paymentIntent, checkoutSession, metadata, customer: identity.customer, amount, status });
-    const canChargeRemainingLater = Boolean(metadata.reservation_record_id && stripeCustomerId && paymentMethodId && metadata.future_charge_authorized === 'true' && Number(metadata.final_balance_total || 0) > 0);
+    const airtable = await mirrorAirtable({
+      paymentIntent,
+      checkoutSession,
+      metadata: {
+        ...metadata,
+        deposit_total: depositTotal || metadata.deposit_total || '',
+        final_balance_total: finalBalanceTotal || metadata.final_balance_total || '',
+        future_charge_authorized: futureAuthorized ? 'true' : metadata.future_charge_authorized
+      },
+      customer: identity.customer,
+      amount,
+      status
+    });
+    const canChargeRemainingLater = Boolean(metadata.reservation_record_id && stripeCustomerId && paymentMethodId && futureAuthorized && finalBalanceTotal > 0);
     const blockedReasons = [];
     if (!metadata.reservation_record_id) blockedReasons.push('No yogacloak reservation ID found on the Stripe payment.');
     if (!paymentMethodId) blockedReasons.push('No saved Stripe payment method found.');
-    if (metadata.future_charge_authorized !== 'true') blockedReasons.push('Future-charge authorization was not found on the Stripe payment.');
-    if (!Number(metadata.final_balance_total || 0)) blockedReasons.push('No final-balance amount found on the Stripe payment.');
+    if (!futureAuthorized) blockedReasons.push('Future-charge authorization was not found on the Stripe payment.');
+    if (!finalBalanceTotal) blockedReasons.push('No final-balance amount found on the Stripe payment.');
 
     await auditAdminAction(req, {
       actionType: 'sync_stripe_payment',

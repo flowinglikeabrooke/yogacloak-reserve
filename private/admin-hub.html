@@ -226,6 +226,23 @@ tr:last-child td{border-bottom:0}
 .detail .btn.danger{background:#d4948d;color:#1e2320}
 .profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid rgba(var(--cream),.08);padding-bottom:14px;margin-bottom:12px}
 .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.customer-workspace-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;border-bottom:1px solid rgba(30,35,32,.1);padding-bottom:18px;margin-bottom:16px}
+.customer-identity h2{font-size:30px;font-weight:500;letter-spacing:-.03em;line-height:1.05;color:var(--ink);margin-bottom:5px}
+.customer-identity p{font-size:13px;line-height:1.45}
+.customer-status-stack{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.customer-focus-grid{display:grid;grid-template-columns:1.25fr repeat(2,minmax(0,.72fr));gap:12px;margin:12px 0}
+.customer-focus-card{border:1px solid rgba(30,35,32,.1);border-radius:8px;background:#fffaf0;padding:14px;min-height:116px}
+.customer-focus-card.next{grid-row:span 2;background:#f3f0e7;border-color:rgba(124,140,130,.24)}
+.customer-focus-card span{display:block;font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;color:rgba(30,35,32,.48);font-weight:800}
+.customer-focus-card strong{display:block;margin-top:8px;font-size:22px;line-height:1.08;letter-spacing:-.025em;color:var(--ink)}
+.customer-focus-card p{margin-top:7px;font-size:12px;line-height:1.4}
+.customer-pane-tabs{display:flex;gap:7px;overflow:auto;border-top:1px solid rgba(30,35,32,.08);border-bottom:1px solid rgba(30,35,32,.08);padding:10px 0;margin:12px 0}
+.customer-pane-tab{background:transparent;color:rgba(30,35,32,.58);border:1px solid rgba(30,35,32,.12);border-radius:999px;padding:9px 12px;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:none}
+.customer-pane-tab:hover{background:rgba(30,35,32,.04);transform:none}
+.customer-pane-tab.active{background:var(--ink);color:var(--bone);border-color:var(--ink)}
+.customer-pane{min-height:360px}
+.customer-pane-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.customer-pane .detail-block{margin-bottom:12px}
 .profile-overview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
 .profile-stat{border:1px solid rgba(30,35,32,.1);border-radius:8px;padding:12px;background:rgba(30,35,32,.035);min-height:74px}
 .profile-stat span{display:block;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(30,35,32,.48);font-weight:700}
@@ -253,7 +270,7 @@ tr:last-child td{border-bottom:0}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
 .section-title{font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 @media(max-width:980px){.shell{padding:20px}.top,.login,.split{display:block;margin-top:64px}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.corner-actions{right:14px;top:12px}.corner-status{display:none}.ops-panel{margin-top:12px}.tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}}
-@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-workspace{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}}
+@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-workspace,.customer-workspace-head,.customer-focus-grid,.customer-pane-grid{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}.customer-status-stack{justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -279,7 +296,7 @@ tr:last-child td{border-bottom:0}
 <a href="/" class="wordmark"><span>yoga</span><strong>cloak</strong></a>
 <span class="eyebrow">Private admin hub</span>
 <h1 class="command-title"><span id="heroRoleLabel" class="command-word">command</span> <span class="center-word">center</span></h1>
-<p class="sub">Client profiles, inquiry follow-ups, messages, tasks, reservations, and owner-only money tools in one calm place.</p>
+<p class="sub">Client profiles, messages, tasks, reservations and money tools - all in one place.</p>
 </div>
 </div>
 
@@ -322,7 +339,7 @@ var adminUser=adminUserRaw.indexOf('__ADMIN_USER_JSON__')===0?{name:'Preview',ro
 if(!adminUser||typeof adminUser!=='object'||Array.isArray(adminUser)){adminUser={name:'Preview',role:'founder',email:''}}
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
+var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,customerProfilePane:'work',inquiries:[],reservations:[],payments:[],communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
 var taskCustomerSearchTimer=null;
 var ownerOnlyTabs=new Set(['reservations','payments','finals','accounting']);
 var founderOnlyTabs=new Set(['automations','duplicates','settings']);
@@ -748,6 +765,7 @@ document.querySelectorAll('[data-delete-inquiry]').forEach(function(btn){btn.add
 var importRaw=document.getElementById('importRawCustomerBtn');
 if(importRaw){importRaw.addEventListener('click',async function(){await importRawCustomer(detail.customer.id)})}
 document.querySelectorAll('[data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
+document.querySelectorAll('[data-profile-pane]').forEach(function(btn){btn.addEventListener('click',function(){state.customerProfilePane=btn.dataset.profilePane;renderCustomers()})});
 }
 
 function rawSyncReport(){
@@ -1034,7 +1052,7 @@ var rawOnly=c.fallback_source==='airtable_forms'||String(c.id||'').indexOf('airt
 var inbound=comms.filter(function(row){return row.direction==='inbound'}).length;
 var outbound=comms.filter(function(row){return row.direction==='outbound'}).length;
 return '<div class="profile-hubs">'+
-'<div class="profile-hub"><span>Relationship</span><strong>'+esc(formatStatus(c.contact_status||'not_contacted'))+'</strong><p>'+esc(c.next_follow_up_at?'Next follow-up '+date(c.next_follow_up_at):notes.length+' note(s) logged')+'</p></div>'+
+'<div class="profile-hub"><span>Relationship</span><strong>'+esc(customerContactLabel(c.contact_status,c.status))+'</strong><p>'+esc(c.next_follow_up_at?'Next follow-up '+date(c.next_follow_up_at):notes.length+' note(s) logged')+'</p></div>'+
 '<div class="profile-hub"><span>Interest</span><strong>'+esc(products.length?products.slice(0,2).join(' + '):'No product yet')+'</strong><p>'+esc(inquiries.length+' inquiry record(s)')+'</p></div>'+
 '<div class="profile-hub"><span>'+esc(isOwner()?'Sales':'Source')+'</span><strong>'+esc(isOwner()?reservations.length+' reservation(s)':customerOriginLabel(detail))+'</strong><p>'+esc(isOwner()?money(sumPayments(payments))+' collected · '+money(profileOutstanding(detail))+' outstanding':customerOriginDetail(detail))+'</p></div>'+
 '<div class="profile-hub"><span>Messages</span><strong>'+esc(comms.length+' total')+'</strong><p>'+esc(inbound+' inbound · '+outbound+' outbound'+(rawOnly?' · raw backup':'') )+'</p></div>'+
@@ -1101,49 +1119,87 @@ return '<div class="detail-block"><div class="bar"><div><div class="section-titl
 (tasks.length?'<div style="margin-top:14px">'+table(['State','Task','Linked to','Type','Priority','Due','Action'],taskRows(tasks.slice(0,12)),true)+'</div>':'<div class="empty" style="margin-top:14px">No tasks for this customer yet.</div>')+'</div>';
 }
 
+function renderContactTrackingBlock(detail){
+var c=detail.customer||{};
+return '<div class="detail-block"><div class="section-title">Contact tracking</div><p class="muted">Use this to keep the relationship status clear everywhere in the CRM.</p><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Next step<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>';
+}
+
+function renderOwnerNoteBlock(detail){
+var c=detail.customer||{};
+return '<div class="detail-block"><div class="section-title">Relationship notes</div><p class="muted">Private owner context for sizing, tone, promises, and anything you do not want to lose.</p><label style="margin-top:8px">Private customer note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div>';
+}
+
+function renderInternalNotesBlock(detail){
+return '<div class="detail-block"><div class="section-title">Internal notes</div><p class="muted">Calls, texts, emails, payment notes, and follow-ups stay connected to this person.</p><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Next step','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,customerContactLabel(row.contact_status,''),row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>';
+}
+
+function profilePaneOptions(detail,raw){
+var panes=[['work','Work'],['profile','Profile'],['messages','Messages']];
+if(isOwner())panes.push(['sales','Sales']);
+panes.push(['history','History']);
+if(isFounder()||raw)panes.push(['cleanup','Cleanup']);
+return panes;
+}
+
+function activeProfilePane(detail,raw){
+var allowed=profilePaneOptions(detail,raw).map(function(item){return item[0]});
+if(allowed.indexOf(state.customerProfilePane)===-1)state.customerProfilePane='work';
+return state.customerProfilePane||'work';
+}
+
+function renderCustomerPaneTabs(detail,raw){
+var active=activeProfilePane(detail,raw);
+return '<div class="customer-pane-tabs">'+profilePaneOptions(detail,raw).map(function(item){return '<button class="customer-pane-tab '+(item[0]===active?'active':'')+'" data-profile-pane="'+esc(item[0])+'">'+esc(item[1])+'</button>'}).join('')+'</div>';
+}
+
+function renderCustomerFocus(detail,raw,emailHref,smsHref){
+var c=detail.customer||{};
+var inquiries=detail.inquiries||[];
+var reservations=detail.reservations||[];
+var payments=isOwner()?(detail.payments||[]):[];
+var comms=detail.communications||[];
+var next=raw?renderRawNextAction(detail,emailHref,smsHref,state.dashboard&&state.dashboard.database_enabled!==false):renderNextAction(detail,emailHref,smsHref);
+return '<div class="customer-focus-grid"><div class="customer-focus-card next">'+next+'</div>'+
+'<div class="customer-focus-card"><span>Relationship</span><strong>'+esc(customerContactLabel(c.contact_status,c.status))+'</strong><p>'+esc(c.next_follow_up_at?'Follow up '+date(c.next_follow_up_at):'No follow-up set')+'</p></div>'+
+'<div class="customer-focus-card"><span>Why they are here</span><strong>'+esc(customerOriginLabel(detail))+'</strong><p>'+esc(customerOriginDetail(detail))+'</p></div>'+
+'<div class="customer-focus-card"><span>Activity</span><strong>'+esc((inquiries.length+reservations.length+comms.length)+' linked item(s)')+'</strong><p>'+esc((detail.timeline||[]).length?'Timeline is connected':'No timeline yet')+'</p></div>'+
+(isOwner()?'<div class="customer-focus-card"><span>Money</span><strong>'+esc(money(sumPayments(payments))+' paid')+'</strong><p>'+esc(money(profileOutstanding(detail))+' outstanding')+'</p></div>':'')+
+'</div>';
+}
+
+function renderCustomerPane(detail,raw,emailHref,smsHref){
+var pane=activeProfilePane(detail,raw);
+if(pane==='profile'){
+return '<div class="customer-pane"><div class="customer-pane-grid">'+renderEditableCustomerRecord(detail.customer||{})+'<div><div class="section-title">Profile snapshot</div><div class="profile-overview">'+renderProfileOverview(detail)+'</div>'+renderProfileHubs(detail)+'</div></div></div>';
+}
+if(pane==='messages'){
+return '<div class="customer-pane">'+(raw?'<div class="notice warn"><strong>Raw backup profile.</strong><br>Organize this person into the private CRM before sending tracked messages from the hub.</div>':renderMessagePortal(detail,emailHref,smsHref))+'<div class="detail-block"><div class="section-title">Contact form messages</div>'+renderProfileInquiries(detail.inquiries||[])+'</div></div>';
+}
+if(pane==='sales'&&isOwner()){
+return '<div class="customer-pane"><div class="detail-block"><div class="section-title">Reservations + final balance</div>'+renderProfileReservations(detail.reservations||[])+'</div><div class="detail-block"><div class="section-title">Payments</div>'+renderProfilePayments(detail.payments||[])+'</div><div class="detail-block"><div class="section-title">Saved payment methods</div>'+renderPaymentMethods(detail.payment_methods||[])+'</div></div>';
+}
+if(pane==='history'){
+return '<div class="customer-pane">'+renderInternalNotesBlock(detail)+'<div class="detail-block"><div class="section-title">Relationship timeline</div>'+renderTimeline(detail)+'</div></div>';
+}
+if(pane==='cleanup'){
+return '<div class="customer-pane"><div class="notice warn"><strong>Cleanup tools.</strong><br>Use these only when you are fixing duplicates, archiving old records, or moving an inquiry to the correct person.</div>'+renderCrmManagement(detail)+'</div>';
+}
+return '<div class="customer-pane"><div class="customer-pane-grid">'+renderContactTrackingBlock(detail)+renderOwnerNoteBlock(detail)+'</div>'+renderCustomerTasks(detail)+'</div>';
+}
+
 function renderCustomerDetail(detail){
 if(!detail)return '<div class="muted">Select a customer to see their timeline.</div>';
 var c=detail.customer||{};
-if(c.fallback_source==='airtable_forms'){
-var canImportRaw=state.dashboard&&state.dashboard.database_enabled!==false;
-var rawEmailHref=c.email?'mailto:'+encodeURIComponent(c.email):'';
-var rawSmsHref=c.phone?'sms:'+encodeURIComponent(c.phone):'';
-return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_name||c.email||'Customer')+'</div><p class="muted">'+esc(c.email||'')+'<br>'+esc(c.phone||'')+'</p></div><span class="health warn">Raw backup only</span></div>'+
-'<div class="notice warn"><strong>Raw backup caught this.</strong><br>This profile was assembled from Airtable source records, so you can still see the site activity even if it has not been organized into the private CRM yet.</div>'+
-'<div class="meta"><span class="pill">Raw forms <strong>'+esc(c.form_count||0)+'</strong></span><span class="pill">Source <strong>Airtable</strong></span></div>'+
-'<div class="profile-overview">'+renderProfileOverview(detail)+'</div>'+
-renderProfileHubs(detail)+
-'<div class="next-action">'+renderRawNextAction(detail,rawEmailHref,rawSmsHref,canImportRaw)+'</div>'+
-renderEditableCustomerRecord(c)+
-renderCrmManagement(detail)+
-(rawEmailHref||rawSmsHref?'<div class="profile-actions">'+(rawEmailHref?'<a class="btn quiet" href="'+esc(rawEmailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(rawSmsHref?'<a class="btn quiet" href="'+esc(rawSmsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>':'')+
-'<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
-'<div class="detail-block"><div class="section-title">Owner note</div><label>Private note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
-'<div class="detail-block"><div class="section-title">Internal notes</div><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>'+
-(!canImportRaw?'<div class="notice" style="margin-top:12px"><strong>Organized CRM is not connected yet.</strong><br>Raw records are still visible here. Add the private CRM database when you want notes, contact status, follow-ups, and owner actions to save on this profile.</div>':'')+
-'<div class="detail-block"><div class="section-title">Contact form messages</div>'+renderProfileInquiries(detail.inquiries||[])+'</div>'+
-'<div class="detail-block"><div class="section-title">Raw timeline</div>'+renderTimeline(detail)+'</div>';
-}
 var emailHref=c.email?'mailto:'+encodeURIComponent(c.email):'';
 var smsHref=c.phone?'sms:'+encodeURIComponent(c.phone):'';
-return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_name||c.email||'Customer')+'</div><p class="muted">'+esc(c.email||'')+'<br>'+esc(c.phone||'')+'</p></div><span class="health good">Private CRM</span></div>'+
-'<div class="meta"><span class="pill">Contact messages <strong">'+((detail.inquiries||[]).filter(contactMessageInquiry).length)+'</strong></span>'+(isOwner()?'<span class="pill">Reservations <strong>'+((detail.reservations||[]).length)+'</strong></span><span class="pill">Payments <strong>'+((detail.payments||[]).length)+'</strong></span>':'')+'<span class="pill">Messages <strong>'+((detail.communications||[]).length)+'</strong></span><span class="pill">Origin <strong>'+esc(customerOriginLabel(detail))+'</strong></span></div>'+
-'<div class="profile-overview">'+renderProfileOverview(detail)+'</div>'+
-renderProfileHubs(detail)+
-'<div class="next-action">'+renderNextAction(detail,emailHref,smsHref)+'</div>'+
-renderEditableCustomerRecord(c)+
-renderCrmManagement(detail)+
-'<div class="profile-actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>'+
-'<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
-'<div class="detail-block"><div class="section-title">Relationship notes</div><p class="muted">Use notes, tasks, and message history to keep the relationship moving without losing context.</p><label style="margin-top:8px">Private customer note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
-renderMessagePortal(detail,emailHref,smsHref)+
-renderCustomerTasks(detail)+
-'<div class="detail-block"><div class="section-title">Relationship timeline</div>'+renderTimeline(detail)+'</div>'+
-'<div class="detail-block"><div class="section-title">Internal notes</div><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>'+
-(isOwner()?'<div class="detail-block"><div class="section-title">Reservations + final balance</div>'+renderProfileReservations(detail.reservations||[])+'</div>'+
-'<div class="detail-block"><div class="section-title">Payments</div>'+renderProfilePayments(detail.payments||[])+'</div>'+
-'<div class="detail-block"><div class="section-title">Saved payment methods</div>'+renderPaymentMethods(detail.payment_methods||[])+'</div>':'')+
-'<div class="detail-block"><div class="section-title">Contact form messages</div>'+renderProfileInquiries(detail.inquiries||[])+'</div>';
+var raw=c.fallback_source==='airtable_forms'||String(c.id||'').indexOf('airtable:')===0;
+var badge=raw?'<span class="health warn">Raw backup</span>':'<span class="health good">Private CRM</span>';
+var rawNotice=raw?'<div class="notice warn"><strong>Raw backup caught this.</strong><br>This profile was assembled from Airtable source records. Organize it into the private CRM when you want fully editable notes, messages, reservations, and payment history.</div>':'';
+return '<div class="customer-workspace-head"><div class="customer-identity"><span>'+esc(raw?'Raw profile':'Customer profile')+'</span><h2>'+esc(c.full_name||c.email||c.phone||'Customer')+'</h2><p>'+esc([c.email,c.phone].filter(Boolean).join(' · ')||'No contact details yet')+'</p></div><div class="customer-status-stack">'+badge+'<span class="pill">Origin <strong>'+esc(customerOriginLabel(detail))+'</strong></span></div></div>'+
+rawNotice+
+renderCustomerFocus(detail,raw,emailHref,smsHref)+
+renderCustomerPaneTabs(detail,raw)+
+renderCustomerPane(detail,raw,emailHref,smsHref);
 }
 
 function renderProfileOverview(detail){
@@ -1151,7 +1207,7 @@ var c=detail.customer||{};
 var products=profileProducts(detail);
 var outstanding=isOwner()?profileOutstanding(detail):0;
 var last=timelineItems(detail)[0];
-return '<div class="profile-stat"><span>Contact status</span><strong>'+esc(formatStatus(c.contact_status||'not_contacted'))+'</strong></div>'+
+return '<div class="profile-stat"><span>Next step</span><strong>'+esc(customerContactLabel(c.contact_status,c.status))+'</strong></div>'+
 '<div class="profile-stat"><span>Next follow-up</span><strong>'+esc(c.next_follow_up_at?date(c.next_follow_up_at):'None set')+'</strong></div>'+
 '<div class="profile-stat"><span>Product thread</span><strong>'+esc(products.length?products.slice(0,2).join(' + '):'No product yet')+'</strong></div>'+
 '<div class="profile-stat"><span>Tags</span><strong>'+esc(tagsValue(c.tags)||'None')+'</strong></div>'+
@@ -1447,17 +1503,18 @@ report='<div class="notice '+(result.can_charge_remaining_later?'good':'warn')+'
 '</div>';
 }
 return '<section class="panel"><div class="bar"><div><div class="section-title">Recover missing Stripe payment</div><p class="muted">Use this when Stripe shows a payment but the CRM does not. It imports the payment/customer/reservation links; it does not charge anyone.</p></div></div>'+
-'<div class="login"><label>Stripe payment intent<input id="stripePaymentIntentInput" placeholder="pi_..." value="pi_3TmR97KcKQy9WmP60XIIPd0d"></label><label>Payment type<select id="stripePaymentType"><option value="deposit">Deposit</option><option value="final_balance">Final balance</option></select></label><button class="btn" id="syncStripePaymentBtn">Recover payment</button></div>'+report+'</section>';
+'<div class="login"><label>Stripe payment intent<input id="stripePaymentIntentInput" placeholder="pi_..." value="pi_3TmR97KcKQy9WmP60XIIPd0d"></label><label>Payment type<select id="stripePaymentType"><option value="deposit">Deposit</option><option value="final_balance">Final balance</option></select></label><label>Remaining balance, if missing<input id="stripeFinalBalanceInput" type="number" min="0" step="0.01" placeholder="0.00"></label><button class="btn" id="syncStripePaymentBtn">Recover payment</button></div>'+report+'</section>';
 }
 
 async function syncStripePayment(){
 var input=document.getElementById('stripePaymentIntentInput');
 var type=document.getElementById('stripePaymentType');
+var balance=document.getElementById('stripeFinalBalanceInput');
 var paymentIntentId=input&&input.value.trim();
 if(!paymentIntentId){statusText.innerHTML='<span class="error">Paste the Stripe payment intent ID from Stripe.</span>';return}
 setBusy('Recovering Stripe payment...');
 try{
-var result=await post('/api/admin-sync-stripe-payment',{stripe_payment_intent_id:paymentIntentId,payment_type:type&&type.value||'deposit'});
+var result=await post('/api/admin-sync-stripe-payment',{stripe_payment_intent_id:paymentIntentId,payment_type:type&&type.value||'deposit',final_balance_total:balance&&balance.value||''});
 state.stripeRecoveryResult=result;
 state.payments=(await endpoint('/api/admin-payments')).payments||[];
 renderPayments();
