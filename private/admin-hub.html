@@ -747,6 +747,10 @@ tr:last-child td{border-bottom:0}
 .customer-brain-card span{display:block;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(30,35,32,.48);font-weight:800}
 .customer-brain-card strong{display:block;margin-top:7px;color:var(--ink);font-size:17px;line-height:1.12;letter-spacing:-.015em}
 .customer-brain-card small{display:block;margin-top:5px;color:rgba(30,35,32,.55);font-size:11px;line-height:1.35}
+.customer-money-alert{border:1px solid rgba(212,148,141,.24);border-radius:8px;background:linear-gradient(135deg,rgba(212,148,141,.11),rgba(219,186,123,.055));padding:14px;margin:12px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+.customer-money-alert strong{display:block;color:var(--ink);font-size:16px;line-height:1.25}
+.customer-money-alert span{display:block;margin-top:4px;color:rgba(30,35,32,.62);font-size:12px;line-height:1.4}
+.customer-money-alert .actions{justify-content:flex-end}
 .customer-focus-grid{display:grid;grid-template-columns:1.25fr repeat(2,minmax(0,.72fr));gap:12px;margin:12px 0}
 .customer-focus-card{border:1px solid rgba(30,35,32,.1);border-radius:8px;background:#fffaf0;padding:14px;min-height:116px}
 .customer-focus-card.next{grid-row:span 2;background:#f3f0e7;border-color:rgba(124,140,130,.24)}
@@ -809,6 +813,7 @@ tr:last-child td{border-bottom:0}
 .customer-work-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
 .customer-work-actions .btn{padding:9px 12px;font-size:11px}
 .customer-task-list{display:grid;gap:8px;margin-top:14px}
+.customer-task-more .customer-task-list{margin:10px 13px 13px}
 .customer-task-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid rgba(30,35,32,.1);border-radius:8px;background:rgba(30,35,32,.028);padding:12px}
 .customer-task-card.urgent{border-color:rgba(130,68,64,.2);background:rgba(212,148,141,.08)}
 .customer-task-card strong{display:block;color:var(--ink);font-size:14px;line-height:1.25}
@@ -831,6 +836,9 @@ tr:last-child td{border-bottom:0}
 .task-history-drawer summary:after{content:'+';width:22px;height:22px;border:1px solid rgba(30,35,32,.13);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:rgba(30,35,32,.58);font-size:15px}
 .task-history-drawer[open] summary:after{content:'-'}
 .task-history-copy{margin:0 13px 10px;padding:10px 11px;border:1px solid rgba(30,35,32,.08);border-radius:8px;background:rgba(30,35,32,.025);color:rgba(30,35,32,.56);font-size:12px;line-height:1.4}
+.task-lane:not([open]),.today-work-group:not([open]){background:rgba(17,19,20,.46)}
+.task-lane:not([open]) .task-lane-title span,.today-work-group:not([open]) .today-work-group-title span{color:rgba(var(--cream),.36)}
+.task-lane:not([open]) .task-lane-count,.today-work-group:not([open]) .today-work-group-count{opacity:.68}
 .crm-drawer{border:1px solid rgba(var(--cream),.09);border-radius:8px;background:#151618;margin-top:12px;overflow:hidden}
 .crm-drawer summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-weight:800;list-style:none;color:rgba(var(--cream),.72)}
 .crm-drawer summary::-webkit-details-marker{display:none}
@@ -1383,20 +1391,44 @@ var signals=[
 return '<section class="today-signal-strip">'+signals.map(function(item){return '<button class="today-signal '+(item.hot?'hot':'ready')+'" data-jump-tab="'+esc(item.tab)+'"><span>'+esc(item.label)+'</span><strong>'+esc(item.value||0)+'</strong><small>'+esc(item.note)+'</small></button>'}).join('')+'</section>';
 }
 
+function firstDashboardTask(data,types){
+var wanted=new Set(types);
+return (data.tasks||[]).find(function(row){return wanted.has(String(row.type||'').toLowerCase())});
+}
+
+function customerFirstPriority(kind,title,detail,row,tab,pane,hot){
+return {kind:kind,title:title,detail:detail,tab:tab,hot:hot,customer_id:row&&row.customer_id,profile_pane:pane,reservation_id:row&&row.charge_id};
+}
+
+function priorityButton(item,label,style){
+var className=style||'btn small';
+if(item.customer_id)return '<button class="'+esc(className)+'" data-open-customer="'+esc(item.customer_id)+'" data-open-customer-pane="'+esc(item.profile_pane||'work')+'">'+esc(label||'Open profile')+'</button>';
+if(item.reservation_id)return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open balance')+'</button>';
+return '<button class="'+esc(className)+'" data-jump-tab="'+esc(item.tab||'today')+'">'+esc(label||'Open')+'</button>';
+}
+
 function collectPriorityItems(data){
 var summary=data.summary||{};
 var items=[];
-function add(kind,title,detail,tab,hot){
-items.push({kind:kind,title:title,detail:detail,tab:tab,hot:hot});
+function add(kind,title,detail,tab,hot,row,pane){
+items.push(customerFirstPriority(kind,title,detail,row||{},tab, pane||'work', hot));
 }
-if(Number(summary.tasks_overdue||0)>0)add('Tasks',summary.tasks_overdue+' overdue task(s)','Start here before anything slips.', 'tasks', true);
-if(Number(summary.follow_ups_due||0)>0)add('Follow-up',summary.follow_ups_due+' follow-up(s) due','Customers waiting for the next touch.', 'tasks', true);
-if(Number(summary.new_inquiries||0)>0)add('Sales',summary.new_inquiries+' new '+(Number(summary.new_inquiries||0)===1?'inquiry':'inquiries'),'Fresh website activity to qualify.', 'inquiries', true);
-if((data.message_preview||[]).length)add('Messages',(data.message_preview||[]).length+' recent message(s)','Check newest inbound SMS/email replies.', 'communications', true);
-if(Number(summary.needs_notice||0)>0)add('Balances',summary.needs_notice+' final-balance notice(s) needed','Send notice before any remaining-balance collection.', 'finals', false);
-if(Number(summary.ready_to_charge||0)>0)add('Money',summary.ready_to_charge+' ready for dry run','Verify before charging any remaining balance.', 'finals', true);
-if(Number(summary.failed_payments||0)>0)add('Risk',summary.failed_payments+' failed payment(s)','Resolve payment cleanup before fulfillment.', 'payments', true);
-if(Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0)>0)add('Backup','Raw Airtable records need sync','Organize raw activity into clean CRM profiles.', 'settings', false);
+var overdue=firstDashboardTask(data,['general','customer_reply','inquiry_followup','final_balance','payment','operations','accounting','payroll','inventory','owner_task']);
+var follow=firstDashboardTask(data,['follow_up']);
+var inquiry=firstDashboardTask(data,['inquiry']);
+var notice=firstDashboardTask(data,['notice']);
+var charge=firstDashboardTask(data,['charge']);
+var failed=firstDashboardTask(data,['payment']);
+var raw=firstDashboardTask(data,['raw_backup']);
+var message=(data.message_preview||[]).find(function(row){return row.customer_id||row.customers&&row.customers.id});
+if(Number(summary.tasks_overdue||0)>0)add('Tasks',summary.tasks_overdue+' overdue task(s)',overdue&&overdue.detail?overdue.detail:'Start here before anything slips.','tasks',true,overdue,'work');
+if(Number(summary.follow_ups_due||0)>0)add('Follow-up',follow&&follow.detail?'Follow up with '+follow.detail:summary.follow_ups_due+' follow-up(s) due',follow&&follow.created_at?'Due '+date(follow.created_at):'Customers waiting for the next touch.','tasks',true,follow,'work');
+if(Number(summary.new_inquiries||0)>0)add('Sales',inquiry&&inquiry.detail?'New inquiry from '+inquiry.detail:summary.new_inquiries+' new '+(Number(summary.new_inquiries||0)===1?'inquiry':'inquiries'),inquiry&&inquiry.title?inquiry.title:'Fresh website activity to qualify.','inquiries',true,inquiry,'messages');
+if(message){var messageCustomer=message.customer_id||message.customers&&message.customers.id;items.push({kind:'Messages',title:'New '+String(message.channel||'message').toUpperCase()+' from '+(message.customers&&message.customers.full_name||'customer'),detail:message.subject||message.body||'Open the profile and reply.',tab:'communications',hot:true,customer_id:messageCustomer,profile_pane:'messages'});}
+if(Number(summary.needs_notice||0)>0)add('Balances',notice&&notice.detail?'Send balance notice for '+notice.detail:summary.needs_notice+' final-balance notice(s) needed','Send notice before any remaining-balance collection.','finals',false,notice,'sales');
+if(Number(summary.ready_to_charge||0)>0)add('Money',charge&&charge.detail?'Dry run final balance for '+charge.detail:summary.ready_to_charge+' ready for dry run','Verify before charging any remaining balance.','finals',true,charge,'sales');
+if(Number(summary.failed_payments||0)>0)add('Risk',failed&&failed.detail?failed.detail:summary.failed_payments+' failed payment(s)','Resolve payment cleanup before fulfillment.','payments',true,failed,'sales');
+if(Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0)>0)add('Backup','Raw Airtable records need sync',raw&&raw.detail?raw.detail:'Organize raw activity into clean CRM profiles.','settings',false,raw,'profile');
 return items;
 }
 
@@ -1467,6 +1499,11 @@ var profile=row.customer_id?openProfileButton(row.customer_id,'Profile'):'<butto
 return profile+'<button class="btn small" data-task-status="'+esc(row.owner_task_id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(row.owner_task_id)+'" data-status="archived">Archive</button>';
 }
 
+function firstOpenLaneKey(lanes){
+var first=(lanes||[]).find(function(lane){return lane.rows&&lane.rows.length});
+return first?first.key:'';
+}
+
 function renderTodayTasks(tasks){
 var rows=(tasks||[]).slice(0,24);
 if(!rows.length)return '<div class="today-empty">No urgent work right now. Use the lens cards above when you want to review sales, ops, or founder-only money work.</div>';
@@ -1485,8 +1522,9 @@ else if(['inquiry','contact','customer_reply','inquiry_followup'].includes(type)
 else if(['raw_backup','duplicate','operations','accounting','payroll','inventory'].includes(type))lanes[3].rows.push(row);
 else lanes[1].rows.push(row);
 });
+var openLane=firstOpenLaneKey(lanes);
 return '<div class="today-work-groups">'+lanes.map(function(lane,index){
-var open=lane.rows.length&&(index<2||lane.key==='money');
+var open=lane.key===openLane;
 return '<details class="today-work-group" '+(open?'open':'')+'><summary class="today-work-group-head"><div class="today-work-group-title"><strong>'+esc(lane.title)+'</strong><span>'+esc(lane.note)+'</span></div><span class="pill today-work-group-count">'+esc(lane.rows.length)+' item'+(lane.rows.length===1?'':'s')+'</span></summary>'+(lane.rows.length?'<div class="today-work-group-body">'+lane.rows.slice(0,8).map(function(row){
 var tab=todayTaskTab(row);
 var rowClass=(todayTaskHot(row)?'hot ':'')+(todayTaskMoney(row)?'money':'');
@@ -1520,7 +1558,7 @@ function renderPriorityQueue(data){
 var items=collectPriorityItems(data);
 if(!items.length)return '<section class="priority-panel"><div class="priority-headline"><div><h2>Today is clear.</h2><p>No urgent work is waiting. Use a lens below when you want to review customers, sales, ops, or founder-only money work.</p></div><span class="pill">Clear</span></div><div class="priority-empty-actions"><button class="btn quiet small" data-jump-tab="customers">Customers</button><button class="btn quiet small" data-jump-tab="tasks">Tasks</button><button class="btn quiet small" data-jump-tab="inquiries">Inquiries</button></div></section>';
 var first=items[0];
-return '<section class="priority-panel '+(first.hot?'hot':'')+'"><div class="priority-headline"><div><h2>'+esc(first.title)+'</h2><p>'+esc(first.detail)+'</p></div><button class="btn small" data-jump-tab="'+esc(first.tab)+'">Start here</button></div><div class="priority-list">'+items.slice(1,7).map(function(item){return '<div class="priority-row '+(item.hot?'hot':'')+'"><div class="priority-kind">'+esc(item.kind)+'</div><div class="priority-copy"><strong>'+esc(item.title)+'</strong><span>'+esc(item.detail)+'</span></div><button class="btn quiet small" data-jump-tab="'+esc(item.tab)+'">Open</button></div>'}).join('')+'</div></section>';
+return '<section class="priority-panel '+(first.hot?'hot':'')+'"><div class="priority-headline"><div><h2>'+esc(first.title)+'</h2><p>'+esc(first.detail)+'</p></div>'+priorityButton(first,'Start here','btn small')+'</div><div class="priority-list">'+items.slice(1,7).map(function(item){return '<div class="priority-row '+(item.hot?'hot':'')+'"><div class="priority-kind">'+esc(item.kind)+'</div><div class="priority-copy"><strong>'+esc(item.title)+'</strong><span>'+esc(item.detail)+'</span></div>'+priorityButton(item,'Open','btn quiet small')+'</div>'}).join('')+'</div></section>';
 }
 
 function renderToday(){
@@ -1593,8 +1631,9 @@ else if(['payment','final_balance','operations','accounting','payroll','inventor
 else if(customerId||['customer_reply','inquiry_followup'].includes(type))lanes[1].rows.push(task);
 else lanes[3].rows.push(task);
 });
+var openLane=firstOpenLaneKey(lanes);
 return '<div class="task-lanes">'+lanes.map(function(lane,index){
-var open=lane.rows.length&&(index<2||lane.key==='money');
+var open=lane.key===openLane;
 return '<details class="task-lane" '+(open?'open':'')+'><summary class="task-lane-head"><div class="task-lane-title"><strong>'+esc(lane.title)+'</strong><span>'+esc(lane.note)+'</span></div><span class="pill task-lane-count">'+esc(lane.rows.length)+' task'+(lane.rows.length===1?'':'s')+'</span></summary>'+(lane.rows.length?'<div class="task-lane-body">'+lane.rows.map(taskCard).join('')+'</div>':'<div class="task-lane-empty">Nothing here right now.</div>')+'</details>';
 }).join('')+'</div>';
 }
@@ -1824,7 +1863,11 @@ await post('/api/admin-update-task',{task_id:taskId,status:status});
 if(activeTab==='today'){state.dashboard=await endpoint('/api/admin-dashboard');renderToday()}
 if(activeTab==='tasks'){state.tasks=await endpoint('/api/admin-tasks?status='+encodeURIComponent(state.taskFilter||'active'));renderTasks()}
 if(activeTab==='customers'&&state.customerDetail&&state.customerDetail.customer){state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(state.customerDetail.customer.id));renderCustomers()}
-statusText.innerHTML='<span class="ok">Task updated.</span>';
+var taskMessage='Task updated.';
+if(status==='done')taskMessage='Task completed and removed from active todos. It remains in customer history.';
+if(status==='archived')taskMessage='Task archived and removed from active todos. It remains in customer history.';
+if(status==='open')taskMessage='Task reopened.';
+statusText.innerHTML='<span class="ok">'+esc(taskMessage)+'</span>';
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not update task.')+'</span>'}
 }
 
@@ -2272,8 +2315,16 @@ var inactive=tasks.filter(function(task){return ['done','archived'].includes(tas
 var done=tasks.filter(function(task){return task.status==='done'}).length;
 return '<div class="detail-block"><div class="bar"><div><div class="section-title">Tasks for this customer</div><p class="muted">Complete or archive tasks to remove them from active todos. The history stays attached to this customer.</p></div><span class="pill">Active <strong>'+esc(active.length)+'</strong></span><span class="pill">Completed <strong>'+esc(done)+'</strong></span></div>'+
 '<details class="task-composer"><summary>Add a task for this customer</summary><div class="task-composer-body"><div class="record-grid"><label>Task<input id="profileTaskTitle" placeholder="Example: text back about sizing"></label><label>Type<select id="profileTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="profileTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due date<input id="profileTaskDue" type="date"><span class="field-help">Pick a date from the calendar.</span></label><label>Notes<textarea id="profileTaskDescription" placeholder="What should future you remember?"></textarea></label></div><button class="btn" id="addCustomerTaskBtn" style="margin-top:10px">Add customer task</button></div></details>'+
-(active.length?'<div class="customer-task-list">'+active.slice(0,8).map(customerTaskCard).join('')+'</div>':'<div class="empty" style="margin-top:14px">No open tasks for this customer.</div>')+
+renderActiveCustomerTasks(active)+
 (inactive.length?'<details class="task-history-drawer"><summary>Completed / archived task history ('+esc(inactive.length)+')</summary><div class="task-history-copy">These are no longer active todos. They stay here so the customer profile keeps the full work history.</div>'+table(['State','Task','Linked to','Type','Priority','Due','Action'],taskRows(inactive.slice(0,12)),true)+'</details>':'')+'</div>';
+}
+
+function renderActiveCustomerTasks(active){
+if(!active.length)return '<div class="empty" style="margin-top:14px">No open tasks for this customer.</div>';
+var primary=active.slice(0,4);
+var extra=active.slice(4);
+return '<div class="customer-task-list">'+primary.map(customerTaskCard).join('')+'</div>'+
+(extra.length?'<details class="task-history-drawer customer-task-more"><summary>Show remaining active tasks ('+esc(extra.length)+')</summary><div class="task-history-copy">Lower-pressure work stays tucked away until you need it.</div><div class="customer-task-list">'+extra.map(customerTaskCard).join('')+'</div></details>':'');
 }
 
 function renderCustomerTaskPreview(detail){
@@ -2358,6 +2409,31 @@ if(c.contact_status==='not_contacted')return {title:'First follow-up',note:'This
 return {title:'Keep warm',note:'Use notes, tasks, or a message to keep the relationship moving.',pane:'work',hot:false};
 }
 
+function customerFinalBalanceRisk(detail){
+if(!isOwner())return null;
+var reservations=detail.reservations||[];
+var open=reservations.filter(function(row){return !row.final_balance_payment_intent_id&&Number(row.final_balance_total||row.final_balance_amount||0)>0});
+if(!open.length)return null;
+var manual=open.find(function(row){return row.blocked_reason||!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized});
+if(manual)return {level:'blocked',title:'Manual final-balance path',amount:Number(manual.final_balance_total||manual.final_balance_amount||0),pane:'sales',reservation:manual,note:manual.blocked_reason||'This customer still owes a balance, but this profile does not have the saved-card permission/payment-method path needed for batch charging. Use a Stripe invoice or payment link unless the original reservation checkout is reconnected.'};
+var needsNotice=open.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at});
+if(needsNotice)return {level:'needs',title:'Final-balance notice needed',amount:Number(needsNotice.final_balance_total||needsNotice.final_balance_amount||0),pane:'sales',reservation:needsNotice,note:'Send the required balance email before any remaining-balance collection.'};
+var ready=open.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
+if(ready)return {level:'ready',title:'Final balance ready for dry run',amount:Number(ready.final_balance_total||ready.final_balance_amount||0),pane:'sales',reservation:ready,note:'Run a dry run before attempting the final charge.'};
+var waiting=open.find(function(row){return row.final_balance_notice_sent_at});
+if(waiting)return {level:'waiting',title:'Final-balance notice is active',amount:Number(waiting.final_balance_total||waiting.final_balance_amount||0),pane:'sales',reservation:waiting,note:'The notice was sent. The wait period must pass before any charge attempt.'};
+return {level:'needs',title:'Open final balance',amount:open.reduce(function(sum,row){return sum+Number(row.final_balance_total||row.final_balance_amount||0)},0),pane:'sales',reservation:open[0],note:'Review this customer before collecting the remaining balance.'};
+}
+
+function renderCustomerMoneyAlert(detail){
+var risk=customerFinalBalanceRisk(detail);
+if(!risk)return '';
+var chargeId=reservationChargeId(risk.reservation||{});
+var action=chargeId?'<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(chargeId)+'">Check readiness</button>':'<button class="btn quiet small" data-profile-pane="sales">Open sales</button>';
+if(risk.level==='needs'&&chargeId)action='<button class="btn small" data-final-action="notice" data-reservation-id="'+esc(chargeId)+'">Send notice</button>';
+return '<section class="customer-money-alert"><div><strong>'+esc(risk.title)+' · '+money(risk.amount)+'</strong><span>'+esc(risk.note)+'</span></div><div class="actions"><button class="btn quiet small" data-profile-pane="sales">Sales view</button>'+action+'</div></section>';
+}
+
 function renderCustomerWorkStrip(detail,emailHref,smsHref){
 var c=detail.customer||{};
 var tasks=detail.tasks||[];
@@ -2384,6 +2460,7 @@ var overdue=tasks.filter(function(task){return task.due_at&&Date.parse(task.due_
 var inbound=(detail.communications||[]).filter(function(row){return String(row.direction||'').toLowerCase()==='inbound'}).length;
 var inquiries=(detail.inquiries||[]).filter(contactMessageInquiry).length;
 var outstanding=isOwner()?profileOutstanding(detail):0;
+var moneyRisk=customerFinalBalanceRisk(detail);
 var products=profileProducts(detail);
 var contactRoute=c.email&&c.phone?'Email + text':(c.email?'Email only':(c.phone?'Text only':'Missing contact'));
 var contactNote=[c.email,c.phone].filter(Boolean).join(' · ')||'Add email or phone before messaging.';
@@ -2396,7 +2473,7 @@ var cards=[
 {label:'Contact route',value:contactRoute,note:contactNote,hot:!c.email&&!c.phone},
 {label:'Relationship',value:status,note:follow,hot:String(c.contact_status||'').toLowerCase()==='needs_reply'},
 {label:'Open work',value:tasks.length+' task(s)',note:overdue?overdue+' overdue':'No overdue tasks',hot:overdue>0},
-{label:isOwner()?'Money':'Interest',value:isOwner()?money(outstanding):(products[0]||'No product yet'),note:isOwner()?(outstanding?'Still owed':'No balance due'):(inquiries+' message(s)'),money:isOwner()&&outstanding>0}
+{label:isOwner()?'Money':'Interest',value:isOwner()?money(outstanding):(products[0]||'No product yet'),note:isOwner()?(moneyRisk?moneyRisk.title:(outstanding?'Still owed':'No balance due')):(inquiries+' message(s)'),money:isOwner()&&outstanding>0,hot:!!moneyRisk&&moneyRisk.level==='blocked'}
 ];
 return '<section class="customer-brain"><div class="customer-brain-head"><div><span>Customer command</span><strong>'+esc(next.title)+'</strong><p>'+esc(next.note)+'</p></div><div class="actions">'+(emailHref?'<a class="btn quiet small" href="'+esc(emailHref)+'">Email</a>':'')+(smsHref?'<a class="btn quiet small" href="'+esc(smsHref)+'">Text</a>':'')+'<button class="btn quiet small" data-profile-pane="'+esc(next.pane)+'">Open next move</button></div></div><div class="customer-brain-grid">'+cards.map(function(card){return '<article class="customer-brain-card '+(card.hot?'hot ':'')+(card.money?'money':'')+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value)+'</strong><small>'+esc(card.note)+'</small></article>'}).join('')+'</div></section>';
 }
@@ -2581,9 +2658,12 @@ var emailHref=c.email?'mailto:'+encodeURIComponent(c.email):'';
 var smsHref=c.phone?'sms:'+encodeURIComponent(c.phone):'';
 var raw=c.fallback_source==='airtable_forms'||String(c.id||'').indexOf('airtable:')===0;
 var badge=raw?'<span class="health warn">Raw backup</span>':'<span class="health good">Private CRM</span>';
+var moneyRisk=customerFinalBalanceRisk(detail);
+var moneyBadge=moneyRisk?'<span class="health bad">'+esc(moneyRisk.title)+'</span>':'';
 var rawNotice=raw?'<div class="notice warn"><strong>Raw backup caught this.</strong><br>This profile was assembled from Airtable source records. Organize it into the private CRM when you want fully editable notes, messages, reservations, and payment history.</div>':'';
-return '<div class="customer-workspace-head"><div class="customer-identity"><span>'+esc(raw?'Raw profile':'Customer profile')+'</span><h2>'+esc(c.full_name||c.email||c.phone||'Customer')+'</h2><div class="customer-contact-line"><span>Email <strong>'+esc(c.email||'Missing')+'</strong></span><span>Phone <strong>'+esc(c.phone||'Missing')+'</strong></span></div></div><div class="customer-status-stack">'+badge+'<span class="pill">Origin <strong>'+esc(customerOriginLabel(detail))+'</strong></span><span class="pill">Status <strong>'+esc(customerContactLabel(c.contact_status,c.status))+'</strong></span></div></div>'+
+return '<div class="customer-workspace-head"><div class="customer-identity"><span>'+esc(raw?'Raw profile':'Customer profile')+'</span><h2>'+esc(c.full_name||c.email||c.phone||'Customer')+'</h2><div class="customer-contact-line"><span>Email <strong>'+esc(c.email||'Missing')+'</strong></span><span>Phone <strong>'+esc(c.phone||'Missing')+'</strong></span></div></div><div class="customer-status-stack">'+badge+moneyBadge+'<span class="pill">Origin <strong>'+esc(customerOriginLabel(detail))+'</strong></span><span class="pill">Status <strong>'+esc(customerContactLabel(c.contact_status,c.status))+'</strong></span></div></div>'+
 rawNotice+
+renderCustomerMoneyAlert(detail)+
 renderCustomerBrain(detail,raw,emailHref,smsHref)+
 renderCustomerPaneTabs(detail,raw)+
 renderCustomerPane(detail,raw,emailHref,smsHref);
@@ -2871,9 +2951,10 @@ if(!id)return '<span class="muted">No linked profile</span>';
 return '<button class="btn quiet small" data-open-customer="'+esc(id)+'">'+esc(label||'Open profile')+'</button>';
 }
 
-async function openCustomer(customerId){
+async function openCustomer(customerId,pane){
 if(!customerId)return;
 setBusy('Opening customer profile...');
+if(pane)state.customerProfilePane=pane;
 state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(customerId));
 if(!state.customers.length)state.customers=(await endpoint('/api/admin-customers')).customers||[];
 setTab('customers');
@@ -2881,7 +2962,7 @@ statusText.innerHTML='<span class="ok">Customer profile opened.</span>';
 }
 
 function bindCustomerOpeners(){
-document.querySelectorAll('[data-open-customer]').forEach(function(el){el.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();openCustomer(el.dataset.openCustomer)})});
+document.querySelectorAll('[data-open-customer]').forEach(function(el){el.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();openCustomer(el.dataset.openCustomer,el.dataset.openCustomerPane||'')})});
 }
 
 function reservationStatus(row){
@@ -2895,14 +2976,27 @@ function reservationChargeId(row){
 return row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||'';
 }
 
+function profileReservationState(row){
+var amount=Number(row.final_balance_total||row.final_balance_amount||0);
+if(row.final_balance_payment_intent_id)return {className:'charged',label:'Final paid',note:'Remaining balance collected.'};
+if(amount<=0)return {className:'ready',label:'No balance due',note:'No remaining balance is recorded.'};
+if(row.blocked_reason)return {className:'blocked',label:'Manual review',note:row.blocked_reason};
+if(!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized)return {className:'blocked',label:'Manual balance path',note:'No saved-card batch-charge path is connected. Use Stripe invoice/payment link unless this reservation is reconnected.'};
+if(['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at)return {className:'needs',label:'Needs notice',note:'Send the balance email before collecting.'};
+if(finalBalanceReady(row))return {className:'ready',label:'Ready for dry run',note:'Run dry run before charging.'};
+if(row.final_balance_notice_sent_at)return {className:'waiting',label:'Waiting period',note:'Notice sent. Wait period must pass before charging.'};
+return {className:'needs',label:'Review balance',note:'Open final-balance workflow before collecting.'};
+}
+
 function renderProfileReservations(reservations){
 if(!reservations.length)return '<div class="empty">No reservations yet.</div>';
 return table(['Product','Status','Balance','Stripe','Actions'],reservations.map(function(row){
 var chargeId=reservationChargeId(row);
+var state=profileReservationState(row);
 var actions=chargeId?'<div class="actions"><button class="btn quiet" data-final-action="notice" data-reservation-id="'+esc(chargeId)+'">Send notice</button><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(chargeId)+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(chargeId)+'">Charge</button></div>':'<span class="muted">No charge record linked yet</span>';
 return [
 esc(row.product_selection||row.product||'Reservation')+'<br><span class="muted">'+esc(row.size||row.size_selection||'')+'</span>',
-esc(reservationStatus(row))+'<br><span class="muted">'+esc(row.updated_at||row.created_at||'')+'</span>',
+ '<span class="status '+esc(state.className)+'">'+esc(state.label)+'</span><br><span class="muted">'+esc(state.note)+'</span><br><span class="muted">'+esc(row.updated_at||row.created_at||'')+'</span>',
 money(row.final_balance_total||row.final_balance_amount||0)+'<br><span class="muted">Deposit '+money(row.deposit_amount||0)+'</span>',
 esc(row.stripe_customer_id||'')+'<br><span class="muted">'+(row.stripe_payment_method_id?'Saved payment method':'No saved payment method shown')+'</span>',
 actions
