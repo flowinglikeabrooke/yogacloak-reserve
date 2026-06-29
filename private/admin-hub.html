@@ -47,6 +47,8 @@ button:disabled{cursor:not-allowed;opacity:.45}
 .eyebrow{display:block;margin:16px 0 10px;font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:rgba(var(--cream),.46);font-weight:800}
 h1{font-family:'Hanken Grotesk',sans-serif;font-size:clamp(42px,5.8vw,76px);font-weight:500;letter-spacing:-.04em;line-height:1.02;max-width:820px}
 h1 em{font-style:italic;font-weight:300;color:rgba(var(--cream),.66)}
+.command-title{font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;font-size:clamp(82px,13.6vw,176px);font-style:italic;font-weight:300;letter-spacing:-.075em;line-height:.78;color:rgba(251,248,240,.62);max-width:none;margin-top:20px;text-transform:lowercase}
+.command-center-label{display:block;margin-top:18px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--cream),.48);font-weight:800}
 .sub{font-family:'Hanken Grotesk',sans-serif;color:rgba(var(--cream),.6);font-size:15px;line-height:1.7;margin-top:18px;max-width:680px;font-style:italic;font-weight:300}
 .panel{padding:18px;margin-bottom:14px}
 .login{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
@@ -147,10 +149,11 @@ tr:last-child td{border-bottom:0}
 .automation-preset:hover{background:rgba(var(--cream),.06);transform:translateY(-1px)}
 .automation-builder-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .automation-palette{display:grid;gap:8px;margin-top:8px}
-.automation-choice{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(var(--cream),.1);border-radius:8px;background:rgba(var(--cream),.035);padding:12px}
-.automation-choice strong{color:var(--bone);font-size:13px}
-.automation-choice span{font-size:11px;color:rgba(var(--cream),.5)}
-.automation-plus{min-width:36px;height:36px;border-radius:999px;padding:0;font-size:20px;line-height:1}
+.automation-choice{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid rgba(var(--cream),.1);border-radius:8px;background:rgba(var(--cream),.035);padding:13px 12px}
+.automation-choice-copy{min-width:0}
+.automation-choice strong{display:block;color:var(--bone);font-size:13px;line-height:1.22}
+.automation-choice span{display:block;margin-top:4px;font-size:11px;color:rgba(var(--cream),.5);line-height:1.35}
+.automation-plus{flex:0 0 36px;min-width:36px;height:36px;border-radius:999px;padding:0;font-size:20px;line-height:1}
 .automation-settings-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:14px;align-items:start}
 .automation-list{display:grid;gap:8px}
 .automation-list button{width:100%;text-align:left;display:block;background:rgba(var(--cream),.035);border:1px solid rgba(var(--cream),.08);border-radius:8px;color:rgba(var(--cream),.68);padding:13px;box-shadow:none}
@@ -274,7 +277,8 @@ tr:last-child td{border-bottom:0}
 <div class="hero">
 <a href="/" class="wordmark"><span>yoga</span><strong>cloak</strong></a>
 <span class="eyebrow">Private admin hub</span>
-<h1><span id="heroRoleLabel">Command center</span></h1>
+<h1 class="command-title"><span id="heroRoleLabel">command</span></h1>
+<span class="command-center-label">center</span>
 <p class="sub">Client profiles, inquiry follow-ups, messages, tasks, reservations, and owner-only money tools in one calm place.</p>
 </div>
 </div>
@@ -1438,27 +1442,27 @@ return value==='auto_send'?'Auto-send':'Draft only';
 
 function automationStudio(){
 var triggers=[
-['inquiry_created','New inquiry','Contact form creates or updates a customer'],
-['sms_opt_in_created','SMS opt-in','Customer gives text permission'],
-['reservation_created','Deposit made','Reservation/payment activity starts'],
-['final_balance_ready','Final balance ready','Notice was sent and wait period passed'],
-['birthday_today','Birthday','Send a warm note or discount later']
+['inquiry_created','New inquiry','Contact form creates or updates a customer profile'],
+['sms_opt_in_created','SMS opt-in','Customer gives permission to text'],
+['reservation_created','Deposit made','Reservation and payment activity starts'],
+['final_balance_ready','Final balance ready','Email notice is sent and the wait period has passed'],
+['birthday_today','Customer birthday','Draft a birthday note or discount code']
 ];
 var actions=[
-['task','Create task','Make sure Brooke or Christian follows up'],
-['email','Send email','Owner alert or customer response'],
-['sms','Send text','Only with opt-in and Twilio setup'],
-['note','Add note','Log context on the customer timeline'],
-['charge','Queue charge','Founder-controlled final-balance action']
+['task','Create task','Assign a follow-up to Brooke or Christian'],
+['email','Send email','Notify an owner or prepare a customer reply'],
+['sms','Send text','Only when the customer has opted into SMS'],
+['note','Add timeline note','Save context on the customer profile'],
+['charge','Queue balance charge','Founder-controlled final-balance step']
 ];
 var presets=[
 ['New inquiry follow-up','Create task, alert owner, draft reply'],
 ['SMS opt-in welcome','Create a text task and draft welcome SMS'],
 ['Deposit received','Alert owners and add reservation task'],
 ['Final balance ready','Notify owner before batch charge'],
-['Birthday love','Draft birthday wish and discount code']
+['Birthday message','Draft birthday wish and discount code']
 ];
-return '<section class="panel"><div class="bar"><div><div class="section-title">Automation studio</div><p class="muted">Build flows like a CRM: choose what starts it, then stack actions. The saved recipes below are the live rules running today.</p></div><button class="btn" id="newAutomationIdea">+ New automation</button></div><div class="automation-studio"><aside class="automation-rail"><h3>Quick recipes</h3><p>Start from a pattern yogacloak will use often.</p>'+presets.map(function(item){return '<button class="automation-preset" data-automation-idea="'+esc(item[0])+'"><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+'</span></button>'}).join('')+'</aside><div class="automation-builder"><h3>Flow builder</h3><p>Click plus to sketch a flow. Custom multi-step saving comes next; current live rules stay safe and editable below.</p><div class="automation-builder-grid"><div><div class="tiny-label">Triggers</div><div class="automation-palette">'+triggers.map(function(item){return '<div class="automation-choice"><div><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="trigger:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div><div><div class="tiny-label">Actions</div><div class="automation-palette">'+actions.map(function(item){return '<div class="automation-choice"><div><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="action:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div></div><div class="notice" id="automationSketch" style="margin-top:14px"><strong>Sketch an automation.</strong><br>Example: New inquiry -> create task -> send owner email -> draft customer reply.</div></div></div></section>';
+return '<section class="panel"><div class="bar"><div><div class="section-title">Automation studio</div><p class="muted">Choose what starts a workflow, then add the owner tasks, emails, texts, notes, or balance steps that should happen next.</p></div><button class="btn" id="newAutomationIdea">+ New automation</button></div><div class="automation-studio"><aside class="automation-rail"><h3>Quick recipes</h3><p>Start with a workflow yogacloak will use often.</p>'+presets.map(function(item){return '<button class="automation-preset" data-automation-idea="'+esc(item[0])+'"><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+'</span></button>'}).join('')+'</aside><div class="automation-builder"><h3>Flow builder</h3><p>Click plus to sketch the workflow. Saved live rules stay below in Automation settings.</p><div class="automation-builder-grid"><div><div class="tiny-label">Triggers</div><div class="automation-palette">'+triggers.map(function(item){return '<div class="automation-choice"><div class="automation-choice-copy"><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="trigger:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div><div><div class="tiny-label">Actions</div><div class="automation-palette">'+actions.map(function(item){return '<div class="automation-choice"><div class="automation-choice-copy"><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="action:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div></div><div class="notice" id="automationSketch" style="margin-top:14px"><strong>Sketch an automation.</strong><br>Example: new inquiry -> create task -> send owner email -> draft customer reply.</div></div></div></section>';
 }
 
 function renderAutomationCard(rule){
