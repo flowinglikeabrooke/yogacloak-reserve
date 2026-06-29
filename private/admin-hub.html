@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1E2320;--ink-2:#252b27;--panel:#151618;--panel2:#1a1d1b;--bone:#fbf8f0;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--gold:#d8c7a2;--rose:#d4948d;--blue:#9aadb9;--line:rgba(251,248,240,.09);--muted:rgba(251,248,240,.58);--soft:rgba(251,248,240,.06);--cream:251,248,240;--phi:1.618;--page-max:1618px;--read-max:1000px;--side-max:618px;--space-1:5px;--space-2:8px;--space-3:13px;--space-4:21px;--space-5:34px;--space-6:55px;--space-7:89px;--gutter:clamp(21px,3.4vw,55px);--shadow:0 34px 90px -48px rgba(0,0,0,.72)}
+:root{--ink:#1E2320;--ink-2:#252b27;--panel:#151618;--panel2:#1a1d1b;--bone:#fbf8f0;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--gold:#d8c7a2;--rose:#d4948d;--blue:#9aadb9;--line:rgba(251,248,240,.09);--muted:rgba(251,248,240,.58);--soft:rgba(251,248,240,.06);--cream:251,248,240;--phi:1.618;--page-max:1618px;--read-max:1000px;--side-max:618px;--space-1:5px;--space-2:8px;--space-3:13px;--space-4:21px;--space-5:34px;--space-6:55px;--space-7:89px;--gutter:clamp(21px,3.4vw,55px);--radius-sm:5px;--radius:8px;--radius-lg:13px;--main-col:minmax(0,1.618fr);--side-col:minmax(360px,1fr);--shadow:0 34px 90px -48px rgba(0,0,0,.72)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{min-height:100vh;background:var(--ink);color:var(--bone);font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:0;overflow-x:hidden}
 a{color:inherit}
@@ -1145,29 +1145,84 @@ textarea{background:rgba(0,0,0,.14);border-color:rgba(var(--cream),.1)}
 .signal-drawer summary{color:rgba(var(--cream),.66);background:rgba(var(--cream),.012)}
 .section-title{letter-spacing:-.025em}
 /* Golden-ratio rhythm: one proportional system for the whole command center. */
-.ops-panel,.panel,.card,.customer-card-row,.task-card,.inquiry-card,.message-card,.payment-card,.accounting-card,.reservation-card,.final-card,.detail{border-radius:8px}
+.shell{max-width:var(--page-max);padding:var(--space-5) var(--gutter) var(--space-7)}
+.top,.view,.today-command,.finals-page,.customer-page-shell{max-width:var(--page-max)}
+.hero{display:grid;gap:var(--space-3)}
+.ops-panel,.panel,.card,.customer-card-row,.task-card,.inquiry-card,.message-card,.payment-card,.accounting-card,.reservation-card,.final-card,.detail,.detail-block,.crm-tool,.notice,.mini,.setup-card,.automation-card,.automation-rail,.automation-builder,.automation-list button,.automation-preset,.automation-choice,.finals-lane,.finals-command-card,.finals-action-step,.finals-route,.final-decision-money,.final-decision-copy,.final-context,.final-next-box,.profile-drawer,.profile-stat,.profile-hub,.relationship-card{border-radius:var(--radius)}
+.utility-btn,.pill,.status,.btn,.tab,.lens-btn,.customer-queue-chip,.inquiry-filter-chip,.profile-trigger{border-radius:999px}
+.profile-menu,.profile-menu button{border-radius:var(--radius)}
 .grid,.setup-grid,.quick-actions,.hub-card-grid,.today-briefing,.today-command,.today-workspace,.task-board,.inquiry-command,.comms-command,.payment-command,.accounting-command,.reservation-ops,.finals-command-grid,.finals-workflow,.customer-command-grid,.customer-pane-grid,.customer-activity-grid,.customer-operating-grid,.customer-message-workspace,.duplicate-hub-grid{gap:var(--space-4)}
-.customer-list,.task-lanes,.task-lane-body,.inquiry-queue,.message-list,.payment-ledger,.accounting-ledger,.reservation-board,.finals-primary-lanes,.finals-reference-lanes,.finals-records,.automation-settings-layout,.automation-studio,.automation-board{gap:var(--space-3)}
-.card,.task-stat,.inquiry-stat,.comms-stat,.payment-stat,.reservation-stat,.accounting-focus-card,.finals-stat,.finals-command-card,.finals-action-step,.customer-command-panel,.task-command-main,.task-command-side,.inquiry-command-main,.inquiry-guidance,.comms-command-main,.comms-guidance,.payment-command-main,.payment-command-side,.accounting-side,.reservation-ops-main,.reservation-ops-side{padding:var(--space-4)}
-.task-command,.inquiry-command,.comms-command,.payment-command,.reservation-ops{grid-template-columns:minmax(0,1.618fr) minmax(360px,1fr)}
-.accounting-command,.comms-layout{grid-template-columns:minmax(0,1.618fr) minmax(360px,1fr)}
-.finals-command-grid{grid-template-columns:minmax(0,1.618fr) minmax(420px,1fr)}
-.customer-command-grid,.split{grid-template-columns:minmax(0,1.618fr) minmax(420px,1fr)}
+.customer-list,.task-lanes,.task-lane-body,.inquiry-queue,.message-list,.payment-ledger,.accounting-ledger,.reservation-board,.finals-primary-lanes,.finals-reference-lanes,.finals-records,.automation-settings-layout,.automation-studio,.automation-board,.profile-overview,.profile-hubs,.profile-columns,.customer-focus-grid,.customer-work-strip,.customer-brain-grid,.relationship-mini,.record-grid,.finals-summary,.task-stat-grid,.inquiry-stats,.comms-stats,.payment-summary,.reservation-summary,.accounting-focus{gap:var(--space-3)}
+.card,.task-stat,.inquiry-stat,.comms-stat,.payment-stat,.reservation-stat,.accounting-focus-card,.finals-stat,.finals-command-card,.finals-action-step,.customer-command-panel,.task-command-main,.task-command-side,.inquiry-command-main,.inquiry-guidance,.comms-command-main,.comms-guidance,.payment-command-main,.payment-command-side,.accounting-side,.reservation-ops-main,.reservation-ops-side,.today-start,.brief-card,.hub-panel,.detail-block{padding:var(--space-4)}
+.task-command,.inquiry-command,.comms-command,.payment-command,.reservation-ops,.accounting-command,.comms-layout{grid-template-columns:var(--main-col) var(--side-col)}
+.finals-command-grid,.customer-command-grid,.split{grid-template-columns:minmax(0,1.618fr) minmax(420px,1fr)}
+.customer-command-hero{grid-template-columns:minmax(0,1.618fr) minmax(320px,1fr)}
 .customer-card-row{grid-template-columns:minmax(220px,1.618fr) minmax(260px,1fr) minmax(220px,1fr) minmax(200px,.618fr) auto}
 .inquiry-card{grid-template-columns:minmax(260px,1fr) minmax(360px,1.618fr) minmax(300px,1fr)}
+.message-card{grid-template-columns:minmax(180px,.618fr) minmax(0,1.618fr) minmax(180px,.618fr)}
 .payment-card,.accounting-card{grid-template-columns:minmax(220px,1fr) minmax(300px,1.618fr) minmax(220px,1fr) auto}
 .reservation-card{grid-template-columns:minmax(230px,1fr) minmax(260px,1fr) minmax(210px,.618fr) minmax(320px,1.618fr)}
-.finals-decision{grid-template-columns:160px minmax(0,1.618fr) minmax(220px,1fr)}
-.profile-overview,.profile-hubs,.profile-columns,.customer-focus-grid,.customer-work-strip,.customer-brain-grid,.customer-operating-grid,.relationship-mini,.record-grid,.finals-summary,.task-stat-grid,.inquiry-stats,.comms-stats,.payment-summary,.reservation-summary,.accounting-focus{gap:var(--space-3)}
+.finals-decision{grid-template-columns:minmax(144px,.618fr) minmax(0,1.618fr) minmax(220px,1fr)}
 .bar{gap:var(--space-3);margin:var(--space-1) 0 var(--space-4)}
-.actions{gap:var(--space-2)}
+.actions,.meta,.customer-card-signals,.customer-queue-chips,.inquiry-filter-bar,.inquiry-actions,.message-meta,.final-record-tags,.final-next-actions,.reservation-actions{gap:var(--space-2)}
 .btn{padding:var(--space-3) var(--space-4)}
-.btn.quiet.small,.btn.small{padding:var(--space-2) var(--space-3)}
-input,select,textarea{padding:var(--space-3) var(--space-3)}
-.command-title{font-size:clamp(55px,6.18vw,89px);line-height:.98}
+.btn.quiet.small,.btn.small,.utility-btn,.tab{padding:var(--space-2) var(--space-3)}
+input,select,textarea{padding:var(--space-3) var(--space-3);border-radius:var(--radius)}
+.card,.task-stat,.inquiry-stat,.comms-stat,.payment-stat,.reservation-stat,.finals-stat,.today-signal,.hub-card-grid .card{min-height:var(--space-7)}
+.command-title{font-size:clamp(var(--space-6),6.18vw,var(--space-7));line-height:.98}
 .sub{max-width:calc(var(--read-max) * .618)}
-.finals-page,.customer-page-shell{max-width:var(--read-max)}
 #finals .finals-page,#accounting .finals-page{max-width:var(--page-max)}
+/* 2026 command surface: fewer nested boxes, clearer work paths, same data underneath. */
+body{background:linear-gradient(180deg,#1c231f 0%,#18201c 42%,#202820 100%)}
+.shell{padding-top:var(--space-6)}
+.tabs{position:sticky;top:var(--space-3);width:max-content;max-width:100%;margin:var(--space-4) auto var(--space-6);padding:var(--space-2);background:rgba(17,19,20,.72);border:1px solid rgba(var(--cream),.07);border-radius:999px;backdrop-filter:blur(18px);box-shadow:0 21px 55px -42px rgba(0,0,0,.9)}
+.tab{padding:var(--space-2) var(--space-4);color:rgba(var(--cream),.6)}
+.tab.active{box-shadow:none}
+.today-command{gap:var(--space-5);margin-bottom:var(--space-5)}
+.today-briefing{grid-template-columns:minmax(0,1.618fr) minmax(360px,1fr);align-items:stretch}
+.today-start{min-height:258px;padding:var(--space-5);background:linear-gradient(135deg,rgba(251,248,240,.075),rgba(124,140,130,.035) 52%,rgba(0,0,0,.18));border-color:rgba(var(--cream),.1);box-shadow:0 34px 89px -60px rgba(0,0,0,.88)}
+.today-start.hot{background:linear-gradient(135deg,rgba(212,148,141,.12),rgba(251,248,240,.045) 55%,rgba(0,0,0,.18));box-shadow:inset var(--space-1) 0 0 rgba(212,148,141,.58),0 34px 89px -60px rgba(0,0,0,.88)}
+.today-start span{font-size:10px;color:rgba(var(--cream),.5)}
+.today-start h2{font-size:clamp(32px,3.4vw,55px);max-width:760px}
+.today-start p{font-size:15px;max-width:720px;color:rgba(var(--cream),.62)}
+.today-brief-side{gap:var(--space-3)}
+.brief-card{min-height:0;padding:var(--space-4);background:rgba(17,19,20,.58);border-color:rgba(var(--cream),.055)}
+.brief-card strong{font-size:28px}
+.today-workspace{grid-template-columns:minmax(0,1.618fr) minmax(380px,1fr);max-width:var(--page-max);gap:var(--space-5)}
+.work-panel{padding:var(--space-5);background:rgba(17,19,20,.68);border-color:rgba(var(--cream),.065);box-shadow:0 34px 89px -62px rgba(0,0,0,.88)}
+.work-panel header{margin-bottom:var(--space-4)}
+.work-panel h2{font-size:clamp(24px,2.1vw,34px)}
+.today-work-groups{gap:var(--space-3)}
+.today-work-group{background:rgba(var(--cream),.018);border-color:rgba(var(--cream),.065)}
+.today-work-group:not([open]){background:transparent}
+.today-work-group-head{padding:var(--space-4)}
+.today-work-group-head:after{content:'+';background:rgba(var(--cream),.035)}
+.today-work-group-title strong{font-size:17px}
+.today-work-group-title span{max-width:760px}
+.today-work-group-body{padding:0 var(--space-4);gap:var(--space-3)}
+.today-flow-row{grid-template-columns:minmax(120px,.42fr) minmax(0,1.618fr) auto;padding:var(--space-4);background:rgba(251,248,240,.025);border-color:rgba(var(--cream),.06)}
+.today-flow-row:hover{background:rgba(251,248,240,.045);border-color:rgba(var(--cream),.13)}
+.today-flow-row.hot,.today-flow-row.money{background:rgba(251,248,240,.026);border-color:rgba(var(--cream),.065)}
+.today-flow-kind strong,.today-flow-copy strong{font-size:15px}
+.today-flow-route{background:transparent!important;border-color:rgba(var(--cream),.1)}
+.today-side{gap:var(--space-4)}
+.work-row{padding:var(--space-4);background:rgba(251,248,240,.024);border-color:rgba(var(--cream),.06)}
+.signal-drawer{background:rgba(17,19,20,.42);border-color:rgba(var(--cream),.06)}
+.signal-drawer summary{padding:var(--space-4)}
+.customer-command-panel{padding:var(--space-5);background:rgba(17,19,20,.68);border-color:rgba(var(--cream),.065)}
+.customer-command-head h2{font-size:clamp(24px,2.2vw,34px)}
+.customer-queue-chip{padding:var(--space-3) var(--space-4);background:rgba(var(--cream),.026)}
+.customer-filter-panel{grid-template-columns:minmax(220px,.618fr) minmax(360px,1.618fr) auto auto;gap:var(--space-3)}
+.customer-list{gap:var(--space-4)}
+.customer-card-row{padding:var(--space-4);background:rgba(17,19,20,.68);border-color:rgba(var(--cream),.06);box-shadow:0 21px 55px -48px rgba(0,0,0,.72)}
+.customer-card-row:hover{background:rgba(251,248,240,.04);border-color:rgba(var(--cream),.13)}
+.customer-card-main strong{font-size:18px}
+.customer-card-meta,.customer-card-contact,.next-read{background:rgba(251,248,240,.018);border:1px solid rgba(var(--cream),.055);border-radius:var(--radius);padding:var(--space-3)}
+.customer-card-meta span,.customer-card-contact span{color:rgba(var(--cream),.52)}
+.customer-card-actions .btn{min-width:110px}
+.customer-duplicate-hub{background:rgba(17,19,20,.58)}
+.command-title{font-size:clamp(48px,5vw,76px)}
+.sub{font-size:15px;color:rgba(var(--cream),.62)}
 .hide{display:none!important}
 .select-cell{width:42px}.select-cell input{width:auto}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
@@ -1464,9 +1519,9 @@ return {kind:kind,title:title,detail:detail,tab:tab,hot:hot,customer_id:row&&row
 
 function priorityButton(item,label,style){
 var className=style||'btn small';
-if(item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money'))return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open exact balance')+'</button>';
+if(item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money'))return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open balance plan')+'</button>';
 if(item.customer_id)return '<button class="'+esc(className)+'" data-open-customer="'+esc(item.customer_id)+'" data-open-customer-pane="'+esc(item.profile_pane||'work')+'">'+esc(label||'Open profile')+'</button>';
-if(item.reservation_id)return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open exact balance')+'</button>';
+if(item.reservation_id)return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open balance plan')+'</button>';
 return '<button class="'+esc(className)+'" data-jump-tab="'+esc(item.tab||'today')+'">'+esc(label||'Open')+'</button>';
 }
 
@@ -1514,7 +1569,7 @@ var rawBackup=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_
 var items=collectPriorityItems(data);
 var first=items[0];
 var start=first?first:{kind:'Clear',title:'Today is clear.',detail:'No urgent work is waiting. Review a lens below when you want to check sales, ops, customers, or founder money work.',tab:'customers',hot:false};
-var startAction=first?priorityButton(start,'Open exact work','btn'):'<button class="btn" data-jump-tab="customers">Open customers</button>';
+var startAction=first?priorityButton(start,'Start here','btn'):'<button class="btn" data-jump-tab="customers">Open customers</button>';
 var cards=[
 {label:'Customer pulse',value:Number(summary.new_inquiries||0)+Number(summary.follow_ups_due||0)+messages,note:'Leads, follow-ups, and inbound replies',tab:'inquiries',hot:Number(summary.new_inquiries||0)>0||messages>0},
 {label:'Money watch',value:Number(summary.needs_notice||0)+Number(summary.ready_to_charge||0)+Number(summary.failed_payments||0),note:'Final balances and payment cleanup',tab:'finals',hot:Number(summary.ready_to_charge||0)>0||Number(summary.failed_payments||0)>0},
@@ -1596,18 +1651,18 @@ return ['notice','charge','payment','final_balance'].includes(String(type||'').t
 }
 
 function paneActionLabel(pane){
-if(pane==='sales')return 'Open sales';
+if(pane==='sales')return 'Open money';
 if(pane==='messages')return 'Open messages';
-if(pane==='work')return 'Open work';
+if(pane==='work')return 'Open To-Do';
 return 'Open profile';
 }
 
 function renderTodayAction(row){
 var type=String(row.type||'').toLowerCase();
-if(row.charge_id)return '<button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'">Open exact balance</button>';
+if(row.charge_id)return '<button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'">Open balance plan</button>';
 if(row.customer_id){
 var pane=todayTaskPane(row);
-return openProfileButton(row.customer_id,moneyTaskType(type)?'Open sales':paneActionLabel(pane),pane);
+return openProfileButton(row.customer_id,moneyTaskType(type)?'Open money':paneActionLabel(pane),pane);
 }
 return '<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+'">Open</button>';
 }
@@ -1615,8 +1670,8 @@ return '<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+
 function renderTodayTaskButtons(row){
 var type=String(row.type||'').toLowerCase();
 if(!row.owner_task_id&&row.charge_id&&moneyTaskType(type)){
-var profile=row.customer_id?openProfileButton(row.customer_id,'Open sales','sales'):'';
-return profile+'<button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'">Open exact balance</button>';
+var profile=row.customer_id?openProfileButton(row.customer_id,'Open money','sales'):'';
+return profile+'<button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'">Open balance plan</button>';
 }
 if(!row.owner_task_id)return renderTodayAction(row)+'<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+'">'+esc(tabLabel(todayTaskTab(row)))+'</button>';
 var pane=todayTaskPane(row);
@@ -1668,7 +1723,7 @@ return '<div class="work-list">'+rows.map(function(row){var customerId=row.custo
 function renderTodayQuickQueue(data){
 var items=collectPriorityItems(data).slice(0,5);
 if(!items.length)return '<div class="empty">No exact work links waiting right now.</div>';
-return '<div class="work-list">'+items.map(function(item){var label=item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money')?'Open exact balance':(item.customer_id?paneActionLabel(item.profile_pane||'work'):'Open');return '<div class="work-row"><div><strong>'+esc(item.title)+'</strong><span>'+esc(priorityDestinationLabel(item)+' · '+item.kind+' · '+item.detail)+'</span></div>'+priorityButton(item,label,'btn quiet small')+'</div>'}).join('')+'</div>';
+return '<div class="work-list">'+items.map(function(item){var label=item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money')?'Open balance plan':(item.customer_id?paneActionLabel(item.profile_pane||'work'):'Open');return '<div class="work-row"><div><strong>'+esc(item.title)+'</strong><span>'+esc(priorityDestinationLabel(item)+' · '+item.kind+' · '+item.detail)+'</span></div>'+priorityButton(item,label,'btn quiet small')+'</div>'}).join('')+'</div>';
 }
 
 function renderPriorityQueue(data){
@@ -1687,7 +1742,7 @@ var summary=data.summary||{};
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
 var diagnostics='<details class="signal-drawer"><summary>Review live counters</summary><div class="signal-drawer-body">'+renderTodaySignals(summary,data)+'</div></details>';
 root.innerHTML='<div class="today-command">'+databaseNotice+renderTodayBriefing(data)+'</div>'+
-'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Today\'s work queue</h2><p class="muted">Grouped by what you need to do next: reply, move sales forward, clean up records, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messages needing reply</h2><p class="muted">Open the customer profile so the reply stays attached to the right person.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Messaging</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Exact links</h2><p class="muted">Jump straight to the customer, lead, or balance record behind today\'s alerts.</p></div></header>'+renderTodayQuickQueue(data)+'</section>'+diagnostics+'</div></div>';
+'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Today\'s work queue</h2><p class="muted">Grouped by what you need to do next: reply, move a customer forward, clean up a profile, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messages needing reply</h2><p class="muted">Open the customer profile so the reply stays attached to the right person.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Messaging</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Exact links</h2><p class="muted">Jump straight to the customer, lead, or balance plan behind today\'s alerts.</p></div></header>'+renderTodayQuickQueue(data)+'</section>'+diagnostics+'</div></div>';
 bindCustomerOpeners();
 bindTaskButtons();
 document.querySelectorAll('[data-hub-lens]').forEach(function(btn){btn.addEventListener('click',function(){setHubLens(btn.dataset.hubLens)})});
@@ -2760,7 +2815,7 @@ var saved=methods.some(function(row){return row.stripe_payment_method_id&&row.fu
 var needsNotice=reservations.filter(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id}).length;
 var ready=reservations.filter(function(row){return finalBalanceReady(row)&&reservationChargeId(row)}).length;
 var next=ready?'Dry run before collecting any final balance.':(needsNotice?'Send the required balance notice before collecting.':(outstanding?'Review the reservation before taking payment.':'No money action is waiting.'));
-return '<section class="detail-block profile-snapshot-block"><div class="bar"><div><div class="section-title">Sales snapshot</div><p class="muted">'+esc(next)+'</p></div><button class="btn quiet small" data-profile-pane="history">Open timeline</button></div><div class="profile-overview">'+
+return '<section class="detail-block profile-snapshot-block"><div class="bar"><div><div class="section-title">Money snapshot</div><p class="muted">'+esc(next)+'</p></div><button class="btn quiet small" data-profile-pane="history">Open timeline</button></div><div class="profile-overview">'+
 '<div class="profile-stat"><span>Collected</span><strong>'+money(collected)+'</strong></div>'+
 '<div class="profile-stat"><span>Outstanding</span><strong>'+money(outstanding)+'</strong></div>'+
 '<div class="profile-stat"><span>Orders</span><strong>'+esc(reservations.length)+'</strong></div>'+
@@ -2969,7 +3024,7 @@ var source=customerSourceLabel(row);
 var next=customerContactLabel(row&&row.contact_status,row&&row.status);
 var follow=row&&row.next_follow_up_at?'Follow up '+date(row.next_follow_up_at):'No follow-up set';
 var raw=customerIsRaw(row);
-var badge=raw?'<span class="status blocked">Raw backup</span>':'<span class="status ready">CRM profile</span>';
+var badge=raw?'<span class="status blocked">Raw backup</span>':'<span class="status ready">Customer profile</span>';
 return '<div class="crm-read">'+badge+'<strong>'+esc(source+' · '+next)+'</strong><span>'+esc(follow)+'</span></div>';
 }
 
@@ -3096,7 +3151,7 @@ var source=customerSourceLabel(row);
 var next=customerContactLabel(row&&row.contact_status,row&&row.status);
 var follow=row&&row.next_follow_up_at?'Follow up '+date(row.next_follow_up_at):'No follow-up set';
 var raw=customerIsRaw(row);
-var badge=raw?'<span class="status blocked">Raw backup</span>':'<span class="status ready">CRM profile</span>';
+var badge=raw?'<span class="status blocked">Raw backup</span>':'<span class="status ready">Customer profile</span>';
 var contact=[row.email||'No email yet',row.phone||'No phone yet'].join(' · ');
 return '<article class="customer-card-row">'+
 '<div class="customer-card-main">'+badge+'<strong>'+customerLink(row.id,name)+'</strong><span>'+esc(contact)+'</span></div>'+
@@ -3596,7 +3651,7 @@ return '<article class="payment-card '+(failed?'failed ':pending?'pending ':'')+
 '<div class="payment-person"><span class="status '+(failed?'blocked':pending?'waiting':'ready')+'">'+esc(formatStatus(row.status||'paid'))+'</span><strong>'+customerLink(customerId,customer)+'</strong><span>'+esc(formatStatus(row.payment_type||'payment'))+' · '+esc(date(row.occurred_at))+'</span></div>'+
 '<div class="payment-money"><div><span>Gross</span><strong>'+money(amounts.gross)+'</strong></div><div><span>Stripe fee</span><strong>'+esc(feeLabel)+'</strong></div><div><span>Net</span><strong>'+money(amounts.net)+'</strong></div></div>'+
 '<div class="payment-context"><strong>'+esc(label)+'</strong><span>'+esc(context)+'</span><details class="payment-card-more"><summary>Stripe details</summary><span>'+esc(row.stripe_customer_id||'No Stripe customer shown')+'</span><code>'+esc(row.stripe_payment_intent_id||'No payment intent shown')+'</code></details></div>'+
-'<div class="payment-actions">'+openProfileButton(customerId,'Open sales','sales')+'</div>'+
+'<div class="payment-actions">'+openProfileButton(customerId,'Open money','sales')+'</div>'+
 '</article>';
 }
 
@@ -3902,7 +3957,7 @@ var lane=card.closest('details');
 if(lane)lane.open=true;
 card.classList.add('is-focused');
 card.scrollIntoView({behavior:'smooth',block:'center'});
-statusText.innerHTML='<span class="ok">Opened the connected final-balance record.</span>';
+statusText.innerHTML='<span class="ok">Opened the connected balance plan.</span>';
 state.focusReservation='';
 }
 
@@ -3945,7 +4000,7 @@ if(pickable&&row.notice_required)actionButtons.push('<button class="btn quiet sm
 if(pickable)actionButtons.push('<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(row.id)+'">Dry run</button>');
 if(pickable&&row.charge_eligible)actionButtons.push('<button class="btn small" data-final-action="charge" data-reservation-id="'+esc(row.id)+'">Charge</button>');
 if(manual)actionButtons.push(stripePaymentsLink('Open Stripe'));
-actionButtons.push(openProfileButton(row.customer_id,'Open sales','sales'));
+actionButtons.push(openProfileButton(row.customer_id,'Open money','sales'));
 var product=esc(row.product||'Order')+(row.size?' · '+esc(row.size):'');
 var timeline='<div class="final-context-grid"><div><span>Started</span><strong>'+esc(date(row.checkout_started_at||row.reservation_date)||'Unknown')+'</strong></div><div><span>Deposit</span><strong>'+esc(row.paid_at?date(row.paid_at):'Not recorded')+'</strong></div><div><span>Notice</span><strong>'+esc(row.final_balance_notice_sent_at?date(row.final_balance_notice_sent_at):'Not sent')+'</strong></div><div><span>Record</span><strong>'+esc(String(row.id||'').startsWith('crm:')?'Recovered payment':'Checkout')+'</strong></div></div>';
 var finalAmount=Number(row.final_balance_total||0);
@@ -3989,7 +4044,7 @@ var pending=open.reduce(function(sum,row){return sum+Number(row.final_balance_to
 var fee=stripeFeeEstimate(pending);
 var samples=open.slice(0,4);
 return '<div class="finals-summary compact"><div class="finals-stat"><span>Needs notice</span><strong>'+esc(needs.length)+'</strong><small>Send email first</small></div><div class="finals-stat"><span>Ready</span><strong>'+esc(ready.length)+'</strong><small>Dry run before charging</small></div><div class="finals-stat"><span>Needs payment link</span><strong>'+esc(blocked.length)+'</strong><small>Secure Stripe link or invoice</small></div><div class="finals-stat"><span>Pending net est.</span><strong>'+money(Math.max(0,pending-fee))+'</strong><small>'+money(fee)+' Stripe fee est.</small></div></div>'+
-(samples.length?'<div class="work-list">'+samples.map(function(row){var id=row.id||row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||'';var customer=row.customer_name||row.email||'Customer';var status=finalStatusLabel(row.readiness_group||'Review');return '<div class="work-row"><div><strong>'+esc(customer)+' · '+money(row.final_balance_total||0)+'</strong><span>'+esc(status)+' · '+esc(row.blocked_reason?'Needs secure payment link':'Connected final balance')+'</span></div><button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(id)+'">Open exact balance</button></div>'}).join('')+'</div>':'<div class="empty">No open final balances right now.</div>');
+(samples.length?'<div class="work-list">'+samples.map(function(row){var id=row.id||row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||'';var customer=row.customer_name||row.email||'Customer';var status=finalStatusLabel(row.readiness_group||'Review');return '<div class="work-row"><div><strong>'+esc(customer)+' · '+money(row.final_balance_total||0)+'</strong><span>'+esc(status)+' · '+esc(row.blocked_reason?'Needs secure payment link':'Connected final balance')+'</span></div><button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(id)+'">Open balance plan</button></div>'}).join('')+'</div>':'<div class="empty">No open final balances right now.</div>');
 }
 
 function renderAccountingFocus(t){
@@ -4045,7 +4100,7 @@ var status=String(row.status||'').toLowerCase();
 var klass=status.includes('fail')?'failed':(status.includes('pending')?'pending':'');
 var feeSource=row.fee_is_estimated?'Estimated fee':'Stripe fee';
 var openAttr=customer.id?' data-open-accounting-customer="'+esc(customer.id)+'"':'';
-return '<article class="accounting-card '+klass+'"'+openAttr+'><div class="accounting-person"><strong>'+customerLink(customer.id,customer.full_name||'Customer')+'</strong><span>'+esc(customer.email||customer.phone||'No contact info')+'</span><span>'+esc(date(row.occurred_at))+'</span></div><div class="accounting-money"><div><span>Gross</span><strong>'+money(amount)+'</strong></div><div><span>'+esc(feeSource)+'</span><strong>'+money(fee)+'</strong></div><div><span>Net</span><strong>'+money(net)+'</strong></div></div><div class="accounting-context"><strong>'+esc(titleCase(row.payment_type||'payment'))+' · '+esc(row.status||'unknown')+'</strong><span>'+esc(row.fee_is_estimated?'Fee estimated until Stripe balance transaction data is available.':'Fee came from Stripe or saved transaction data.')+'</span><code>'+esc(row.stripe_payment_intent_id||'No Stripe ID saved')+'</code></div><div class="accounting-actions">'+openProfileButton(customer.id,'Open sales','sales')+'</div></article>';
+return '<article class="accounting-card '+klass+'"'+openAttr+'><div class="accounting-person"><strong>'+customerLink(customer.id,customer.full_name||'Customer')+'</strong><span>'+esc(customer.email||customer.phone||'No contact info')+'</span><span>'+esc(date(row.occurred_at))+'</span></div><div class="accounting-money"><div><span>Gross</span><strong>'+money(amount)+'</strong></div><div><span>'+esc(feeSource)+'</span><strong>'+money(fee)+'</strong></div><div><span>Net</span><strong>'+money(net)+'</strong></div></div><div class="accounting-context"><strong>'+esc(titleCase(row.payment_type||'payment'))+' · '+esc(row.status||'unknown')+'</strong><span>'+esc(row.fee_is_estimated?'Fee estimated until Stripe balance transaction data is available.':'Fee came from Stripe or saved transaction data.')+'</span><code>'+esc(row.stripe_payment_intent_id||'No Stripe ID saved')+'</code></div><div class="accounting-actions">'+openProfileButton(customer.id,'Open money','sales')+'</div></article>';
 }
 
 function titleCase(value){
@@ -4247,7 +4302,7 @@ statusText.innerHTML=failed.length?'<span class="error">Sent '+sent+', failed '+
 async function runBatch(dryRun){
 if(state.batchBusy){statusText.innerHTML='<span class="muted">Batch request already running.</span>';return}
 var ids=Array.from(state.selected);
-if(!ids.length){statusText.innerHTML='<span class="error">Pick at least one balance record.</span>';return}
+if(!ids.length){statusText.innerHTML='<span class="error">Pick at least one balance first.</span>';return}
 if(ids.length>100){statusText.innerHTML='<span class="error">Batch limit is 100 balances. Pick fewer records and try again.</span>';return}
 if(!dryRun){
 var readyRows=state.reservations.filter(function(row){return state.selected.has(row.id)&&row.charge_eligible&&!row.already_charged});
@@ -4279,7 +4334,7 @@ if(state.batchBusy){statusText.innerHTML='<span class="muted">Final-balance auto
 var readyRows=state.reservations.filter(function(row){return row.charge_eligible&&!row.already_charged});
 var readyAmount=readyRows.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
 if(!dryRun){
-if(!readyRows.length){statusText.innerHTML='<span class="error">No emailed final-balance records are ready to charge yet.</span>';return}
+if(!readyRows.length){statusText.innerHTML='<span class="error">No emailed balances are ready to charge yet.</span>';return}
 var safety=state.finalBalanceSafety||{};
 var message='Collect every emailed-and-ready final balance now?\\n\\nReady balances: '+readyRows.length+'\\nEstimated total: '+money(readyAmount)+'\\nStripe mode: '+(safety.stripe_mode||'unknown')+'\\nNotice wait: '+(safety.notice_hours||24)+'h\\n\\nAnything unsafe will be skipped and shown in the results.';
 if(!window.confirm(message)){statusText.innerHTML='<span class="muted">Automatic charge cancelled.</span>';return}
