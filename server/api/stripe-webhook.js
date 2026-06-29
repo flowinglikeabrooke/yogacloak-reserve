@@ -73,6 +73,31 @@ function escapeFormulaValue(value) {
   return String(value || '').replace(/'/g, "\\'");
 }
 
+function dollars(cents) {
+  return Number(cents || 0) / 100;
+}
+
+function objectId(value) {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return String(value.id || '').trim();
+}
+
+function paymentFeeBreakdown(paymentIntent) {
+  const charge = paymentIntent?.latest_charge && typeof paymentIntent.latest_charge === 'object'
+    ? paymentIntent.latest_charge
+    : null;
+  const balanceTransaction = charge?.balance_transaction && typeof charge.balance_transaction === 'object'
+    ? charge.balance_transaction
+    : null;
+  if (!balanceTransaction) return {};
+  return {
+    feeAmount: dollars(balanceTransaction.fee),
+    netAmount: dollars(balanceTransaction.net),
+    balanceTransactionId: objectId(balanceTransaction)
+  };
+}
+
 async function airtableRequest(path, options = {}) {
   const pat = process.env.AIRTABLE_PAT;
   const baseId = process.env.AIRTABLE_BASE_ID;
@@ -164,8 +189,9 @@ export default async function handler(req, res) {
       const amountPaid = session.amount_total ? session.amount_total / 100 : Number(metadata.deposit_total || 0);
       const paidDate = new Date().toISOString().slice(0, 10);
       const paymentIntent = session.payment_intent
-        ? await stripeRequest(`payment_intents/${session.payment_intent}`)
+        ? await stripeRequest(`payment_intents/${session.payment_intent}?expand[]=latest_charge.balance_transaction`)
         : null;
+      const fee = paymentFeeBreakdown(paymentIntent);
       const savedPaymentMethod = paymentIntent?.payment_method || '';
       let paymentMethodDetails = null;
       if (savedPaymentMethod) {
@@ -281,13 +307,16 @@ export default async function handler(req, res) {
             stripePaymentIntentId: transactionId,
             stripeCustomerId: session.customer || '',
             amount: amountPaid,
+            feeAmount: fee.feeAmount,
+            netAmount: fee.netAmount,
             paymentType: 'deposit',
             status: session.payment_status === 'paid' ? 'paid' : 'pending',
             occurredAt: paymentIntent?.created ? new Date(paymentIntent.created * 1000).toISOString() : new Date().toISOString(),
             metadata: {
               checkout_session_id: session.id,
               airtable_payment_id: payment.id,
-              airtable_reservation_id: metadata.reservation_record_id
+              airtable_reservation_id: metadata.reservation_record_id,
+              stripe_balance_transaction_id: fee.balanceTransactionId || ''
             }
           });
 

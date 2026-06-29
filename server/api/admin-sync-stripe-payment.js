@@ -36,6 +36,21 @@ function dollars(cents) {
   return Number(cents || 0) / 100;
 }
 
+function paymentFeeBreakdown(paymentIntent) {
+  const charge = paymentIntent?.latest_charge && typeof paymentIntent.latest_charge === 'object'
+    ? paymentIntent.latest_charge
+    : null;
+  const balanceTransaction = charge?.balance_transaction && typeof charge.balance_transaction === 'object'
+    ? charge.balance_transaction
+    : null;
+  if (!balanceTransaction) return {};
+  return {
+    feeAmount: dollars(balanceTransaction.fee),
+    netAmount: dollars(balanceTransaction.net),
+    balanceTransactionId: objectId(balanceTransaction)
+  };
+}
+
 function paidStatus(paymentIntent) {
   if (paymentIntent.status === 'succeeded') return 'paid';
   if (paymentIntent.status === 'processing') return 'pending';
@@ -218,7 +233,7 @@ export default async function handler(req, res) {
     }
 
     const paymentIntent = await step('load_stripe_payment', () => stripeRequest(
-      `payment_intents/${encodeURIComponent(paymentIntentId)}?expand[]=payment_method&expand[]=customer`
+      `payment_intents/${encodeURIComponent(paymentIntentId)}?expand[]=payment_method&expand[]=customer&expand[]=latest_charge.balance_transaction`
     ));
     const checkoutSession = await step('load_checkout_session', () => checkoutSessionForPaymentIntent(paymentIntent.id));
     const metadata = metadataFrom(paymentIntent, checkoutSession);
@@ -236,6 +251,7 @@ export default async function handler(req, res) {
     const billing = paymentMethod?.billing_details || {};
     const sessionDetails = checkoutSession?.customer_details || {};
     const amount = dollars(paymentIntent.amount_received || paymentIntent.amount || checkoutSession?.amount_total || 0);
+    const fee = paymentFeeBreakdown(paymentIntent);
     const status = paidStatus(paymentIntent);
     const fullName = clean(sessionDetails.name || billing.name || stripeCustomer?.name || metadata.customer_name || metadata.full_name, 240);
     const email = clean(sessionDetails.email || billing.email || stripeCustomer?.email || paymentIntent.receipt_email || metadata.email, 240).toLowerCase();
@@ -303,12 +319,15 @@ export default async function handler(req, res) {
       stripePaymentIntentId: paymentIntent.id,
       stripeCustomerId,
       amount,
+      feeAmount: fee.feeAmount,
+      netAmount: fee.netAmount,
       paymentType: clean(metadata.payment_type || req.body?.payment_type || 'deposit', 80).toLowerCase(),
       status,
       occurredAt: paymentIntent.created ? new Date(paymentIntent.created * 1000).toISOString() : new Date().toISOString(),
       metadata: {
         checkout_session_id: checkoutSession?.id || '',
         airtable_reservation_id: metadata.reservation_record_id || '',
+        stripe_balance_transaction_id: fee.balanceTransactionId || '',
         recovered_from_stripe: true
       }
     }));
@@ -370,6 +389,8 @@ export default async function handler(req, res) {
       metadata: {
         stripe_payment_intent_id: paymentIntent.id,
         stripe_customer_id: stripeCustomerId,
+        stripe_fee_amount: fee.feeAmount,
+        stripe_net_amount: fee.netAmount,
         can_charge_remaining_later: canChargeRemainingLater,
         blocked_reasons: blockedReasons
       }
@@ -381,6 +402,8 @@ export default async function handler(req, res) {
       customer: identity.customer,
       reservation: databaseReservation,
       airtable,
+      stripe_fee_amount: fee.feeAmount,
+      stripe_net_amount: fee.netAmount,
       can_charge_remaining_later: canChargeRemainingLater,
       blocked_reasons: blockedReasons
     });

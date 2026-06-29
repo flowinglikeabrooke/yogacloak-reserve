@@ -92,6 +92,27 @@ tr:last-child td{border-bottom:0}
 .link:hover{border-bottom-color:#d7e1cd}
 .status{display:inline-block;border:1px solid rgba(var(--cream),.13);border-radius:999px;padding:5px 8px;color:rgba(var(--cream),.78);white-space:nowrap}
 .ready{border-color:rgba(154,170,136,.38);color:#9aaa88}.needs{border-color:rgba(219,186,123,.35);color:#dbba7b}.waiting{border-color:rgba(138,164,192,.35);color:#9bb6ce}.blocked{border-color:rgba(212,148,141,.35);color:#d4948d}.charged{color:rgba(var(--cream),.55)}
+.finals-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;margin-bottom:14px}
+.finals-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+.finals-stat{border:1px solid rgba(var(--cream),.09);border-radius:8px;background:#151618;padding:13px;min-height:82px}
+.finals-stat span{display:block;font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:800}
+.finals-stat strong{display:block;margin-top:8px;font-family:'Hanken Grotesk',sans-serif;font-size:26px;font-weight:500;letter-spacing:0}
+.finals-toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:620px}
+.finals-workflow{display:grid;gap:14px}
+.finals-lane{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:17px;box-shadow:var(--shadow)}
+.finals-lane-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.finals-lane h3{font-size:24px;font-weight:500;letter-spacing:-.025em}
+.finals-lane p{margin-top:5px;color:rgba(var(--cream),.48);font-size:12px;line-height:1.45}
+.finals-records{display:grid;gap:10px}
+.final-card{display:grid;grid-template-columns:minmax(220px,1fr) minmax(120px,.45fr) minmax(240px,1fr) auto;gap:14px;align-items:center;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:rgba(var(--cream),.026);padding:14px}
+.final-card.manual{border-color:rgba(212,148,141,.2);background:linear-gradient(135deg,rgba(212,148,141,.09),rgba(var(--cream),.025))}
+.final-person strong{display:block;font-size:15px;line-height:1.25}
+.final-person span,.final-money span,.final-context span{display:block;color:rgba(var(--cream),.47);font-size:12px;line-height:1.35;margin-top:4px}
+.final-money strong{display:block;font-family:'Hanken Grotesk',sans-serif;font-size:30px;font-weight:500;letter-spacing:-.02em;color:var(--bone)}
+.final-context strong{display:block;font-size:13px;color:rgba(var(--cream),.82);line-height:1.35}
+.final-card .actions{justify-content:flex-end}
+.final-card code{font-size:10px;color:rgba(var(--cream),.42);word-break:break-all}
+.final-empty{min-height:96px;display:grid;place-items:center;border:1px dashed rgba(var(--cream),.08);border-radius:8px;color:rgba(var(--cream),.38);font-size:14px;background:rgba(var(--cream),.018)}
 .notice{border:1px solid rgba(var(--cream),.12);border-radius:8px;padding:15px 16px;background:rgba(var(--cream),.04);color:rgba(var(--cream),.68);line-height:1.5;margin-bottom:14px}
 .notice strong{color:var(--bone)}
 .notice.warn{border-color:rgba(212,148,141,.28);background:rgba(212,148,141,.08)}
@@ -1501,7 +1522,7 @@ bindCustomerOpeners();
 }
 
 function renderPayments(){
-document.getElementById('payments').innerHTML='<div class="bar"><div class="section-title">Payments</div></div>'+stripeRecoveryPanel()+table(['Customer','Type','Amount','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
+document.getElementById('payments').innerHTML='<div class="bar"><div><div class="section-title">Payments</div><p class="muted">Gross is what the customer paid. Fee is Stripe processing. Net is what yogacloak keeps before other costs.</p></div></div>'+stripeRecoveryPanel()+table(['Customer','Type','Gross','Stripe fee','Net','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;var fee=Number(row.fee_amount||0);var net=row.net_amount===null||row.net_amount===undefined||row.net_amount===''?Number(row.amount||0)-fee:Number(row.net_amount||0);return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),money(fee),money(net),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
 var syncStripeBtn=document.getElementById('syncStripePaymentBtn');
 if(syncStripeBtn){syncStripeBtn.addEventListener('click',syncStripePayment)}
 bindCustomerOpeners();
@@ -1699,14 +1720,24 @@ statusText.innerHTML='<span class="ok">Automation saved.</span>';
 function renderFinals(){
 var rows=state.reservations||[];
 var totals=state.finalBalanceSummary||{};
-var summary=['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'].map(function(group){return '<span class="pill">'+esc(group)+' <strong>'+rows.filter(function(row){return row.readiness_group===group}).length+'</strong></span>'}).join('')+'<span class="pill">Ready amount <strong>'+money(totals.ready_to_charge_amount||0)+'</strong></span>';
-var order=['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'];
-var grouped=order.map(function(group){
-var groupRows=rows.filter(function(row){return row.readiness_group===group});
-return '<section class="panel"><div class="bar"><div class="section-title">'+esc(group)+'</div><span class="pill">'+groupRows.length+' record(s)</span></div>'+reservationTable(groupRows,true)+'</section>';
-}).join('');
+var groups={};
+['Needs Notice','Waiting Period','Ready to Charge','Already Charged','Blocked'].forEach(function(group){groups[group]=rows.filter(function(row){return row.readiness_group===group})});
+var stats=[
+['Needs notice',groups['Needs Notice'].length],
+['Waiting',groups['Waiting Period'].length],
+['Ready',groups['Ready to Charge'].length],
+['Manual / blocked',groups.Blocked.length],
+['Ready amount',money(totals.ready_to_charge_amount||0)]
+].map(function(item){return '<div class="finals-stat"><span>'+esc(item[0])+'</span><strong>'+esc(item[1])+'</strong></div>'}).join('');
+var lanes=[
+['Needs Notice','Send the required balance email before collecting remaining money.'],
+['Waiting Period','The notice was sent. The 24-hour wait is still active.'],
+['Ready to Charge','These are the only records safe for batch charge. Run dry run first.'],
+['Already Charged','Final balances already collected or converted.'],
+['Blocked','Manual review. Usually missing saved-card permission or original checkout link.']
+].map(function(item){return finalBalanceLane(item[0],item[1],groups[item[0]])}).join('');
 var disabled=state.batchBusy?' disabled':'';
-document.getElementById('finals').innerHTML='<div class="bar"><div><div class="section-title">Final balances</div><div class="meta">'+summary+'<span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div><div class="actions"><button class="btn quiet" id="selectNeedsNotice">Select needs notice</button><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run</button><button class="btn" id="chargeBatch"'+disabled+'>Charge ready batch</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Check emailed + ready</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge emailed + ready</button></div></div>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+grouped;
+document.getElementById('finals').innerHTML='<section class="panel"><div class="finals-hero"><div><div class="section-title">Final balance workflow</div><p class="muted">Work left to right: send notice, wait, dry run, then charge only records that are truly ready.</p><div class="finals-summary">'+stats+'</div></div><div class="finals-toolbar"><button class="btn quiet" id="selectNeedsNotice">Select needs notice</button><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run</button><button class="btn" id="chargeBatch"'+disabled+'>Charge ready batch</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Check emailed + ready</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge emailed + ready</button><span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div></section>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+'<div class="finals-workflow">'+lanes+'</div>';
 document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
 document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
@@ -1716,6 +1747,22 @@ document.getElementById('chargeBatch').addEventListener('click',function(){runBa
 document.getElementById('autoDryRun').addEventListener('click',function(){runAutoFinalBalance(true)});
 document.getElementById('autoChargeReady').addEventListener('click',function(){runAutoFinalBalance(false)});
 bindCustomerOpeners();
+}
+
+function finalBalanceLane(group,description,rows){
+return '<section class="finals-lane"><div class="finals-lane-head"><div><h3>'+esc(group)+'</h3><p>'+esc(description)+'</p></div><span class="pill">'+rows.length+' record(s)</span></div><div class="finals-records">'+(rows.length?rows.map(finalBalanceCard).join(''):'<div class="final-empty">Nothing here right now.</div>')+'</div></section>';
+}
+
+function finalBalanceCard(row){
+var pickable=row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:');
+var manual=!pickable||row.blocked_reason;
+var checkbox=pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select</label>':'<span class="status blocked">Manual</span>';
+var card=row.stripe_payment_method_saved?'<span class="ok">Saved card</span>':'<span class="error">No saved card</span>';
+var auth=row.future_charge_authorized?'<span class="ok">Future charge authorized</span>':'<span class="error">No future-charge permission</span>';
+var next=row.charge_eligible?'Ready for dry run / batch charge':(row.notice_required?'Send final-balance notice':(row.blocked_reason?'Manual notice or payment link':'No action needed right now'));
+var details=[row.notice_status,card,auth].filter(Boolean).join(' · ');
+var actions=pickable?'<div class="actions"><button class="btn quiet small" data-final-action="notice" data-reservation-id="'+esc(row.id)+'">Notice</button><button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(row.id)+'">Dry run</button><button class="btn small" data-final-action="charge" data-reservation-id="'+esc(row.id)+'">Charge</button></div>':'<div class="actions">'+openProfileButton(row.customer_id,'Open profile')+'</div>';
+return '<article class="final-card '+(manual?'manual':'')+'"><div class="final-person">'+checkbox+'<strong>'+customerLink(row.customer_id,row.customer_name||row.email||'Customer')+'</strong><span>'+esc(row.email||'No email')+'</span><span><code>'+esc(row.id)+'</code></span></div><div class="final-money"><strong>'+money(row.final_balance_total||0)+'</strong><span>remaining</span><span>Deposit '+money(row.deposit_amount||0)+'</span></div><div class="final-context"><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span><strong>'+esc(next)+'</strong><span>'+details+'</span>'+(row.blocked_reason?'<span class="error">'+esc(row.blocked_reason)+'</span>':'')+'<span>'+esc(row.product||'Reservation')+(row.size?' · '+esc(row.size):'')+'</span></div>'+actions+'</article>';
 }
 
 function renderAccounting(){
@@ -1913,8 +1960,8 @@ return '<section class="panel"><div class="bar"><div><div class="section-title">
 '</section>';
 }
 function exportAccountingCsv(){
-var rows=(state.accounting&&state.accounting.payments||[]).map(function(row){return [row.occurred_at,row.customers&&row.customers.full_name||'',row.payment_type,row.amount,row.status,row.stripe_payment_intent_id]});
-exportCsv('yogacloak-accounting.csv',['date','customer','type','amount','status','stripe_id'],rows);
+var rows=(state.accounting&&state.accounting.payments||[]).map(function(row){var fee=Number(row.fee_amount||0);var net=row.net_amount===null||row.net_amount===undefined||row.net_amount===''?Number(row.amount||0)-fee:Number(row.net_amount||0);return [row.occurred_at,row.customers&&row.customers.full_name||'',row.payment_type,row.amount,fee,net,row.status,row.stripe_payment_intent_id]});
+exportCsv('yogacloak-accounting.csv',['date','customer','type','gross_amount','stripe_fee','net_amount','status','stripe_id'],rows);
 }
 function exportCsv(filename,headers,rows){
 var csv=[headers].concat(rows).map(function(row){return row.map(function(cell){return '"'+String(cell||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');
