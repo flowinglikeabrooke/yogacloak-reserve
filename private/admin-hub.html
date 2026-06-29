@@ -1292,7 +1292,7 @@ body{background:linear-gradient(180deg,#1c231f 0%,#18201c 42%,#202820 100%)}
 <a href="/" class="wordmark"><span>yoga</span><strong>cloak</strong></a>
 <span class="eyebrow">Private admin hub</span>
 <h1 class="command-title"><span id="heroRoleLabel" class="command-word">command</span> <span class="center-word">center</span></h1>
-<p class="sub">Client profiles, messages, To-Do, orders, and money tools - all in one place.</p>
+<p class="sub">Client profiles, messages, tasks, reservations and money tools - all in one place.</p>
 </div>
 </div>
 
@@ -1556,10 +1556,22 @@ var text=[row.type,row.title,row.detail,row.description].map(function(value){ret
 return text.indexOf('sms opt')!==-1||text.indexOf('text opt')!==-1;
 }
 
+function isRoutineBalanceNoticeTask(row){
+var text=[row.type,row.title,row.detail,row.description].map(function(value){return String(value||'').toLowerCase()}).join(' ');
+if(row.owner_task_id)return false;
+if(text.indexOf('failed')!==-1||text.indexOf('ready to charge')!==-1||text.indexOf('dry run')!==-1)return false;
+return text.indexOf('final-balance notice')!==-1||
+text.indexOf('final balance notice')!==-1||
+text.indexOf('balance notice')!==-1||
+text.indexOf('needs notice')!==-1||
+String(row.type||'').toLowerCase()==='notice'||
+String(row.type||'').toLowerCase()==='final_balance';
+}
+
 function shouldShowTodayTask(row){
 var type=String(row.type||'').toLowerCase();
 if(row.owner_task_id)return true;
-if(type==='notice'||type==='final_balance')return false;
+if(isRoutineBalanceNoticeTask(row))return false;
 if(type==='contact'&&isSmsOptInOnlyTask(row))return false;
 return true;
 }
@@ -1614,7 +1626,6 @@ var follow=firstDashboardTask(taskData,['follow_up']);
 var inquiry=firstDashboardTask(taskData,['inquiry']);
 var charge=firstDashboardTask(taskData,['charge']);
 var failed=firstDashboardTask(taskData,['payment']);
-var raw=firstDashboardTask(taskData,['raw_backup']);
 var message=(data.message_preview||[]).find(function(row){return row.customer_id||row.customers&&row.customers.id});
 if(overdue&&Number(summary.tasks_overdue||0)>0)add('To-Do',summary.tasks_overdue+' overdue task(s)',overdue.detail||'Overdue','tasks',true,overdue,'work');
 if(follow&&Number(summary.follow_ups_due||0)>0)add('Follow-up',follow.detail?'Follow up with '+follow.detail:summary.follow_ups_due+' due',follow.created_at?'Due '+date(follow.created_at):'Due','tasks',true,follow,'work');
@@ -1622,7 +1633,6 @@ if(Number(summary.new_inquiries||0)>0)add('Lead',inquiry&&inquiry.detail?'New le
 if(message){var messageCustomer=message.customer_id||message.customers&&message.customers.id;items.push({kind:'Messages',title:'New '+String(message.channel||'message').toUpperCase()+' from '+(message.customers&&message.customers.full_name||'customer'),detail:message.subject||message.body||'Reply',tab:'communications',hot:true,customer_id:messageCustomer,profile_pane:'messages'});}
 if(Number(summary.ready_to_charge||0)>0)add('Money',charge&&charge.detail?'Dry run final balance for '+charge.detail:summary.ready_to_charge+' ready for dry run','Final balance','finals',true,charge,'sales');
 if(Number(summary.failed_payments||0)>0)add('Risk',failed&&failed.detail?failed.detail:summary.failed_payments+' failed payment(s)','Payment cleanup','payments',true,failed,'sales');
-if(Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0)>0)add('Backup','Raw Airtable records need sync',raw&&raw.detail?raw.detail:'Raw backup','settings',false,raw,'profile');
 return items;
 }
 
@@ -1641,7 +1651,7 @@ var cards=[
 {label:'Money',value:Number(summary.ready_to_charge||0)+Number(summary.failed_payments||0),tab:'accounting',hot:Number(summary.ready_to_charge||0)>0||Number(summary.failed_payments||0)>0},
 {label:'Cleanup',value:visibleOpenTasks+rawBackup+Number(summary.duplicate_candidates||0),tab:'tasks',hot:visibleOpenTasks>0}
 ];
-return '<section class="today-briefing"><div class="today-start '+(start.hot?'hot':'')+'"><div><span>Today · '+esc(start.kind)+'</span><h2>'+esc(start.title)+'</h2>'+(start.detail?'<p>'+esc(start.detail)+'</p>':'')+'</div><div class="actions">'+startAction+'<button class="btn quiet" data-jump-tab="tasks">To-Do</button></div></div><div class="today-brief-side">'+cards.map(function(card){return '<button class="brief-card '+(card.hot?'hot':'')+'" data-jump-tab="'+esc(card.tab)+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong></button>'}).join('')+'</div></section>';
+return '<section class="today-briefing"><div class="today-start '+(start.hot?'hot':'')+'"><div><span>'+esc(start.kind)+'</span><h2>'+esc(start.title)+'</h2>'+(start.detail?'<p>'+esc(start.detail)+'</p>':'')+'</div><div class="actions">'+startAction+'<button class="btn quiet" data-jump-tab="tasks">To-Do</button></div></div><div class="today-brief-side">'+cards.map(function(card){return '<button class="brief-card '+(card.hot?'hot':'')+'" data-jump-tab="'+esc(card.tab)+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong></button>'}).join('')+'</div></section>';
 }
 
 function todayTaskTab(row){
@@ -2699,12 +2709,12 @@ if(raw&&c.contact_status==='needs_reply')return {title:'Reply needed',note:'Raw 
 if(raw)return {title:'Organize into CRM',note:'Import this raw Airtable profile so notes, tasks, messages, and money stay together.',pane:'profile',hot:true};
 if(moneyRisk&&moneyRisk.level==='blocked')return {title:'Needs secure payment link',note:moneyRisk.note,pane:'sales',hot:true};
 if(failedPayment)return {title:'Payment needs attention',note:'Reach out before trying another charge.',pane:'sales',hot:true};
-if(moneyRisk&&moneyRisk.level==='needs')return {title:'Send balance notice',note:moneyRisk.note,pane:'sales',hot:true};
+if(moneyRisk&&moneyRisk.level==='needs')return {title:'Balance pending',note:moneyRisk.note,pane:'sales',hot:false};
 if(moneyRisk&&moneyRisk.level==='ready')return {title:'Final balance check',note:moneyRisk.note,pane:'sales',hot:true};
 if(c.contact_status==='needs_reply')return {title:'Reply needed',note:'Open messages and answer before this gets lost.',pane:'messages',hot:true};
 if(followUpDue)return {title:'Follow-up is due',note:'Due '+date(c.next_follow_up_at)+'. Reply or move the follow-up date.',pane:'work',hot:true};
 if(readyToCharge)return {title:'Final balance check',note:'Run a dry run before charging the saved card.',pane:'sales',hot:true};
-if(needsNotice)return {title:'Send balance notice',note:'Send the required email before collecting the remaining balance.',pane:'sales',hot:true};
+if(needsNotice)return {title:'Balance pending',note:'Remaining balance email can wait until you are closer to shipping.',pane:'sales',hot:false};
 if(moneyRisk&&moneyRisk.level==='waiting')return {title:'Notice is active',note:moneyRisk.note,pane:'sales',hot:false};
 if(waiting)return {title:'Notice is active',note:'The 24-hour wait is still protecting this charge.',pane:'sales',hot:false};
 if(!hasActivity)return {title:'Start relationship',note:'Add a note, task, or first message.',pane:'work',hot:false};
@@ -2720,7 +2730,7 @@ if(!open.length)return null;
 var manual=open.find(function(row){return row.blocked_reason||!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized});
 if(manual)return {level:'blocked',title:'Needs secure payment link',amount:Number(manual.final_balance_total||manual.final_balance_amount||0),pane:'sales',reservation:manual,note:'This customer still owes the remaining balance, but their card is not approved for automatic final collection. Contact them, then send a secure Stripe invoice or payment link, or have them complete checkout again with later-charge permission.'};
 var needsNotice=open.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at});
-if(needsNotice)return {level:'needs',title:'Final-balance notice needed',amount:Number(needsNotice.final_balance_total||needsNotice.final_balance_amount||0),pane:'sales',reservation:needsNotice,note:'Send the required balance email before any remaining-balance collection.'};
+if(needsNotice)return {level:'needs',title:'Balance pending',amount:Number(needsNotice.final_balance_total||needsNotice.final_balance_amount||0),pane:'sales',reservation:needsNotice,routine:true,note:'This customer still owes the remaining balance. Send the required balance email when you are ready to collect closer to shipment.'};
 var ready=open.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
 if(ready)return {level:'ready',title:'Final balance ready for dry run',amount:Number(ready.final_balance_total||ready.final_balance_amount||0),pane:'sales',reservation:ready,note:'Run a dry run before attempting the final charge.'};
 var waiting=open.find(function(row){return row.final_balance_notice_sent_at});
@@ -2730,7 +2740,7 @@ return {level:'needs',title:'Open final balance',amount:open.reduce(function(sum
 
 function renderCustomerMoneyAlert(detail){
 var risk=customerFinalBalanceRisk(detail);
-if(!risk)return '';
+if(!risk||risk.routine)return '';
 var chargeId=reservationChargeId(risk.reservation||{});
 var action='<button class="btn quiet small" data-profile-pane="sales">Open money details</button>';
 if(risk.level==='blocked')action+='<button class="btn quiet small" data-jump-tab="finals" '+(chargeId?'data-focus-reservation="'+esc(chargeId)+'"':'')+'>Open balance plan</button>'+stripePaymentsLink('Open Stripe');
@@ -2910,13 +2920,13 @@ var collected=sumPayments(payments);
 var saved=methods.some(function(row){return row.stripe_payment_method_id&&row.future_charge_authorized});
 var needsNotice=reservations.filter(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id}).length;
 var ready=reservations.filter(function(row){return finalBalanceReady(row)&&reservationChargeId(row)}).length;
-var next=ready?'Dry run before collecting any final balance.':(needsNotice?'Send the required balance notice before collecting.':(outstanding?'Review the reservation before taking payment.':'No money action is waiting.'));
+var next=ready?'Dry run before collecting any final balance.':(outstanding?'Open balance exists. Collect later when production is ready.':'No money action is waiting.');
 return '<section class="detail-block profile-snapshot-block"><div class="bar"><div><div class="section-title">Money snapshot</div><p class="muted">'+esc(next)+'</p></div><button class="btn quiet small" data-profile-pane="history">Open timeline</button></div><div class="profile-overview">'+
 '<div class="profile-stat"><span>Collected</span><strong>'+money(collected)+'</strong></div>'+
 '<div class="profile-stat"><span>Outstanding</span><strong>'+money(outstanding)+'</strong></div>'+
 '<div class="profile-stat"><span>Orders</span><strong>'+esc(reservations.length)+'</strong></div>'+
 '<div class="profile-stat"><span>Saved card</span><strong>'+esc(saved?'Authorized':'Not ready')+'</strong></div>'+
-'<div class="profile-stat"><span>Needs notice</span><strong>'+esc(needsNotice)+'</strong></div>'+
+'<div class="profile-stat"><span>Balance emails</span><strong>'+esc(needsNotice)+'</strong></div>'+
 '<div class="profile-stat"><span>Ready check</span><strong>'+esc(ready)+'</strong></div>'+
 '</div></section>';
 }
@@ -3027,7 +3037,7 @@ actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email custome
 return '<span>Next best move</span><strong>Payment needs attention</strong><p>A Stripe payment is marked '+esc(formatStatus(failedPayment.status))+'. Reach out before trying any new charge.</p><div class="actions">'+actions+'</div>';
 }
 if(moneyRisk&&moneyRisk.level==='needs'&&reservationChargeId(moneyRisk.reservation||{})){
-return '<span>Next best move</span><strong>Send final-balance notice</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn" data-final-action="notice" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Send notice</button><button class="btn quiet" data-profile-pane="sales">Review sales</button></div>';
+return '<span>Money</span><strong>Balance pending</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open money</button></div>';
 }
 if(moneyRisk&&moneyRisk.level==='ready'&&reservationChargeId(moneyRisk.reservation||{})){
 return '<span>Next best move</span><strong>Final balance check</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Charge</button></div>';
@@ -3044,7 +3054,7 @@ if(readyToCharge){
 return '<span>Next best move</span><strong>Ready for final-balance check</strong><p>The notice wait appears complete. Run a dry run first, then charge only if the customer passes every safety check.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Charge</button></div>';
 }
 if(needsNotice){
-return '<span>Next best move</span><strong>Send final-balance notice</strong><p>This customer has an order that needs the required balance email before any final charge.</p><div class="actions"><button class="btn" data-final-action="notice" data-reservation-id="'+esc(reservationChargeId(needsNotice))+'">Send notice</button></div>';
+return '<span>Money</span><strong>Balance pending</strong><p>This customer still owes the remaining balance. Send the balance email when you are ready to collect closer to shipment.</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open money</button></div>';
 }
 if(waiting){
 return '<span>Next best move</span><strong>Balance email is active</strong><p>The balance email was sent. Check readiness after the 24-hour wait before collecting the remaining balance.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(waiting))+'">Check readiness</button></div>';
@@ -3354,7 +3364,7 @@ if(row.final_balance_payment_intent_id)return {className:'charged',label:'Final 
 if(amount<=0)return {className:'ready',label:'No balance due',note:'No remaining balance is recorded.'};
 if(row.blocked_reason)return {className:'blocked',label:'Needs payment link',note:'This order is not approved for automatic final collection yet. Send a secure Stripe invoice or payment link.'};
 if(!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized)return {className:'blocked',label:'Needs payment link',note:'This order is not approved for automatic final collection yet. Send a secure Stripe invoice or payment link.'};
-if(['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at)return {className:'needs',label:'Needs notice',note:'Send the balance email before collecting.'};
+if(['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at)return {className:'waiting',label:'Balance pending',note:'Send the balance email later, when you are ready to collect closer to shipment.'};
 if(finalBalanceReady(row))return {className:'ready',label:'Ready for dry run',note:'Run dry run before charging.'};
 if(row.final_balance_notice_sent_at)return {className:'waiting',label:'Waiting period',note:'Notice sent. Wait period must pass before charging.'};
 return {className:'needs',label:'Review balance',note:'Open final-balance workflow before collecting.'};
@@ -4007,10 +4017,10 @@ var batchRouteCount=groups['Ready to Charge'].length+groups['Waiting Period'].le
 var manualAmount=groups.Blocked.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
 var selectableIds=new Set(rows.filter(finalBatchSelectable).map(function(row){return row.id}));
 Array.from(state.selected).forEach(function(id){if(!selectableIds.has(id))state.selected.delete(id)});
-var nextHeadline=groups['Ready to Charge'].length?'Dry run the ready balances.':(groups['Needs Notice'].length?'Start with balance notices.':(groups['Waiting Period'].length?'Wait window is running.':(manualCount?'Send payment links for these balances.':'Final balances are clear.')));
-var nextCopy=groups['Ready to Charge'].length?'These records have passed the notice window. Run the dry check first, then charge only records that pass every safety check.':(groups['Needs Notice'].length?'These customers owe the remaining balance, but the required email has to go out before collection.':(groups['Waiting Period'].length?'The email has been sent. The CRM will not treat the record as safe until the notice window passes.':(manualCount?'Money is still owed, but these orders are not approved for automatic final collection yet. Contact the customer and send a secure Stripe invoice or payment link.':'No customer needs a final-balance action right now.')));
+var nextHeadline=groups['Ready to Charge'].length?'Dry run ready balances.':(groups['Needs Notice'].length?'Balances are pending.':(groups['Waiting Period'].length?'Wait window is active.':(manualCount?'Payment links needed.':'Final balances are clear.')));
+var nextCopy=groups['Ready to Charge'].length?'Run the dry check first. Charge only records that pass.':(groups['Needs Notice'].length?'These customers owe later. Send balance emails when collection is actually starting.':(groups['Waiting Period'].length?'The email is sent. Wait 24 hours before charge review.':(manualCount?'These balances need a secure Stripe invoice or payment link.':'No customer needs a final-balance action right now.')));
 var stats=[
-['Needs notice',groups['Needs Notice'].length,'Send the required email first'],
+['Pending notice',groups['Needs Notice'].length,'Collect later'],
 ['Waiting',groups['Waiting Period'].length,'24-hour window is running'],
 ['Ready',groups['Ready to Charge'].length,'Dry run before charge'],
 ['Needs payment link',groups.Blocked.length,'Invoice or payment link']
@@ -4027,12 +4037,12 @@ var referenceLanes=[
 ].map(function(item){return finalBalanceLane(item[0],item[1],groups[item[0]])}).join('');
 var disabled=state.batchBusy?' disabled':'';
 var toolbar='<div class="finals-toolbar"><span class="sr-only">Select needs notice</span><span class="sr-only">Charge ready batch</span><span class="sr-only">Check emailed + ready</span><span class="sr-only">Charge emailed + ready</span><span class="sr-only">Ready amount</span>'+
- '<div class="finals-action-step"><div><span>1. Notice</span><strong>Send balance email</strong><p>This starts the required wait period. No money moves from this step.</p></div><div class="actions"><button class="btn quiet" id="selectNeedsNotice">Pick needs notice</button><button class="btn quiet" id="sendNotices">Send email</button></div></div>'+
-'<div class="finals-action-step"><div><span>2. Dry run</span><strong>Check Stripe safety</strong><p>Confirms saved card, future-charge permission, notice age, and duplicate protection.</p></div><div class="actions"><button class="btn quiet" id="selectReady">Pick ready</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run picked</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Dry run all ready</button></div></div>'+
-'<div class="finals-action-step"><div><span>3. Charge</span><strong>Collect approved balances</strong><p>Picked: '+selectedCount+'. Orders that need a payment link stay out of batch charging.</p></div><div class="actions"><button class="btn" id="chargeBatch"'+disabled+'>Charge picked</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge all emailed + ready</button></div></div>'+
+ '<div class="finals-action-step"><div><span>1. Notice</span><strong>Send balance email</strong><p>No charge happens here.</p></div><div class="actions"><button class="btn quiet" id="selectNeedsNotice">Pick pending</button><button class="btn quiet" id="sendNotices">Send email</button></div></div>'+
+'<div class="finals-action-step"><div><span>2. Dry run</span><strong>Check readiness</strong><p>Saved card, permission, notice age, and duplicate protection.</p></div><div class="actions"><button class="btn quiet" id="selectReady">Pick ready</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run picked</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Dry run ready</button></div></div>'+
+'<div class="finals-action-step"><div><span>3. Charge</span><strong>Collect approved balances</strong><p>Picked: '+selectedCount+'. Payment-link orders stay separate.</p></div><div class="actions"><button class="btn" id="chargeBatch"'+disabled+'>Charge picked</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge emailed + ready</button></div></div>'+
 '</div>';
-var command='<div class="finals-command-grid"><div class="finals-command-card primary"><div><div class="finals-command-title">Final balance <span>workspace</span></div><p><strong>'+esc(nextHeadline)+'</strong> '+esc(nextCopy)+'</p></div>'+renderFinalsNextList(groups,readyAmount,pendingAmount)+'</div><div class="finals-command-card money-card"><div><h3>Cash after Stripe</h3><p>Pending means the customer still owes money. It is not a failed payment. Stripe fees are estimated until Stripe creates the real charge.</p></div><div class="finals-money-row"><div><span>Customers owe</span><strong>'+money(pendingAmount)+'</strong></div><div><span>Stripe fees est.</span><strong>'+money(pendingFee)+'</strong></div><div><span>You keep est.</span><strong>'+money(pendingNet)+'</strong></div></div><div class="finals-route-panel"><div class="finals-route batch"><span>Can batch charge</span><strong>'+esc(batchRouteCount)+' record(s)</strong><p>These can move through email, wait, dry run, then batch charge when Stripe permission exists.</p></div><div class="finals-route manual"><span>Needs payment link</span><strong>'+money(manualAmount)+'</strong><p>Still owed, but collect with a secure Stripe invoice or payment link unless the customer completes checkout with later-charge permission.</p></div></div><div class="actions" style="margin-top:12px">'+stripePaymentsLink('Open Stripe payments')+'</div><div class="finals-money-note"><strong>'+money(readyAmount)+' can enter batch review.</strong> If all ready balances collect, estimated net is '+money(readyNet)+' after '+money(readyFee)+' in Stripe fees.</div></div></div>';
-document.getElementById('finals').innerHTML='<div class="finals-page"><section class="panel finals-hero"><div class="finals-command-head"><div><p class="muted">Use this only when you are ready to collect final balances: send the email, wait 24 hours, dry run, then collect only records that pass Stripe safety checks.</p></div><span class="pill">Stripe-safe workflow</span></div>'+command+'<div class="finals-summary">'+stats+'</div>'+toolbar+'</section>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+'<div class="finals-workflow"><div class="finals-primary-lanes">'+primaryLanes+'</div><div class="finals-reference-lanes">'+referenceLanes+'</div></div></div>';
+var command='<div class="finals-command-grid"><div class="finals-command-card primary"><div><div class="finals-command-title">Final balance <span>workspace</span></div><p><strong>'+esc(nextHeadline)+'</strong> '+esc(nextCopy)+'</p></div>'+renderFinalsNextList(groups,readyAmount,pendingAmount)+'</div><div class="finals-command-card money-card"><div><h3>Cash after Stripe</h3></div><div class="finals-money-row"><div><span>Customers owe</span><strong>'+money(pendingAmount)+'</strong></div><div><span>Stripe fees est.</span><strong>'+money(pendingFee)+'</strong></div><div><span>You keep est.</span><strong>'+money(pendingNet)+'</strong></div></div><div class="finals-route-panel"><div class="finals-route batch"><span>Can batch charge</span><strong>'+esc(batchRouteCount)+' record(s)</strong><p>Saved-card route.</p></div><div class="finals-route manual"><span>Needs payment link</span><strong>'+money(manualAmount)+'</strong><p>Invoice or payment link route.</p></div></div><div class="actions" style="margin-top:12px">'+stripePaymentsLink('Open Stripe payments')+'</div><div class="finals-money-note"><strong>'+money(readyAmount)+' can enter batch review.</strong> Estimated net: '+money(readyNet)+' after '+money(readyFee)+' in Stripe fees.</div></div></div>';
+document.getElementById('finals').innerHTML='<div class="finals-page"><section class="panel finals-hero"><div class="finals-command-head"><div><p class="muted">Notice. Wait 24 hours. Dry run. Collect approved balances.</p></div><span class="pill">Stripe-safe workflow</span></div>'+command+'<div class="finals-summary">'+stats+'</div>'+toolbar+'</section>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+'<div class="finals-workflow"><div class="finals-primary-lanes">'+primaryLanes+'</div><div class="finals-reference-lanes">'+referenceLanes+'</div></div></div>';
 document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
 document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return finalBatchSelectable(row)&&row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return finalBatchSelectable(row)&&row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
@@ -4062,7 +4072,7 @@ state.focusReservation='';
 
 function renderFinalsNextList(groups,readyAmount,pendingAmount){
 var items=[
-['1','Needs email',groups['Needs Notice'].length+' customer(s)','Send the required balance notice first.'],
+['1','Pending email',groups['Needs Notice'].length+' customer(s)','Collect later.'],
 ['2','Review open balances',money(pendingAmount),'All unpaid final balances still open.'],
 ['3','Batch-ready',money(readyAmount),'Dry run, then charge only clean records.']
 ];
@@ -4074,7 +4084,7 @@ return ({'Needs Notice':'Needs balance email','Waiting Period':'Waiting period',
 }
 
 function finalStatusLabel(group){
-return ({'Needs Notice':'Needs email','Waiting Period':'Waiting','Ready to Charge':'Ready check','Already Charged':'Collected','Blocked':'Payment link needed'}[group]||formatStatus(group));
+return ({'Needs Notice':'Pending email','Waiting Period':'Waiting','Ready to Charge':'Ready check','Already Charged':'Collected','Blocked':'Payment link needed'}[group]||formatStatus(group));
 }
 
 function finalBalanceLane(group,description,rows){
@@ -4120,12 +4130,12 @@ openCustomer(btn.dataset.draftCustomer,'messages');
 function finalBalanceCard(row){
 var pickable=finalBatchSelectable(row);
 var manual=!pickable;
-var checkbox=!manual&&pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for batch</label>':'<span class="status blocked">Payment link path</span>';
+var checkbox=!manual&&pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for batch</label>':'<span class="status blocked">Needs payment link</span>';
 var card=row.stripe_payment_method_saved?'Card saved for later charge':'No card saved for later charge';
 var auth=row.future_charge_authorized?'Customer approved the later charge':'Customer has not approved the later charge';
 var notice=row.final_balance_notice_sent_at?'Balance email sent '+date(row.final_balance_notice_sent_at):'Balance email not sent';
-var next=row.charge_eligible?'Dry run, then charge if still ready':(manual?'Draft a payment-link email':(row.notice_required?'Send balance email':'No action right now'));
-var nextHelp=row.charge_eligible?'This customer has the saved-card permission needed for a safe final-balance review. Dry run checks the email notice, wait time, saved card, permission, and duplicate protection before money moves.':(manual?'This customer still owes money, but this order is not approved for automatic final collection. Draft a note, send a secure Stripe invoice or payment link, then mark the profile when it is handled.':(row.notice_required?'Send the final-balance email first. After the wait window, this can move to charge review if the saved-card permission is present.':'Keep this record for reference.'));
+var next=row.charge_eligible?'Dry run, then charge if still ready':(manual?'Send a secure payment link':(row.notice_required?'Balance email later':'No action right now'));
+var nextHelp=row.charge_eligible?'Ready for the saved-card route. Dry run before money moves.':(manual?'Still owed, but not approved for automatic collection. Use Stripe invoice or payment link.':(row.notice_required?'Still owed. Send the balance email when collection is actually starting.':'Keep for reference.'));
 var details=[notice,card,auth].filter(Boolean).join(' · ');
 var actionButtons=[];
 if(!manual&&pickable&&row.notice_required)actionButtons.push('<button class="btn quiet small" data-final-action="notice" data-reservation-id="'+esc(row.id)+'">Send notice</button>');
@@ -4142,13 +4152,13 @@ var person=row.customer_name||row.email||'Customer';
 var contactLine=[row.email,row.phone].filter(Boolean).join(' · ')||'No contact detail saved';
 var route=manual?'Needs payment link':'Saved-card route';
 var selection=checkbox;
-var routeLabel=manual?'Owner sends secure link':'Saved-card route';
+var routeLabel=manual?'Secure link route':'Saved-card route';
 var feeNote=finalAmount>0?'Estimated net after Stripe fee: '+money(netAmount)+' · Fee estimate '+money(feeAmount):'No final balance entered.';
 return '<article class="final-card '+(manual?'manual':'')+'" data-final-card="'+esc(row.id)+'" data-final-charge-id="'+esc(row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||row.id)+'">'+
 '<div class="final-card-headline"><div class="final-card-title"><span class="status '+readyClass(row.readiness_group)+'">'+esc(finalStatusLabel(row.readiness_group||row.status))+'</span><strong>'+customerLink(row.customer_id,person)+'</strong><div class="final-card-statusline"><span>'+esc(contactLine)+'</span><span>'+esc(route)+'</span></div></div>'+selection+'</div>'+
 '<div class="final-record-tags"><span class="pill">'+product+'</span><span class="pill">Deposit paid '+money(row.deposit_amount||0)+'</span><span class="pill">'+esc(notice)+'</span></div>'+
 '<div class="finals-decision"><div class="final-decision-money"><span>Still owed</span><strong>'+money(finalAmount)+'</strong><small>'+esc(feeNote)+'</small></div><div class="final-decision-copy"><span>'+esc(routeLabel)+'</span><strong>'+esc(next)+'</strong><span>'+esc(nextHelp)+'</span>'+(manual?'<span class="final-warning">Not batch-chargeable yet. Use a Stripe payment link or invoice, or have the customer reserve again with later-charge permission.</span>':'')+'</div><div class="final-decision-actions">'+actionButtons.join('')+'</div></div>'+
-'<div class="final-card-foot"><details class="final-card-more"><summary>View safety details and timeline</summary><div class="final-card-body"><div class="final-context"><strong>Collection safety</strong><span>'+esc(card)+'</span><span>'+esc(auth)+'</span><span>'+esc(notice)+'</span></div><div class="final-context"><strong>Timeline</strong>'+timeline+'</div></div><span>'+esc(details)+'</span><code>Internal CRM record: '+esc(row.id)+'</code></details></div></article>';
+'<div class="final-card-foot"><details class="final-card-more"><summary>Safety details</summary><div class="final-card-body"><div class="final-context"><strong>Collection safety</strong><span>'+esc(card)+'</span><span>'+esc(auth)+'</span><span>'+esc(notice)+'</span></div><div class="final-context"><strong>Timeline</strong>'+timeline+'</div></div><span>'+esc(details)+'</span></details></div></article>';
 }
 
 function renderAccounting(){
