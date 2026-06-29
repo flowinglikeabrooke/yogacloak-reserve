@@ -9,7 +9,7 @@ import { checkRateLimit, rejectLargeRequest, requireOwner } from '../../lib/yoga
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 3, windowSeconds: 60, keyPrefix: 'money-single' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 3, windowSeconds: 60, keyPrefix: 'money-single' }))) return;
   if (rejectLargeRequest(req, res, 8 * 1024)) return;
   if (!requireOwner(req, res)) return;
 

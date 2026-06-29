@@ -49,7 +49,7 @@ function webhookAllowed(req, body) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
-  if (!checkRateLimit(req, res, { maxRequests: 30, windowSeconds: 60, keyPrefix: 'twilio-webhook' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 30, windowSeconds: 60, keyPrefix: 'twilio-webhook' }))) return;
   if (rejectLargeRequest(req, res, 16 * 1024)) return;
 
   try {

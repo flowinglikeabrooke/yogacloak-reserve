@@ -187,8 +187,26 @@ Security layers:
 - Admin page is blocked from iframes with `X-Frame-Options: DENY`.
 - Admin browser `POST` actions require CSRF protection.
 - Sensitive admin and money endpoints are rate limited.
+- Rate limits use Vercel KV / Upstash Redis when configured, with a local fallback for development.
+- The private admin page uses a server-generated CSP nonce so only scripts stamped by the server can run.
 - Run `npm run predeploy:check` before deploy. It checks the single Vercel API dispatcher, final-balance workflow, public files, admin links, SEO landmarks, and protected-route headers. If npm is not available locally, run `node scripts/predeploy-check.js`.
 - `robots.txt` also disallows the admin URL, but this is only an SEO signal; the real protection is the server-side session.
+
+For production-grade rate limiting, add either Vercel KV or Upstash Redis REST variables in Vercel:
+
+```text
+KV_REST_API_URL=...
+KV_REST_API_TOKEN=...
+```
+
+or:
+
+```text
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+If those are missing, the site still works, but rate limits reset whenever Vercel moves the serverless function.
 
 ## Automatic final-balance charging
 

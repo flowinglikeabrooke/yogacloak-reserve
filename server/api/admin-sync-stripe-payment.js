@@ -189,7 +189,7 @@ async function mirrorAirtable({ paymentIntent, checkoutSession, metadata, custom
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 6, windowSeconds: 60, keyPrefix: 'admin-sync-stripe-payment' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 6, windowSeconds: 60, keyPrefix: 'admin-sync-stripe-payment' }))) return;
   if (rejectLargeRequest(req, res, 8 * 1024)) return;
   if (!requireOwner(req, res)) return;
 

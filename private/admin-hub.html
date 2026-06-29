@@ -1728,6 +1728,7 @@ document.getElementById('settings').innerHTML=commandCenterSettingsPanel()+'<sec
 row('Admin session secret',yes(s.admin_session_secret_configured))+
 row('Admin token',yes(s.admin_token_configured))+
 row('Google approved-email login',yes(s.google_admin_login_configured))+
+row('Durable rate limiting',s.durable_rate_limit_configured?'<span class="ok">Redis/KV</span>':'<span class="muted">Local fallback; add Vercel KV or Upstash Redis for production</span>')+
 row('Private CRM database',s.supabase_configured?'<span class="ok">Primary</span>':'<span class="muted">Not connected; add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel Production</span>')+
 row('Airtable raw backup','<span class="ok">Active when Airtable env vars are set</span>')+
 row('Raw backup sync log',sync.error?'<span class="error">Needs latest schema</span>':(sync.enabled?'<span class="ok">On</span>':'<span class="muted">Waiting for private CRM</span>'))+

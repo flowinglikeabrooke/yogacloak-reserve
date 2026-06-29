@@ -37,7 +37,7 @@ function extractInboundEmail(payload) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 30, windowSeconds: 60, keyPrefix: 'email-webhook' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 30, windowSeconds: 60, keyPrefix: 'email-webhook' }))) return;
   if (rejectLargeRequest(req, res, 64 * 1024)) return;
   if (!webhookAllowed(req)) return res.status(401).json({ error: 'Unauthorized' });
 

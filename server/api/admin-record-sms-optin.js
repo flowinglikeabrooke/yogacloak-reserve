@@ -8,7 +8,7 @@ const CONSENT_TEXT = 'Customer gave yogacloak permission to send SMS updates. Ms
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 12, windowSeconds: 60, keyPrefix: 'admin-record-sms-optin' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 12, windowSeconds: 60, keyPrefix: 'admin-record-sms-optin' }))) return;
   if (rejectLargeRequest(req, res, 10 * 1024)) return;
   if (!requireAdmin(req, res)) return;
 

@@ -5,7 +5,7 @@ import { checkRateLimit, rejectLargeRequest, requireAdmin } from '../../lib/yoga
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 12, windowSeconds: 60, keyPrefix: 'admin-send-sms' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 12, windowSeconds: 60, keyPrefix: 'admin-send-sms' }))) return;
   if (rejectLargeRequest(req, res, 8 * 1024)) return;
   if (!requireAdmin(req, res)) return;
 

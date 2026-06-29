@@ -86,7 +86,7 @@ async function sendOwnerSummary({ dryRun, results }) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 3, windowSeconds: 60, keyPrefix: 'money-batch' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 3, windowSeconds: 60, keyPrefix: 'money-batch' }))) return;
   if (rejectLargeRequest(req, res, 32 * 1024)) return;
   if (!requireOwner(req, res)) return;
 

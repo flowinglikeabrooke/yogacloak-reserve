@@ -4,7 +4,7 @@ import { checkRateLimit, rejectLargeRequest, requireFounder } from '../../lib/yo
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 20, windowSeconds: 60, keyPrefix: 'admin-update-automation' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 20, windowSeconds: 60, keyPrefix: 'admin-update-automation' }))) return;
   if (rejectLargeRequest(req, res, 12 * 1024)) return;
   if (!requireFounder(req, res)) return;
 

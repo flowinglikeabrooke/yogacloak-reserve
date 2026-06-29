@@ -4,7 +4,7 @@ import { auditAdminAction } from '../../lib/admin-audit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 6, windowSeconds: 300, keyPrefix: 'admin-login' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 6, windowSeconds: 300, keyPrefix: 'admin-login' }))) return;
   if (rejectLargeRequest(req, res, 4 * 1024)) return;
 
   const token = String(req.body?.token || '').trim();

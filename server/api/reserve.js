@@ -350,7 +350,7 @@ async function createCheckoutSession(payload) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!checkRateLimit(req, res, { maxRequests: 10, windowSeconds: 60, keyPrefix: 'reserve' })) return;
+  if (!(await checkRateLimit(req, res, { maxRequests: 10, windowSeconds: 60, keyPrefix: 'reserve' }))) return;
   if (rejectLargeRequest(req, res, 16 * 1024)) return;
 
   try {
