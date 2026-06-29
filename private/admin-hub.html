@@ -420,6 +420,7 @@ tr:last-child td{border-bottom:0}
 .finals-records{display:grid;gap:14px;padding:0 24px}
 .final-card{display:grid;gap:14px;border:1px solid rgba(var(--cream),.09);border-radius:8px;background:linear-gradient(135deg,rgba(var(--cream),.04),rgba(0,0,0,.16));padding:18px}
 .final-card.manual{border-color:rgba(212,148,141,.28);background:linear-gradient(135deg,rgba(212,148,141,.12),rgba(var(--cream),.026))}
+.final-card.is-focused{border-color:rgba(219,186,123,.5);box-shadow:0 0 0 2px rgba(219,186,123,.11),0 24px 70px -44px rgba(219,186,123,.9)}
 .final-card-top{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:stretch}
 .final-person,.final-money,.final-context{min-width:0}
 .final-card-main{display:grid;gap:12px}
@@ -747,8 +748,11 @@ tr:last-child td{border-bottom:0}
 .customer-brain-card span{display:block;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(30,35,32,.48);font-weight:800}
 .customer-brain-card strong{display:block;margin-top:7px;color:var(--ink);font-size:17px;line-height:1.12;letter-spacing:-.015em}
 .customer-brain-card small{display:block;margin-top:5px;color:rgba(30,35,32,.55);font-size:11px;line-height:1.35}
-.customer-money-alert{border:1px solid rgba(212,148,141,.24);border-radius:8px;background:linear-gradient(135deg,rgba(212,148,141,.11),rgba(219,186,123,.055));padding:14px;margin:12px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
-.customer-money-alert strong{display:block;color:var(--ink);font-size:16px;line-height:1.25}
+.customer-money-alert{border:1px solid rgba(212,148,141,.24);border-radius:8px;background:linear-gradient(135deg,rgba(212,148,141,.11),rgba(219,186,123,.055));padding:16px;margin:12px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+.customer-money-alert.blocked{border-color:rgba(130,68,64,.28);background:linear-gradient(135deg,rgba(212,148,141,.16),rgba(255,250,240,.72))}
+.customer-money-alert.needs{border-color:rgba(164,132,68,.25);background:linear-gradient(135deg,rgba(219,186,123,.14),rgba(255,250,240,.72))}
+.customer-money-alert.ready{border-color:rgba(124,140,130,.25);background:linear-gradient(135deg,rgba(124,140,130,.12),rgba(255,250,240,.72))}
+.customer-money-alert strong{display:block;color:var(--ink);font-size:18px;line-height:1.2;letter-spacing:-.015em}
 .customer-money-alert span{display:block;margin-top:4px;color:rgba(30,35,32,.62);font-size:12px;line-height:1.4}
 .customer-money-alert .actions{justify-content:flex-end}
 .customer-focus-grid{display:grid;grid-template-columns:1.25fr repeat(2,minmax(0,.72fr));gap:12px;margin:12px 0}
@@ -1182,7 +1186,7 @@ var adminUser=adminUserRaw.indexOf('__ADMIN_USER_JSON__')===0?{name:'Preview',ro
 if(!adminUser||typeof adminUser!=='object'||Array.isArray(adminUser)){adminUser={name:'Preview',role:'founder',email:''}}
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,customerProfilePane:'work',customerQueueFilter:'all',inquiryQueueFilter:'all',inquiries:[],reservations:[],payments:[],paymentFilter:'all',communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
+var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,customerProfilePane:'work',customerQueueFilter:'all',inquiryQueueFilter:'all',inquiries:[],reservations:[],payments:[],paymentFilter:'all',communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false,focusReservation:''};
 var taskCustomerSearchTimer=null;
 var ownerOnlyTabs=new Set(['reservations','payments','finals','accounting']);
 var founderOnlyTabs=new Set(['automations','duplicates','settings']);
@@ -1458,6 +1462,20 @@ if(type==='raw_backup')return 'settings';
 return 'tasks';
 }
 
+function todayTaskPane(row){
+var type=String(row.type||'').toLowerCase();
+if(['notice','charge','payment','final_balance'].includes(type))return 'sales';
+if(['inquiry','contact'].includes(type))return 'messages';
+if(type==='raw_backup')return 'profile';
+return 'work';
+}
+
+function todayRowAttrs(row,tab){
+if(row.customer_id)return 'data-open-customer="'+esc(row.customer_id)+'" data-open-customer-pane="'+esc(todayTaskPane(row))+'"';
+if(row.charge_id)return 'data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'"';
+return 'data-jump-tab="'+esc(tab)+'"';
+}
+
 function todayTaskKind(row){
 var type=String(row.type||'task').toLowerCase();
 return ({inquiry:'Sales',contact:'Relationship',follow_up:'Follow-up',customer_reply:'Reply task',inquiry_followup:'Inquiry task',final_balance:'Balance task',operations:'Ops task',accounting:'Accounting',payroll:'Payroll',inventory:'Inventory',owner_task:'Owner task',notice:'Balance email',charge:'Collect',payment:'Payment',duplicate:'Duplicate',raw_backup:'Backup'}[type]||'Task');
@@ -1489,13 +1507,14 @@ return ['notice','charge','payment'].includes(type);
 
 function renderTodayAction(row){
 var type=String(row.type||'').toLowerCase();
-if(row.customer_id)return openProfileButton(row.customer_id,type==='charge'?'Open profile':'Open customer');
+if(row.customer_id)return openProfileButton(row.customer_id,type==='charge'?'Open profile':'Open customer',todayTaskPane(row));
+if(row.charge_id)return '<button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'">Open balance</button>';
 return '<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+'">Open</button>';
 }
 
 function renderTodayTaskButtons(row){
 if(!row.owner_task_id)return renderTodayAction(row)+'<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+'">'+esc(tabLabel(todayTaskTab(row)))+'</button>';
-var profile=row.customer_id?openProfileButton(row.customer_id,'Profile'):'<button class="btn quiet small" data-jump-tab="tasks">Task center</button>';
+var profile=row.customer_id?openProfileButton(row.customer_id,'Profile',todayTaskPane(row)):'<button class="btn quiet small" data-jump-tab="tasks">Task center</button>';
 return profile+'<button class="btn small" data-task-status="'+esc(row.owner_task_id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(row.owner_task_id)+'" data-status="archived">Archive</button>';
 }
 
@@ -1529,7 +1548,7 @@ return '<details class="today-work-group" '+(open?'open':'')+'><summary class="t
 var tab=todayTaskTab(row);
 var rowClass=(todayTaskHot(row)?'hot ':'')+(todayTaskMoney(row)?'money':'');
 var details=[row.detail,row.due_at?'Due '+date(row.due_at):'',date(row.created_at)].filter(Boolean).join(' · ');
-return '<article class="today-flow-row '+rowClass+'" data-jump-tab="'+esc(tab)+'" role="button" tabindex="0"><div class="today-flow-kind"><span>'+esc(todayTaskKind(row))+'</span><strong>'+esc(todayTaskStatus(row))+'</strong></div><div class="today-flow-copy"><strong>'+esc(row.title||formatStatus(row.type))+'</strong><span>'+esc(details||'Open the connected workspace')+'</span></div><div class="today-flow-actions">'+renderTodayTaskButtons(row)+'</div></article>';
+return '<article class="today-flow-row '+rowClass+'" '+todayRowAttrs(row,tab)+' role="button" tabindex="0"><div class="today-flow-kind"><span>'+esc(todayTaskKind(row))+'</span><strong>'+esc(todayTaskStatus(row))+'</strong></div><div class="today-flow-copy"><strong>'+esc(row.title||formatStatus(row.type))+'</strong><span>'+esc(details||'Open the connected workspace')+'</span></div><div class="today-flow-actions">'+renderTodayTaskButtons(row)+'</div></article>';
 }).join('')+'</div>':'<div class="today-work-group-empty">Nothing here right now.</div>')+'</details>';
 }).join('')+'</div>';
 }
@@ -1540,18 +1559,10 @@ if(!rows.length)return '<div class="empty">No inbound texts or emails yet.</div>
 return '<div class="work-list">'+rows.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;var inbound=String(row.direction||'').toLowerCase()==='inbound';var openAttr=customerId?' data-open-today-message-customer="'+esc(customerId)+'"':'';return '<div class="work-row message-row clickable '+(inbound?'inbound':'')+'"'+openAttr+'><div><strong>'+esc((inbound?'New ':'')+String(row.channel||'message').toUpperCase()+' · '+(row.customers&&row.customers.full_name||'Customer'))+'</strong><span>'+esc(row.subject||row.body||row.status||'Message')+' · '+esc(date(row.created_at))+'</span></div>'+openProfileButton(customerId,'Open')+'</div>'}).join('')+'</div>';
 }
 
-function renderTodayQuickQueue(summary){
-var rawBackup=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
-var items=[
-['New inquiries',summary.new_inquiries||0,'Open Inquiries','inquiries'],
-['Follow-ups due',summary.follow_ups_due||0,'Open Tasks','tasks'],
-['Ready to charge',summary.ready_to_charge||0,'Open Final Balances','finals'],
-['Failed payments',summary.failed_payments||0,'Open Payments','payments'],
-['Raw records',rawBackup,'Open Settings','settings'],
-['Duplicates',summary.duplicate_candidates||0,'Review Duplicates','duplicates']
-].filter(function(item){return Number(item[1]||0)>0});
-if(!items.length)return '<div class="empty">No quick jumps waiting right now.</div>';
-return '<div class="work-list">'+items.map(function(item){return '<div class="work-row"><div><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+' waiting</span></div><button class="btn quiet small" data-jump-tab="'+esc(item[3])+'">'+esc(item[2])+'</button></div>'}).join('')+'</div>';
+function renderTodayQuickQueue(data){
+var items=collectPriorityItems(data).slice(0,5);
+if(!items.length)return '<div class="empty">No exact work links waiting right now.</div>';
+return '<div class="work-list">'+items.map(function(item){return '<div class="work-row"><div><strong>'+esc(item.title)+'</strong><span>'+esc(item.kind+' · '+item.detail)+'</span></div>'+priorityButton(item,item.customer_id?'Open profile':'Open','btn quiet small')+'</div>'}).join('')+'</div>';
 }
 
 function renderPriorityQueue(data){
@@ -1570,13 +1581,13 @@ var summary=data.summary||{};
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
 var diagnostics='<details class="signal-drawer"><summary>Open live signal diagnostics</summary><div class="signal-drawer-body">'+renderTodaySignals(summary,data)+'</div></details>';
 root.innerHTML='<div class="today-command">'+databaseNotice+renderPriorityQueue(data)+renderHubCards(summary)+'</div>'+
-'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Work lanes</h2><p class="muted">Grouped by what you actually need to do: answer people, move sales forward, clean up records, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Task center</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Message watch</h2><p class="muted">Click a reply to open the customer profile and keep the response attached.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Comms</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Fast jumps</h2><p class="muted">Only appears when a work area has something waiting.</p></div></header>'+renderTodayQuickQueue(summary)+'</section>'+diagnostics+'</div></div>';
+'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Work lanes</h2><p class="muted">Grouped by what you actually need to do: answer people, move sales forward, clean up records, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Task center</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Message watch</h2><p class="muted">Click a reply to open the customer profile and keep the response attached.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Comms</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Exact queue</h2><p class="muted">These links open the connected person or record, not just a broad tab.</p></div></header>'+renderTodayQuickQueue(data)+'</section>'+diagnostics+'</div></div>';
 bindCustomerOpeners();
 bindTaskButtons();
 document.querySelectorAll('[data-hub-lens]').forEach(function(btn){btn.addEventListener('click',function(){setHubLens(btn.dataset.hubLens)})});
-document.querySelectorAll('[data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(event){event.stopPropagation();setTab(btn.dataset.jumpTab)})});
-document.querySelectorAll('[data-jump-tab][role="button"]').forEach(function(btn){btn.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();setTab(btn.dataset.jumpTab)}})});
-document.querySelectorAll('[data-open-today-message-customer]').forEach(function(row){row.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary'))return;openCustomer(row.dataset.openTodayMessageCustomer)})});
+document.querySelectorAll('[data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(event){event.stopPropagation();if(btn.dataset.focusReservation)state.focusReservation=btn.dataset.focusReservation;setTab(btn.dataset.jumpTab)})});
+document.querySelectorAll('[data-jump-tab][role="button"]').forEach(function(btn){btn.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();if(btn.dataset.focusReservation)state.focusReservation=btn.dataset.focusReservation;setTab(btn.dataset.jumpTab)}})});
+document.querySelectorAll('[data-open-today-message-customer]').forEach(function(row){row.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary'))return;openCustomer(row.dataset.openTodayMessageCustomer,'messages')})});
 }
 
 function taskStatusOptions(value){
@@ -2392,17 +2403,22 @@ var reservations=detail.reservations||[];
 var payments=detail.payments||[];
 var followUpDue=c.next_follow_up_at&&Date.parse(c.next_follow_up_at)<=Date.now();
 var failedPayment=payments.find(function(row){return ['failed','requires_payment_method','requires_action'].includes(row.status)});
+var moneyRisk=customerFinalBalanceRisk(detail);
 var readyToCharge=reservations.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
 var needsNotice=reservations.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id&&reservationChargeId(row)});
 var waiting=reservations.find(function(row){return row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id&&!finalBalanceReady(row)});
 var hasActivity=timelineItems(detail).length>0;
 if(raw&&c.contact_status==='needs_reply')return {title:'Reply needed',note:'Raw backup profile, but this customer still needs a response.',pane:'messages',hot:true};
 if(raw)return {title:'Organize into CRM',note:'Import this raw Airtable profile so notes, tasks, messages, and money stay together.',pane:'profile',hot:true};
+if(moneyRisk&&moneyRisk.level==='blocked')return {title:'Manual balance issue',note:moneyRisk.note,pane:'sales',hot:true};
 if(failedPayment)return {title:'Payment needs attention',note:'Reach out before trying another charge.',pane:'sales',hot:true};
+if(moneyRisk&&moneyRisk.level==='needs')return {title:'Send balance notice',note:moneyRisk.note,pane:'sales',hot:true};
+if(moneyRisk&&moneyRisk.level==='ready')return {title:'Final balance check',note:moneyRisk.note,pane:'sales',hot:true};
 if(c.contact_status==='needs_reply')return {title:'Reply needed',note:'Open messages and answer before this gets lost.',pane:'messages',hot:true};
 if(followUpDue)return {title:'Follow-up is due',note:'Due '+date(c.next_follow_up_at)+'. Reply or move the follow-up date.',pane:'work',hot:true};
 if(readyToCharge)return {title:'Final balance check',note:'Run a dry run before charging the saved card.',pane:'sales',hot:true};
 if(needsNotice)return {title:'Send balance notice',note:'Send the required email before collecting the remaining balance.',pane:'sales',hot:true};
+if(moneyRisk&&moneyRisk.level==='waiting')return {title:'Notice is active',note:moneyRisk.note,pane:'sales',hot:false};
 if(waiting)return {title:'Notice is active',note:'The 24-hour wait is still protecting this charge.',pane:'sales',hot:false};
 if(!hasActivity)return {title:'Start relationship',note:'Add a note, task, or first message.',pane:'work',hot:false};
 if(c.contact_status==='not_contacted')return {title:'First follow-up',note:'This person has activity but has not been marked contacted.',pane:'messages',hot:true};
@@ -2429,9 +2445,11 @@ function renderCustomerMoneyAlert(detail){
 var risk=customerFinalBalanceRisk(detail);
 if(!risk)return '';
 var chargeId=reservationChargeId(risk.reservation||{});
-var action=chargeId?'<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(chargeId)+'">Check readiness</button>':'<button class="btn quiet small" data-profile-pane="sales">Open sales</button>';
-if(risk.level==='needs'&&chargeId)action='<button class="btn small" data-final-action="notice" data-reservation-id="'+esc(chargeId)+'">Send notice</button>';
-return '<section class="customer-money-alert"><div><strong>'+esc(risk.title)+' · '+money(risk.amount)+'</strong><span>'+esc(risk.note)+'</span></div><div class="actions"><button class="btn quiet small" data-profile-pane="sales">Sales view</button>'+action+'</div></section>';
+var action='<button class="btn quiet small" data-profile-pane="sales">Open sales issue</button>';
+if(risk.level==='blocked')action+='<button class="btn quiet small" data-jump-tab="finals" '+(chargeId?'data-focus-reservation="'+esc(chargeId)+'"':'')+'>Final balance workflow</button>';
+else if(risk.level==='needs'&&chargeId)action+='<button class="btn small" data-final-action="notice" data-reservation-id="'+esc(chargeId)+'">Send notice</button>';
+else if(chargeId)action+='<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(chargeId)+'">Check readiness</button>';
+return '<section class="customer-money-alert '+esc(risk.level||'')+'"><div><strong>'+esc(risk.title)+' · '+money(risk.amount)+'</strong><span>'+esc(risk.note)+'</span></div><div class="actions">'+action+'</div></section>';
 }
 
 function renderCustomerWorkStrip(detail,emailHref,smsHref){
@@ -2507,6 +2525,10 @@ var reservations=detail.reservations||[];
 var payments=detail.payments||[];
 var failed=payments.find(function(row){return ['failed','requires_payment_method','requires_action'].includes(String(row.status||''))});
 if(failed)return {label:'Payment issue',value:money(failed.amount||0),note:formatStatus(failed.status),pane:'sales',hot:true};
+var risk=customerFinalBalanceRisk(detail);
+if(risk&&risk.level==='blocked')return {label:'Manual balance issue',value:money(risk.amount),note:'Invoice/payment link needed',pane:'sales',hot:true};
+if(risk&&risk.level==='needs')return {label:'Needs notice',value:money(risk.amount),note:'Email before collecting',pane:'sales',hot:true};
+if(risk&&risk.level==='ready')return {label:'Ready balance',value:money(risk.amount),note:'Dry run before charge',pane:'sales',hot:true};
 var ready=reservations.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
 if(ready)return {label:'Ready balance',value:money(ready.final_balance_total||ready.final_balance_amount||0),note:'Dry run before charge',pane:'sales',hot:true};
 var notice=reservations.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id});
@@ -2690,14 +2712,24 @@ var reservations=detail.reservations||[];
 var payments=detail.payments||[];
 var followUpDue=c.next_follow_up_at&&Date.parse(c.next_follow_up_at)<=Date.now();
 var failedPayment=payments.find(function(row){return ['failed','requires_payment_method','requires_action'].includes(row.status)});
+var moneyRisk=customerFinalBalanceRisk(detail);
 var readyToCharge=reservations.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
 var needsNotice=reservations.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id&&reservationChargeId(row)});
 var waiting=reservations.find(function(row){return row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id&&!finalBalanceReady(row)});
 var hasActivity=timelineItems(detail).length>0;
 var actions='';
+if(moneyRisk&&moneyRisk.level==='blocked'){
+return '<span>Next best move</span><strong>Manual balance issue</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open sales issue</button><button class="btn quiet" data-jump-tab="finals" '+(reservationChargeId(moneyRisk.reservation||{})?'data-focus-reservation="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'"':'')+'>Final balance workflow</button></div>';
+}
 if(failedPayment){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email customer</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Text customer</a>':'');
 return '<span>Next best move</span><strong>Payment needs attention</strong><p>A Stripe payment is marked '+esc(formatStatus(failedPayment.status))+'. Reach out before trying any new charge.</p><div class="actions">'+actions+'</div>';
+}
+if(moneyRisk&&moneyRisk.level==='needs'&&reservationChargeId(moneyRisk.reservation||{})){
+return '<span>Next best move</span><strong>Send final-balance notice</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn" data-final-action="notice" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Send notice</button><button class="btn quiet" data-profile-pane="sales">Review sales</button></div>';
+}
+if(moneyRisk&&moneyRisk.level==='ready'&&reservationChargeId(moneyRisk.reservation||{})){
+return '<span>Next best move</span><strong>Final balance check</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Charge</button></div>';
 }
 if(c.contact_status==='needs_reply'){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Reply by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Reply by text</a>':'');
@@ -2946,9 +2978,9 @@ if(!id)return esc(label||'');
 return '<span class="link" data-open-customer="'+esc(id)+'">'+esc(label||'Open customer')+'</span>';
 }
 
-function openProfileButton(id,label){
+function openProfileButton(id,label,pane){
 if(!id)return '<span class="muted">No linked profile</span>';
-return '<button class="btn quiet small" data-open-customer="'+esc(id)+'">'+esc(label||'Open profile')+'</button>';
+return '<button class="btn quiet small" data-open-customer="'+esc(id)+'" '+(pane?'data-open-customer-pane="'+esc(pane)+'"':'')+'>'+esc(label||'Open profile')+'</button>';
 }
 
 async function openCustomer(customerId,pane){
@@ -2963,6 +2995,7 @@ statusText.innerHTML='<span class="ok">Customer profile opened.</span>';
 
 function bindCustomerOpeners(){
 document.querySelectorAll('[data-open-customer]').forEach(function(el){el.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();openCustomer(el.dataset.openCustomer,el.dataset.openCustomerPane||'')})});
+document.querySelectorAll('[data-open-customer][role="button"]').forEach(function(el){el.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();openCustomer(el.dataset.openCustomer,el.dataset.openCustomerPane||'')}})});
 }
 
 function reservationStatus(row){
@@ -3643,6 +3676,20 @@ document.getElementById('autoDryRun').addEventListener('click',function(){runAut
 document.getElementById('autoChargeReady').addEventListener('click',function(){runAutoFinalBalance(false)});
 document.querySelectorAll('#finals [data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
 bindCustomerOpeners();
+focusFinalReservation();
+}
+
+function focusFinalReservation(){
+var id=state.focusReservation;
+if(!id)return;
+var card=Array.from(document.querySelectorAll('[data-final-card]')).find(function(item){return item.dataset.finalCard===id||item.dataset.finalChargeId===id});
+if(!card)return;
+var lane=card.closest('details');
+if(lane)lane.open=true;
+card.classList.add('is-focused');
+card.scrollIntoView({behavior:'smooth',block:'center'});
+statusText.innerHTML='<span class="ok">Opened the connected final-balance record.</span>';
+state.focusReservation='';
 }
 
 function renderFinalsNextList(groups,readyAmount,pendingAmount){
@@ -3655,7 +3702,7 @@ return '<div class="finals-next-list">'+items.map(function(item){return '<div cl
 }
 
 function finalBalanceLane(group,description,rows){
-var shouldOpen=rows.length&&['Needs Notice','Ready to Charge','Blocked'].includes(group);
+var shouldOpen=rows.length&&(['Needs Notice','Ready to Charge','Blocked'].includes(group)||rows.some(function(row){return row.id===state.focusReservation}));
 var countLabel=rows.length===1?'1 record':rows.length+' records';
 var laneClass=group==='Ready to Charge'?'ready':(group==='Needs Notice'?'needs':(group==='Blocked'?'blocked':''));
 return '<details class="finals-lane '+esc(laneClass)+'" '+(shouldOpen?'open':'')+'><summary class="finals-lane-head"><div><h3>'+esc(group)+'</h3><p>'+esc(description)+'</p></div><div class="finals-lane-count"><span class="pill">'+esc(countLabel)+'</span></div></summary><div class="finals-records">'+(rows.length?rows.map(finalBalanceCard).join(''):'<div class="final-empty">Nothing here right now.</div>')+'</div></details>';
@@ -3675,7 +3722,7 @@ var actionButtons=[];
 if(pickable&&row.notice_required)actionButtons.push('<button class="btn quiet small" data-final-action="notice" data-reservation-id="'+esc(row.id)+'">Send notice</button>');
 if(pickable)actionButtons.push('<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(row.id)+'">Dry run</button>');
 if(pickable&&row.charge_eligible)actionButtons.push('<button class="btn small" data-final-action="charge" data-reservation-id="'+esc(row.id)+'">Charge</button>');
-actionButtons.push(openProfileButton(row.customer_id,'Open profile'));
+actionButtons.push(openProfileButton(row.customer_id,'Open profile','sales'));
 var product=esc(row.product||'Reservation')+(row.size?' · '+esc(row.size):'');
 var timeline='<div class="final-context-grid"><div><span>Started</span><strong>'+esc(date(row.checkout_started_at||row.reservation_date)||'Unknown')+'</strong></div><div><span>Deposit</span><strong>'+esc(row.paid_at?date(row.paid_at):'Not recorded')+'</strong></div><div><span>Notice</span><strong>'+esc(row.final_balance_notice_sent_at?date(row.final_balance_notice_sent_at):'Not sent')+'</strong></div><div><span>Record</span><strong>'+esc(String(row.id||'').startsWith('crm:')?'Manual':'Checkout')+'</strong></div></div>';
 var finalAmount=Number(row.final_balance_total||0);
@@ -3687,7 +3734,7 @@ var route=manual?'Manual invoice/payment link path':'Saved-card batch path';
 var selection=pickable?checkbox:'<span class="status blocked">Cannot batch charge</span>';
 var routeLabel=manual?'Manual collection':'Saved-card workflow';
 var feeNote=finalAmount>0?'Estimated net after Stripe fee: '+money(netAmount)+' · Fee estimate '+money(feeAmount):'No final balance entered.';
-return '<article class="final-card '+(manual?'manual':'')+'">'+
+return '<article class="final-card '+(manual?'manual':'')+'" data-final-card="'+esc(row.id)+'" data-final-charge-id="'+esc(row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||row.id)+'">'+
 '<div class="final-card-headline"><div class="final-card-title"><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span><strong>'+customerLink(row.customer_id,person)+'</strong><div class="final-card-statusline"><span>'+esc(contactLine)+'</span><span>'+esc(route)+'</span></div></div>'+selection+'</div>'+
 '<div class="final-record-tags"><span class="pill">'+product+'</span><span class="pill">Deposit paid '+money(row.deposit_amount||0)+'</span><span class="pill">'+esc(notice)+'</span></div>'+
 '<div class="finals-decision"><div class="final-decision-money"><span>Still owed</span><strong>'+money(finalAmount)+'</strong><small>'+esc(feeNote)+'</small></div><div class="final-decision-copy"><span>'+esc(routeLabel)+'</span><strong>'+esc(next)+'</strong><span>'+esc(nextHelp)+'</span>'+(row.blocked_reason?'<span class="final-warning">'+esc(row.blocked_reason)+'</span>':'')+'</div><div class="final-decision-actions">'+actionButtons.join('')+'</div></div>'+
