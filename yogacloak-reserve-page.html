@@ -1059,6 +1059,7 @@ showTrayPrompt();
 <form id="contactForm">
 <div class="contact-field"><label for="contactName">Name</label><input id="contactName" type="text" required autocomplete="name"></div>
 <div class="contact-field"><label for="contactEmail">Email</label><input id="contactEmail" type="email" required autocomplete="email"></div>
+<div class="contact-field"><label for="contactPhone">Phone <span>optional</span></label><input id="contactPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (444) 444-4444"></div>
 <div class="contact-field"><label for="contactMessage">Message</label><textarea id="contactMessage" required placeholder="What's on your mind?"></textarea></div>
 <button type="submit" class="contact-btn">Send</button>
 </form>
@@ -1083,7 +1084,7 @@ if(openBtn)openBtn.addEventListener('click',open);
 if(closeBtn)closeBtn.addEventListener('click',close);
 ov.addEventListener('click',function(e){if(e.target===ov)close()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('show'))close()});
-if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m,source:'Reserve Page'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
+if(form){form.addEventListener('submit',async function(e){e.preventDefault();var n=document.getElementById('contactName').value.trim();var em=document.getElementById('contactEmail').value.trim();var ph=(document.getElementById('contactPhone').value||'').trim();var m=document.getElementById('contactMessage').value.trim();var btn=form.querySelector('.contact-btn');var orig=btn.textContent;btn.textContent='Sending...';btn.disabled=true;try{var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,phone:ph,message:m,source:'Reserve Page'})});if(r.ok){modal.classList.add('done')}else{throw new Error('failed')}}catch(err){var s='Hello from '+n;var b='Name: '+n+'\nEmail: '+em+(ph?'\nPhone: '+ph:'')+'\n\n'+m;window.location.href='mailto:hello@yogacloak.com?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);modal.classList.add('done')}finally{btn.textContent=orig;btn.disabled=false}})}
 })();
 </script>
 

@@ -16,17 +16,25 @@ export default async function handler(req, res) {
   if (rejectLargeRequest(req, res, 16 * 1024)) return;
 
   try {
-    const { name, email, message, source } = req.body || {};
+    const { name, email, phone, message, source } = req.body || {};
 
     if (!name || !email || !message) return res.status(400).json({ error: 'Missing required fields' });
     if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
       return res.status(400).json({ error: 'Invalid field types' });
     }
-    if (name.length > 200 || email.length > 200 || message.length > 5000) {
+    if (phone !== undefined && typeof phone !== 'string') {
+      return res.status(400).json({ error: 'Invalid field types' });
+    }
+    const cleanPhone = String(phone || '').trim();
+    const phoneDigits = cleanPhone.replace(/\D/g, '');
+    if (name.length > 200 || email.length > 200 || cleanPhone.length > 80 || message.length > 5000) {
       return res.status(400).json({ error: 'Field too long' });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Invalid email' });
+    }
+    if (cleanPhone && phoneDigits.length < 10) {
+      return res.status(400).json({ error: 'Invalid phone' });
     }
 
     const trimmedName = name.trim().replace(/\s+/g, ' ');
@@ -45,6 +53,7 @@ export default async function handler(req, res) {
       'First Name': firstName,
       'Last Name': lastName,
       'Email': email.trim().toLowerCase(),
+      ...(cleanPhone ? { 'Phone': cleanPhone } : {}),
       'Notes': message.trim(),
       'Source Page': (source || 'unknown').toString().slice(0, 100),
       'Form Type': 'Contact',
@@ -58,6 +67,7 @@ export default async function handler(req, res) {
         lastName,
         fullName: trimmedName,
         email,
+        phone: cleanPhone,
         status: 'lead',
         source: 'Website Contact',
         reason: 'Customer submitted the contact form.'
@@ -70,6 +80,7 @@ export default async function handler(req, res) {
           sourcePage: source || 'unknown',
           message,
           email,
+          phone: cleanPhone,
           status: 'new',
           eventTitle: 'Contact form received',
           metadata: {

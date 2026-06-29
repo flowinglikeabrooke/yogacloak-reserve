@@ -3,7 +3,7 @@
 
 import { checkRateLimit, rejectLargeRequest } from '../../lib/yogacloak-ops.js';
 import { runAutomationTrigger } from '../../lib/automations.js';
-import { findOrCreateCustomer, recordInquiry } from '../../lib/customer-identity.js';
+import { findOrCreateCustomer, recordInquiry, splitName } from '../../lib/customer-identity.js';
 
 const FORMS_TABLE_FALLBACK = 'tblRvWlirlbzlW5Up';
 const CONSENT_TEXT = 'By signing up, you agree to receive yogacloak texts about launch updates and reservations. Msg & data rates may apply. Reply STOP to opt out.';
@@ -47,12 +47,15 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-    const firstName = cleanString(body.first_name || body.firstName || body.name, 120);
+    const fullName = cleanString(body.full_name || body.fullName || body.name || body.first_name || body.firstName, 240);
+    const split = splitName(fullName);
+    const firstName = split.firstName;
+    const lastName = split.lastName;
     const phone = cleanString(body.phone, 80);
     const digits = phone.replace(/\D/g, '');
 
-    if (!firstName) {
-      return res.status(400).json({ error: 'First name required' });
+    if (!fullName) {
+      return res.status(400).json({ error: 'Name required' });
     }
 
     if (digits.length < 10 || phone.length > 80) {
@@ -72,6 +75,8 @@ export default async function handler(req, res) {
       : DEFAULT_TAGS;
     const consentDetails = {
       first_name: firstName,
+      last_name: lastName,
+      full_name: fullName,
       phone,
       sms_opt_in: true,
       opt_in_timestamp: now,
@@ -88,6 +93,8 @@ export default async function handler(req, res) {
     try {
       const identity = await findOrCreateCustomer({
         firstName,
+        lastName,
+        fullName,
         phone,
         status: 'lead',
         source: 'SMS Opt-In',
@@ -137,6 +144,7 @@ export default async function handler(req, res) {
       'Submission ID': submissionId,
       'Submission Date': now,
       'First Name': firstName,
+      ...(lastName ? { 'Last Name': lastName } : {}),
       'Phone': phone,
       'SMS Opt-In': true,
       'Opt-In Timestamp': now,
@@ -163,6 +171,7 @@ export default async function handler(req, res) {
       'Submission ID': submissionId,
       'Submission Date': now,
       'First Name': firstName,
+      ...(lastName ? { 'Last Name': lastName } : {}),
       'Source Page': sourcePage,
       'Form Type': 'SMS Opt-In',
       'Lead Source': 'Website',
