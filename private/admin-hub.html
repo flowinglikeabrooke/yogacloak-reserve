@@ -1519,6 +1519,23 @@ var wanted=new Set(types);
 return (data.tasks||[]).find(function(row){return wanted.has(String(row.type||'').toLowerCase())});
 }
 
+function isSmsOptInOnlyTask(row){
+var text=[row.type,row.title,row.detail,row.description].map(function(value){return String(value||'').toLowerCase()}).join(' ');
+return text.indexOf('sms opt')!==-1||text.indexOf('text opt')!==-1;
+}
+
+function shouldShowTodayTask(row){
+var type=String(row.type||'').toLowerCase();
+if(row.owner_task_id)return true;
+if(type==='notice'||type==='final_balance')return false;
+if(type==='contact'&&isSmsOptInOnlyTask(row))return false;
+return true;
+}
+
+function todayVisibleTasks(tasks){
+return (tasks||[]).filter(shouldShowTodayTask);
+}
+
 function customerFirstPriority(kind,title,detail,row,tab,pane,hot){
 return {kind:kind,title:title,detail:detail,tab:tab,hot:hot,customer_id:row&&row.customer_id,profile_pane:pane,reservation_id:row&&row.charge_id};
 }
@@ -1562,19 +1579,18 @@ var items=[];
 function add(kind,title,detail,tab,hot,row,pane){
 items.push(customerFirstPriority(kind,title,detail,row||{},tab, pane||'work', hot));
 }
-var overdue=firstDashboardTask(data,['general','customer_reply','inquiry_followup','final_balance','payment','operations','accounting','payroll','inventory','owner_task']);
-var follow=firstDashboardTask(data,['follow_up']);
-var inquiry=firstDashboardTask(data,['inquiry']);
-var notice=firstDashboardTask(data,['notice']);
-var charge=firstDashboardTask(data,['charge']);
-var failed=firstDashboardTask(data,['payment']);
-var raw=firstDashboardTask(data,['raw_backup']);
+var taskData={tasks:todayVisibleTasks(data.tasks||[])};
+var overdue=firstDashboardTask(taskData,['general','customer_reply','inquiry_followup','payment','operations','accounting','payroll','inventory','owner_task']);
+var follow=firstDashboardTask(taskData,['follow_up']);
+var inquiry=firstDashboardTask(taskData,['inquiry']);
+var charge=firstDashboardTask(taskData,['charge']);
+var failed=firstDashboardTask(taskData,['payment']);
+var raw=firstDashboardTask(taskData,['raw_backup']);
 var message=(data.message_preview||[]).find(function(row){return row.customer_id||row.customers&&row.customers.id});
-if(Number(summary.tasks_overdue||0)>0)add('To-Do',summary.tasks_overdue+' overdue task(s)',overdue&&overdue.detail?overdue.detail:'Start here before anything slips.','tasks',true,overdue,'work');
-if(Number(summary.follow_ups_due||0)>0)add('Follow-up',follow&&follow.detail?'Follow up with '+follow.detail:summary.follow_ups_due+' follow-up(s) due',follow&&follow.created_at?'Due '+date(follow.created_at):'Customers waiting for the next touch.','tasks',true,follow,'work');
+if(overdue&&Number(summary.tasks_overdue||0)>0)add('To-Do',summary.tasks_overdue+' overdue task(s)',overdue.detail?overdue.detail:'Start here before anything slips.','tasks',true,overdue,'work');
+if(follow&&Number(summary.follow_ups_due||0)>0)add('Follow-up',follow.detail?'Follow up with '+follow.detail:summary.follow_ups_due+' follow-up(s) due',follow.created_at?'Due '+date(follow.created_at):'Customers waiting for the next touch.','tasks',true,follow,'work');
 if(Number(summary.new_inquiries||0)>0)add('Lead',inquiry&&inquiry.detail?'New lead from '+inquiry.detail:summary.new_inquiries+' new '+(Number(summary.new_inquiries||0)===1?'lead':'leads'),inquiry&&inquiry.title?inquiry.title:'Fresh website activity to qualify.','inquiries',true,inquiry,'messages');
 if(message){var messageCustomer=message.customer_id||message.customers&&message.customers.id;items.push({kind:'Messages',title:'New '+String(message.channel||'message').toUpperCase()+' from '+(message.customers&&message.customers.full_name||'customer'),detail:message.subject||message.body||'Open Messages and reply.',tab:'communications',hot:true,customer_id:messageCustomer,profile_pane:'messages'});}
-if(Number(summary.needs_notice||0)>0)add('Balances',notice&&notice.detail?'Send balance notice for '+notice.detail:summary.needs_notice+' final-balance notice(s) needed','Send notice before any remaining-balance collection.','finals',false,notice,'sales');
 if(Number(summary.ready_to_charge||0)>0)add('Money',charge&&charge.detail?'Dry run final balance for '+charge.detail:summary.ready_to_charge+' ready for dry run','Verify before charging any remaining balance.','finals',true,charge,'sales');
 if(Number(summary.failed_payments||0)>0)add('Risk',failed&&failed.detail?failed.detail:summary.failed_payments+' failed payment(s)','Resolve payment cleanup before fulfillment.','payments',true,failed,'sales');
 if(Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0)>0)add('Backup','Raw Airtable records need sync',raw&&raw.detail?raw.detail:'Organize raw activity into clean CRM profiles.','settings',false,raw,'profile');
@@ -1585,14 +1601,16 @@ function renderTodayBriefing(data){
 var summary=data.summary||{};
 var messages=(data.message_preview||[]).length;
 var rawBackup=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
+var visibleTasks=todayVisibleTasks(data.tasks||[]);
+var visibleOpenTasks=visibleTasks.filter(function(row){return row.owner_task_id||!['raw_backup','duplicate'].includes(String(row.type||'').toLowerCase())}).length;
 var items=collectPriorityItems(data);
 var first=items[0];
 var start=first?first:{kind:'Clear',title:'Today is clear.',detail:'No urgent work is waiting. Review a lens below when you want to check sales, ops, customers, or founder money work.',tab:'customers',hot:false};
 var startAction=first?priorityButton(start,'Start here','btn'):'<button class="btn" data-jump-tab="customers">Open customers</button>';
 var cards=[
 {label:'Customer pulse',value:Number(summary.new_inquiries||0)+Number(summary.follow_ups_due||0)+messages,note:'Leads, follow-ups, and inbound replies',tab:'inquiries',hot:Number(summary.new_inquiries||0)>0||messages>0},
-{label:'Money watch',value:Number(summary.needs_notice||0)+Number(summary.ready_to_charge||0)+Number(summary.failed_payments||0),note:'Final balances and payment cleanup',tab:'finals',hot:Number(summary.ready_to_charge||0)>0||Number(summary.failed_payments||0)>0},
-{label:'CRM cleanup',value:Number(summary.tasks_overdue||0)+rawBackup+Number(summary.duplicate_candidates||0),note:'Overdue work, raw records, duplicate review',tab:'tasks',hot:Number(summary.tasks_overdue||0)>0}
+{label:'Money watch',value:Number(summary.ready_to_charge||0)+Number(summary.failed_payments||0),note:'Ready charges and failed payments only',tab:'accounting',hot:Number(summary.ready_to_charge||0)>0||Number(summary.failed_payments||0)>0},
+{label:'CRM cleanup',value:visibleOpenTasks+rawBackup+Number(summary.duplicate_candidates||0),note:'Open To-Do, raw records, duplicate review',tab:'tasks',hot:visibleOpenTasks>0}
 ];
 return '<section class="today-briefing"><div class="today-start '+(start.hot?'hot':'')+'"><div><span>Start here · '+esc(start.kind)+'</span><h2>'+esc(start.title)+'</h2><p>'+esc(start.detail)+'</p>'+priorityMetaTrail(start)+'</div><div class="actions">'+startAction+'<button class="btn quiet" data-jump-tab="tasks">Open To-Do</button></div></div><div class="today-brief-side">'+cards.map(function(card){return '<button class="brief-card '+(card.hot?'hot':'')+'" data-jump-tab="'+esc(card.tab)+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></button>'}).join('')+'</div></section>';
 }
@@ -1709,7 +1727,7 @@ if(!rows.length)return '<div class="today-empty">No active To-Do items right now
 var lanes=[
 {key:'first',title:'Do first',note:'Replies, overdue follow-ups, failed payments, and money ready for action.',rows:[]},
 {key:'customer',title:'Customer movement',note:'New leads and relationship work that should not go cold.',rows:[]},
-{key:'money',title:'Money to resolve',note:'Final-balance notices, dry runs, charges, and failed payments.',rows:[]},
+{key:'money',title:'Money to resolve',note:'Failed payments and balances that are actually ready for action.',rows:[]},
 {key:'cleanup',title:'CRM cleanup',note:'Raw backup records and duplicate review that keep customer profiles clean.',rows:[]}
 ];
 rows.forEach(function(row){
@@ -1756,11 +1774,11 @@ function renderToday(){
 var root=document.getElementById('today');
 var data=state.dashboard;
 if(!data){root.innerHTML='<div class="empty">Load the hub to see today\'s action list.</div>';return}
-var tasks=data.tasks||[];
+var tasks=todayVisibleTasks(data.tasks||[]);
 var summary=data.summary||{};
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
 root.innerHTML='<div class="today-command">'+databaseNotice+renderTodayBriefing(data)+'</div>'+
-'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Today\'s work queue</h2><p class="muted">Grouped by what you need to do next: reply, move a customer forward, clean up a profile, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messages needing reply</h2><p class="muted">Open the customer profile so the reply stays attached to the right person.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Messaging</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Next paths</h2><p class="muted">Jump straight to the exact customer, lead, or balance plan behind today\'s work.</p></div></header>'+renderTodayQuickQueue(data)+'</section></div></div>';
+'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Today\'s work queue</h2><p class="muted">Only the work that needs attention now: replies, active follow-ups, failed payments, and owner-created To-Do items.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messages needing reply</h2><p class="muted">Open the customer profile so the reply stays attached to the right person.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Messaging</button></header>'+renderTodayMessages(data.message_preview||[])+'</section></div></div>';
 bindCustomerOpeners();
 bindTaskButtons();
 document.querySelectorAll('[data-hub-lens]').forEach(function(btn){btn.addEventListener('click',function(){setHubLens(btn.dataset.hubLens)})});
@@ -2113,7 +2131,7 @@ if(saveProfile){saveProfile.addEventListener('click',async function(){var custom
 var save=document.getElementById('saveNoteBtn');
 if(save){save.addEventListener('click',async function(){await post('/api/admin-update-customer-note',{customer_id:detail.customer.id,note:document.getElementById('ownerNote').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Note saved.</span>'})}
 var sendEmail=document.getElementById('sendEmailBtn');
-if(sendEmail){sendEmail.addEventListener('click',async function(){await post('/api/admin-send-email',{customer_id:detail.customer.id,subject:document.getElementById('emailSubject').value,body:document.getElementById('emailBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Email sent and logged.</span>'})}
+if(sendEmail){sendEmail.addEventListener('click',async function(){await post('/api/admin-send-email',{customer_id:detail.customer.id,subject:document.getElementById('emailSubject').value,body:document.getElementById('emailBody').value});state.customerMessageDraft=null;state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Email sent and logged.</span>'})}
 var sendSms=document.getElementById('sendSmsBtn');
 if(sendSms){sendSms.addEventListener('click',async function(){await post('/api/admin-send-sms',{customer_id:detail.customer.id,body:document.getElementById('smsBody').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">SMS sent and logged.</span>'})}
 var recordSms=document.getElementById('recordSmsOptinBtn');
@@ -2518,8 +2536,13 @@ return '<div class="notice warn"><strong>SMS opt-in needed before texting.</stro
 
 function renderMessagePortal(detail,emailHref,smsHref){
 var comms=(detail.communications||[]).slice(0,8);
+var c=detail.customer||{};
+var draft=state.customerMessageDraft&&state.customerMessageDraft.customer_id===c.id?state.customerMessageDraft:null;
+var subject=draft?draft.subject:'A note from yogacloak';
+var body=draft?draft.body:'';
+var draftNotice=draft?'<div class="notice good"><strong>Draft loaded for review.</strong><br>Edit anything you want, then send from this profile so it stays on the customer timeline.</div>':'';
 return '<div class="detail-block message-portal"><div class="bar"><div><div class="section-title">Messaging portal</div><p class="muted">Send from here so replies, To-Do, notes, and timeline history stay attached to this customer.</p></div><div class="actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email app</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text app</a>':'')+'</div></div>'+
-'<div class="customer-message-workspace"><section class="message-compose-card"><h3>Write from this profile</h3><p>Email can be sent now. SMS requires opt-in and Twilio setup.</p><div class="record-grid"><label>Email subject<input id="emailSubject" value="A note from yogacloak"></label><label>Email message<textarea id="emailBody" placeholder="Write the customer email here."></textarea></label><label>SMS message<textarea id="smsBody" maxlength="1000" placeholder="Write a short text here. SMS requires opt-in."></textarea></label></div><div class="record-actions"><div class="actions"><button class="btn quiet" id="sendEmailBtn">Send email</button><button class="btn quiet" id="sendSmsBtn">Send SMS</button></div></div><details class="profile-drawer" style="margin-top:12px"><summary>SMS consent</summary><div class="profile-drawer-body">'+renderSmsConsentBlock(detail)+'</div></details></section>'+
+'<div class="customer-message-workspace"><section class="message-compose-card"><h3>Write from this profile</h3><p>Email can be sent now. SMS requires opt-in and Twilio setup.</p>'+draftNotice+'<div class="record-grid"><label>Email subject<input id="emailSubject" value="'+esc(subject)+'"></label><label>Email message<textarea id="emailBody" placeholder="Write the customer email here.">'+esc(body)+'</textarea></label><label>SMS message<textarea id="smsBody" maxlength="1000" placeholder="Write a short text here. SMS requires opt-in."></textarea></label></div><div class="record-actions"><div class="actions"><button class="btn quiet" id="sendEmailBtn">Send email</button><button class="btn quiet" id="sendSmsBtn">Send SMS</button></div></div><details class="profile-drawer" style="margin-top:12px"><summary>SMS consent</summary><div class="profile-drawer-body">'+renderSmsConsentBlock(detail)+'</div></details></section>'+
 '<section class="message-history-card"><h3>Recent communication</h3><p>Newest emails and texts for this customer.</p>'+renderProfileMessageFeed(comms)+'</section></div></div>';
 }
 
@@ -4003,21 +4026,50 @@ var laneClass=group==='Ready to Charge'?'ready':(group==='Needs Notice'?'needs':
 return '<details class="finals-lane '+esc(laneClass)+'" '+(shouldOpen?'open':'')+'><summary class="finals-lane-head"><div><h3>'+esc(finalGroupLabel(group))+'</h3><p>'+esc(description)+'</p></div><div class="finals-lane-count"><span class="pill">'+esc(countLabel)+'</span></div></summary><div class="finals-records">'+(rows.length?rows.map(finalBalanceCard).join(''):'<div class="final-empty">Nothing here right now.</div>')+'</div></details>';
 }
 
+function finalBalanceDraft(row){
+var name=String(row.customer_name||'there').split(' ')[0]||'there';
+var amount=money(row.final_balance_total||0);
+var product=row.product||row.product_selection||'your yogacloak order';
+var manual=row.blocked_reason||!row.stripe_payment_method_saved||!row.future_charge_authorized||String(row.id||'').startsWith('crm:');
+var subject='Your yogacloak remaining balance';
+var body=manual?
+'Hi '+name+',\n\nI am getting your yogacloak order updated. Your remaining balance is '+amount+' for '+product+'. Because this reservation does not have a saved card approved for later charging, I will send you a secure Stripe payment link so you can finish the balance safely.\n\nOnce it is paid, your order stays connected to your yogacloak profile and production notes.\n\nThank you,\nyogacloak':
+'Hi '+name+',\n\nYour remaining balance for '+product+' is '+amount+'. I am sending the required balance notice before collection. No action is needed right this second unless you want to update your payment method or ask a question.\n\nThank you,\nyogacloak';
+return {subject:subject,body:body};
+}
+
+function finalDraftButton(row){
+if(!row.customer_id)return '';
+var draft=finalBalanceDraft(row);
+return '<button class="btn quiet small" data-draft-balance-email data-draft-customer="'+esc(row.customer_id)+'" data-draft-subject="'+esc(encodeURIComponent(draft.subject))+'" data-draft-body="'+esc(encodeURIComponent(draft.body))+'">Draft email</button>';
+}
+
+function bindFinalDraftButtons(){
+document.querySelectorAll('#finals [data-draft-balance-email]').forEach(function(btn){
+btn.addEventListener('click',function(event){
+event.preventDefault();
+event.stopPropagation();
+state.customerMessageDraft={customer_id:btn.dataset.draftCustomer,subject:decodeURIComponent(btn.dataset.draftSubject||''),body:decodeURIComponent(btn.dataset.draftBody||'')};
+openCustomer(btn.dataset.draftCustomer,'messages');
+});
+});
+}
+
 function finalBalanceCard(row){
 var pickable=row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:');
 var manual=!pickable||row.blocked_reason;
-var checkbox=pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for action</label>':'<span class="status blocked">Payment link only</span>';
+var checkbox=!manual&&pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for batch</label>':'<span class="status blocked">Payment link path</span>';
 var card=row.stripe_payment_method_saved?'Card saved for later charge':'No card saved for later charge';
 var auth=row.future_charge_authorized?'Customer approved the later charge':'Customer has not approved the later charge';
 var notice=row.final_balance_notice_sent_at?'Balance email sent '+date(row.final_balance_notice_sent_at):'Balance email not sent';
-var next=row.charge_eligible?'Dry run, then charge if still ready':(row.blocked_reason?'Send secure payment link':(row.notice_required?'Send balance email':'No action right now'));
-var nextHelp=row.charge_eligible?'This is the saved-card route. Dry run checks the balance email, wait time, saved card, customer permission, and duplicate protection before money moves.':(row.blocked_reason?'This customer still owes money, but this order cannot be auto-charged yet. Contact them, then send a secure Stripe invoice or payment link.':(row.notice_required?'Send the final-balance email first. After the wait window, this can move to charge review if the saved-card permission is present.':'Keep this record for reference.'));
+var next=row.charge_eligible?'Dry run, then charge if still ready':(manual?'Draft a payment-link email':(row.notice_required?'Send balance email':'No action right now'));
+var nextHelp=row.charge_eligible?'This customer has the saved-card permission needed for a safe final-balance review. Dry run checks the email notice, wait time, saved card, permission, and duplicate protection before money moves.':(manual?'This customer still owes money, but this order is not approved for automatic final collection. Draft a note, send a secure Stripe invoice or payment link, then mark the profile when it is handled.':(row.notice_required?'Send the final-balance email first. After the wait window, this can move to charge review if the saved-card permission is present.':'Keep this record for reference.'));
 var details=[notice,card,auth].filter(Boolean).join(' · ');
 var actionButtons=[];
-if(pickable&&row.notice_required)actionButtons.push('<button class="btn quiet small" data-final-action="notice" data-reservation-id="'+esc(row.id)+'">Send notice</button>');
-if(pickable)actionButtons.push('<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(row.id)+'">Dry run</button>');
-if(pickable&&row.charge_eligible)actionButtons.push('<button class="btn small" data-final-action="charge" data-reservation-id="'+esc(row.id)+'">Charge</button>');
-if(manual)actionButtons.push(stripePaymentsLink('Open Stripe'));
+if(!manual&&pickable&&row.notice_required)actionButtons.push('<button class="btn quiet small" data-final-action="notice" data-reservation-id="'+esc(row.id)+'">Send notice</button>');
+if(!manual&&pickable)actionButtons.push('<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(row.id)+'">Dry run</button>');
+if(!manual&&pickable&&row.charge_eligible)actionButtons.push('<button class="btn small" data-final-action="charge" data-reservation-id="'+esc(row.id)+'">Charge</button>');
+if(manual)actionButtons.push(finalDraftButton(row)+stripePaymentsLink('Open Stripe'));
 actionButtons.push(openProfileButton(row.customer_id,'Open money','sales'));
 var product=esc(row.product||'Order')+(row.size?' · '+esc(row.size):'');
 var timeline='<div class="final-context-grid"><div><span>Started</span><strong>'+esc(date(row.checkout_started_at||row.reservation_date)||'Unknown')+'</strong></div><div><span>Deposit</span><strong>'+esc(row.paid_at?date(row.paid_at):'Not recorded')+'</strong></div><div><span>Notice</span><strong>'+esc(row.final_balance_notice_sent_at?date(row.final_balance_notice_sent_at):'Not sent')+'</strong></div><div><span>Record</span><strong>'+esc(String(row.id||'').startsWith('crm:')?'Recovered payment':'Checkout')+'</strong></div></div>';
@@ -4026,14 +4078,14 @@ var feeAmount=Number(row.final_balance_fee_amount||row.estimated_final_balance_f
 var netAmount=finalAmount>0?Math.max(0,finalAmount-feeAmount):0;
 var person=row.customer_name||row.email||'Customer';
 var contactLine=[row.email,row.phone].filter(Boolean).join(' · ')||'No contact detail saved';
-var route=manual?'Needs secure payment link':'Saved-card route';
-var selection=pickable?checkbox:'<span class="status blocked">Cannot batch charge</span>';
-var routeLabel=manual?'Contact customer first':'Saved-card route';
+var route=manual?'Needs payment link':'Saved-card route';
+var selection=checkbox;
+var routeLabel=manual?'Owner sends secure link':'Saved-card route';
 var feeNote=finalAmount>0?'Estimated net after Stripe fee: '+money(netAmount)+' · Fee estimate '+money(feeAmount):'No final balance entered.';
 return '<article class="final-card '+(manual?'manual':'')+'" data-final-card="'+esc(row.id)+'" data-final-charge-id="'+esc(row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||row.id)+'">'+
 '<div class="final-card-headline"><div class="final-card-title"><span class="status '+readyClass(row.readiness_group)+'">'+esc(finalStatusLabel(row.readiness_group||row.status))+'</span><strong>'+customerLink(row.customer_id,person)+'</strong><div class="final-card-statusline"><span>'+esc(contactLine)+'</span><span>'+esc(route)+'</span></div></div>'+selection+'</div>'+
 '<div class="final-record-tags"><span class="pill">'+product+'</span><span class="pill">Deposit paid '+money(row.deposit_amount||0)+'</span><span class="pill">'+esc(notice)+'</span></div>'+
-'<div class="finals-decision"><div class="final-decision-money"><span>Still owed</span><strong>'+money(finalAmount)+'</strong><small>'+esc(feeNote)+'</small></div><div class="final-decision-copy"><span>'+esc(routeLabel)+'</span><strong>'+esc(next)+'</strong><span>'+esc(nextHelp)+'</span>'+(row.blocked_reason?'<span class="final-warning">This balance cannot be batch charged yet. Use a secure Stripe invoice/payment link, or have the customer complete checkout again with later-charge permission.</span>':'')+'</div><div class="final-decision-actions">'+actionButtons.join('')+'</div></div>'+
+'<div class="finals-decision"><div class="final-decision-money"><span>Still owed</span><strong>'+money(finalAmount)+'</strong><small>'+esc(feeNote)+'</small></div><div class="final-decision-copy"><span>'+esc(routeLabel)+'</span><strong>'+esc(next)+'</strong><span>'+esc(nextHelp)+'</span>'+(manual?'<span class="final-warning">Not batch-chargeable yet. Use a Stripe payment link or invoice, or have the customer reserve again with later-charge permission.</span>':'')+'</div><div class="final-decision-actions">'+actionButtons.join('')+'</div></div>'+
 '<div class="final-card-foot"><details class="final-card-more"><summary>View safety details and timeline</summary><div class="final-card-body"><div class="final-context"><strong>Collection safety</strong><span>'+esc(card)+'</span><span>'+esc(auth)+'</span><span>'+esc(notice)+'</span></div><div class="final-context"><strong>Timeline</strong>'+timeline+'</div></div><span>'+esc(details)+'</span><code>Internal CRM record: '+esc(row.id)+'</code></details></div></article>';
 }
 
