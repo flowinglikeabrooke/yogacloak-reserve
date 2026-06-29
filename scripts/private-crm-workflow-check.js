@@ -51,7 +51,7 @@ for (const route of [
   includes(dispatcher, `'${route}'`, `API dispatcher includes /api/${route}`);
 }
 
-const ownerOnlyFiles = new Set([
+const founderOnlyFiles = new Set([
   'server/api/admin-delete-customer.js',
   'server/api/admin-delete-inquiry.js',
   'server/api/admin-update-automation.js',
@@ -71,7 +71,7 @@ for (const file of [
   'server/api/admin-move-inquiry.js',
   'server/api/admin-sync-raw-airtable.js'
 ]) {
-  includes(file, ownerOnlyFiles.has(file) ? 'requireOwner(req, res)' : 'requireAdmin(req, res)', `${file} requires protected authorization`);
+  includes(file, founderOnlyFiles.has(file) ? 'requireFounder(req, res)' : 'requireAdmin(req, res)', `${file} requires protected authorization`);
   includes(file, 'checkRateLimit(req, res', `${file} is rate limited`);
   includes(file, 'rejectLargeRequest(req, res', `${file} rejects oversized requests`);
 }
