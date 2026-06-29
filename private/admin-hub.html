@@ -274,6 +274,15 @@ tr:last-child td{border-bottom:0}
 .selected-customer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;border:1px solid rgba(154,170,136,.3);border-radius:8px;background:rgba(154,170,136,.09);padding:10px 11px;color:rgba(var(--cream),.78);font-size:12px;letter-spacing:0;text-transform:none}
 .selected-customer strong{color:var(--bone)}
 .selected-customer button{background:transparent;color:rgba(var(--cream),.6);border:1px solid rgba(var(--cream),.14);border-radius:999px;padding:5px 8px;font-size:10px}
+.detail .typeahead-results{background:#fffaf0;border-color:rgba(30,35,32,.14);box-shadow:0 26px 60px -38px rgba(30,35,32,.55)}
+.detail .typeahead-option{color:rgba(30,35,32,.72);border-bottom-color:rgba(30,35,32,.08)}
+.detail .typeahead-option:hover{background:rgba(30,35,32,.045)}
+.detail .typeahead-option strong{color:var(--ink)}
+.detail .typeahead-option span{color:rgba(30,35,32,.52)}
+.detail .typeahead-option em{color:rgba(30,35,32,.42)}
+.detail .selected-customer{background:rgba(124,140,130,.1);border-color:rgba(124,140,130,.26);color:rgba(30,35,32,.72)}
+.detail .selected-customer strong{color:var(--ink)}
+.detail .selected-customer button{color:rgba(30,35,32,.62);border-color:rgba(30,35,32,.16)}
 .record-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
 .record-actions .muted{font-size:12px;line-height:1.35}
 .detail .table-wrap{margin-top:8px}
@@ -797,6 +806,77 @@ box.innerHTML='<button class="typeahead-option" type="button" disabled><strong>C
 input.addEventListener('keydown',function(event){if(event.key==='Escape'){document.getElementById('taskCustomerResults').classList.add('hide')}});
 }
 
+function renderCustomerLookupSuggestions(config,rows){
+var box=document.getElementById(config.resultsId);
+if(!box)return;
+var filtered=(rows||[]).filter(function(row){return !config.excludeId||row.id!==config.excludeId});
+if(!filtered.length){
+box.classList.remove('hide');
+box.innerHTML='<button class="typeahead-option" type="button" disabled><strong>No matching contacts</strong><span>Try a full name, email, or phone.</span><em>Search</em></button>';
+return;
+}
+box.classList.remove('hide');
+box.innerHTML=filtered.slice(0,8).map(function(row){
+return '<button class="typeahead-option" type="button" data-customer-lookup-choice="'+esc(row.id||'')+'" data-customer-lookup-label="'+esc(row.full_name||row.email||row.phone||'Customer')+'" data-customer-lookup-target="'+esc(config.hiddenId)+'"><span><strong>'+esc(row.full_name||row.email||row.phone||'Customer')+'</strong><span>'+esc(customerSuggestionMeta(row)||'No email or phone shown')+'</span></span><em>'+esc(customerSuggestionSource(row))+'</em></button>';
+}).join('');
+box.querySelectorAll('[data-customer-lookup-choice]').forEach(function(btn){btn.addEventListener('click',function(){selectCustomerLookup(config,btn.dataset.customerLookupChoice,btn.dataset.customerLookupLabel)})});
+}
+
+function selectCustomerLookup(config,id,label){
+var hidden=document.getElementById(config.hiddenId);
+var input=document.getElementById(config.inputId);
+var selected=document.getElementById(config.selectedId);
+var results=document.getElementById(config.resultsId);
+if(hidden)hidden.value=id||'';
+if(input)input.value=label||'';
+if(selected){
+selected.classList.remove('hide');
+selected.innerHTML='<span>Selected <strong>'+esc(label||'Customer')+'</strong></span><button type="button" data-clear-customer-lookup="'+esc(config.hiddenId)+'">Clear</button>';
+var clear=selected.querySelector('[data-clear-customer-lookup]');
+if(clear){clear.addEventListener('click',function(){clearCustomerLookup(config)})}
+}
+if(results)results.classList.add('hide');
+}
+
+function clearCustomerLookup(config){
+var hidden=document.getElementById(config.hiddenId);
+var input=document.getElementById(config.inputId);
+var selected=document.getElementById(config.selectedId);
+var results=document.getElementById(config.resultsId);
+if(hidden)hidden.value='';
+if(input){input.value='';input.focus()}
+if(selected){selected.classList.add('hide');selected.innerHTML=''}
+if(results)results.classList.add('hide');
+}
+
+function bindCustomerLookup(config){
+var input=document.getElementById(config.inputId);
+if(!input||input.disabled)return;
+var timer=null;
+input.addEventListener('input',function(){
+var hidden=document.getElementById(config.hiddenId);
+var selected=document.getElementById(config.selectedId);
+if(hidden)hidden.value='';
+if(selected){selected.classList.add('hide');selected.innerHTML=''}
+clearTimeout(timer);
+var query=input.value.trim();
+var results=document.getElementById(config.resultsId);
+if(query.length<2){if(results)results.classList.add('hide');return}
+timer=setTimeout(async function(){
+try{
+var data=await endpoint('/api/admin-customers?search='+encodeURIComponent(query));
+renderCustomerLookupSuggestions(config,data.customers||[]);
+}catch(err){
+if(results){
+results.classList.remove('hide');
+results.innerHTML='<button class="typeahead-option" type="button" disabled><strong>Could not search contacts</strong><span>'+esc(err.message||'Try again.')+'</span><em>Error</em></button>';
+}
+}
+},180);
+});
+input.addEventListener('keydown',function(event){if(event.key==='Escape'){var results=document.getElementById(config.resultsId);if(results)results.classList.add('hide')}});
+}
+
 function bindTaskButtons(){
 document.querySelectorAll('[data-task-status]').forEach(function(btn){btn.addEventListener('click',async function(){await updateTaskStatus(btn.dataset.taskStatus,btn.dataset.status)})});
 }
@@ -874,6 +954,25 @@ var importRaw=document.getElementById('importRawCustomerBtn');
 if(importRaw){importRaw.addEventListener('click',async function(){await importRawCustomer(detail.customer.id)})}
 document.querySelectorAll('[data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
 document.querySelectorAll('[data-profile-pane]').forEach(function(btn){btn.addEventListener('click',function(){state.customerProfilePane=btn.dataset.profilePane;renderCustomers()})});
+bindProfileCustomerPickers(detail);
+}
+
+function bindProfileCustomerPickers(detail){
+var currentId=detail&&detail.customer&&detail.customer.id;
+bindCustomerLookup({
+inputId:'mergeTargetCustomerSearch',
+hiddenId:'mergeTargetCustomer',
+resultsId:'mergeTargetCustomerResults',
+selectedId:'mergeTargetCustomerSelected',
+excludeId:currentId
+});
+bindCustomerLookup({
+inputId:'moveInquiryCustomerSearch',
+hiddenId:'moveInquiryCustomerId',
+resultsId:'moveInquiryCustomerResults',
+selectedId:'moveInquiryCustomerSelected',
+excludeId:currentId
+});
 }
 
 function rawSyncReport(){
@@ -961,7 +1060,7 @@ statusText.innerHTML='<span class="ok">Contact archived from active CRM.</span>'
 async function mergeCustomerFromProfile(detail){
 var c=detail&&detail.customer||{};
 var target=document.getElementById('mergeTargetCustomer')&&document.getElementById('mergeTargetCustomer').value.trim();
-if(!c.id||!target){statusText.innerHTML='<span class="error">Paste the customer ID you want to keep.</span>';return}
+if(!c.id||!target){statusText.innerHTML='<span class="error">Search and select the customer profile you want to keep.</span>';return}
 if(target===c.id){statusText.innerHTML='<span class="error">Choose a different target customer.</span>';return}
 if(!window.confirm('Merge this contact into the target customer? All linked inquiries, notes, messages, payments, and reservations will move to the target profile.'))return;
 setBusy('Merging customer records...');
@@ -1010,7 +1109,7 @@ async function moveInquiryFromProfile(detail){
 var customerId=detail&&detail.customer&&detail.customer.id;
 var inquiryId=document.getElementById('moveInquiryId')&&document.getElementById('moveInquiryId').value;
 var target=document.getElementById('moveInquiryCustomerId')&&document.getElementById('moveInquiryCustomerId').value.trim();
-if(!inquiryId||!target){statusText.innerHTML='<span class="error">Choose an inquiry and paste the target customer ID.</span>';return}
+if(!inquiryId||!target){statusText.innerHTML='<span class="error">Choose an inquiry, then search and select the customer it belongs to.</span>';return}
 if(target===customerId){statusText.innerHTML='<span class="error">That inquiry is already on this customer.</span>';return}
 if(!window.confirm('Move this inquiry to the target customer profile?'))return;
 setBusy('Moving inquiry...');
@@ -1138,9 +1237,9 @@ return '<div class="detail-block"><div class="section-title">CRM cleanup</div>'+
 '<div class="notice"><strong>Use this to keep one true customer record.</strong><br>Archive removes a record from your active workspace. Merge and move keep the timeline connected to the right person.</div>'+
 '<div class="crm-tools">'+
 '<div class="crm-tool danger"><strong>Archive/delete contact</strong><p>Hide this person from active CRM lists while preserving payment, opt-in, and timeline history.</p><span class="id-line">'+esc(c.id||'No customer ID')+'</span><button class="btn danger small" id="archiveCustomerBtn" style="margin-top:10px">Archive contact</button></div>'+
-'<div class="crm-tool"><strong>Merge this contact</strong><p>Move this profile into another customer profile when the same person has two records.</p><label>Target customer ID<input id="mergeTargetCustomer" placeholder="Paste the customer ID to keep" '+(raw?'disabled':'')+'></label><button class="btn quiet small" id="mergeThisCustomerBtn" '+(raw?'disabled':'')+' style="margin-top:10px">Merge into target</button>'+(raw?'<p class="muted">Import raw profile first to merge.</p>':'')+'</div>'+
+'<div class="crm-tool"><strong>Merge this contact</strong><p>Search the customer profile to keep. This profile will be archived into that one.</p><label class="customer-picker">Customer to keep<input id="mergeTargetCustomerSearch" autocomplete="off" placeholder="Type name, email, or phone" '+(raw?'disabled':'')+'><input id="mergeTargetCustomer" type="hidden"><div id="mergeTargetCustomerSelected" class="selected-customer hide"></div><div id="mergeTargetCustomerResults" class="typeahead-results hide"></div></label><button class="btn quiet small" id="mergeThisCustomerBtn" '+(raw?'disabled':'')+' style="margin-top:10px">Merge into selected contact</button>'+(raw?'<p class="muted">Import raw profile first to merge.</p>':'')+'</div>'+
 '<div class="crm-tool"><strong>Merge duplicate inquiries</strong><p>Combine two inquiries on this profile when they are the same conversation.</p><label>Source inquiry<select id="mergeInquirySource" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label style="margin-top:8px">Keep inquiry<select id="mergeInquiryTarget" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><button class="btn quiet small" id="mergeInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Merge inquiries</button></div>'+
-'<div class="crm-tool"><strong>Move inquiry to another contact</strong><p>Use this when an inquiry landed on the wrong customer.</p><label>Inquiry<select id="moveInquiryId" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label style="margin-top:8px">Target customer ID<input id="moveInquiryCustomerId" placeholder="Paste target customer ID" '+(!privateInquiryCount?'disabled':'')+'></label><button class="btn quiet small" id="moveInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Move inquiry</button></div>'+
+'<div class="crm-tool"><strong>Move inquiry to another contact</strong><p>Use this when an inquiry landed on the wrong customer.</p><label>Inquiry<select id="moveInquiryId" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label class="customer-picker" style="margin-top:8px">Move to customer<input id="moveInquiryCustomerSearch" autocomplete="off" placeholder="Type name, email, or phone" '+(!privateInquiryCount?'disabled':'')+'><input id="moveInquiryCustomerId" type="hidden"><div id="moveInquiryCustomerSelected" class="selected-customer hide"></div><div id="moveInquiryCustomerResults" class="typeahead-results hide"></div></label><button class="btn quiet small" id="moveInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Move inquiry</button></div>'+
 '</div></div>';
 }
 
@@ -1176,7 +1275,7 @@ if(inquiries.some(function(row){return row.inquiry_type==='sms_opt_in'}))return 
 if(inquiries.some(function(row){return contactMessageInquiry(row)}))return 'Contact form';
 if(c.source)return c.source;
 if(c.fallback_source==='airtable_forms')return 'Raw Airtable';
-return 'CRM profile';
+return 'Manual profile';
 }
 
 function customerOriginDetail(detail){
@@ -1858,7 +1957,7 @@ var data=state.accounting;
 if(!data){document.getElementById('accounting').innerHTML='<div class="empty">Load accounting to see totals.</div>';return}
 var t=data.totals||{};
 document.getElementById('accounting').innerHTML=renderAccountingCards(t)+
-'<section class="panel"><div class="bar"><div class="section-title">Accounting export</div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Estimated Stripe fees',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Pending balances',money(t.pending_balances||t.outstanding_balances)],['Failed payments',t.failed_payments||0]])+'</section>';
+'<section class="panel"><div class="bar"><div><div class="section-title">Accounting export</div><p class="muted">Stripe fees use actual balance-transaction fees when available, otherwise a domestic-card estimate.</p></div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Stripe fees actual + estimated',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Pending balances',money(t.pending_balances||t.outstanding_balances)],['Failed payments',t.failed_payments||0]])+'</section>';
 document.getElementById('exportCsv').addEventListener('click',exportAccountingCsv);
 }
 
@@ -2116,8 +2215,8 @@ return '<section class="panel"><div class="bar"><div><div class="section-title">
 '</section>';
 }
 function exportAccountingCsv(){
-var rows=(state.accounting&&state.accounting.payments||[]).map(function(row){var fee=Number(row.fee_amount||0);var net=row.net_amount===null||row.net_amount===undefined||row.net_amount===''?Number(row.amount||0)-fee:Number(row.net_amount||0);return [row.occurred_at,row.customers&&row.customers.full_name||'',row.payment_type,row.amount,fee,net,row.status,row.stripe_payment_intent_id]});
-exportCsv('yogacloak-accounting.csv',['date','customer','type','gross_amount','stripe_fee','net_amount','status','stripe_id'],rows);
+var rows=(state.accounting&&state.accounting.payments||[]).map(function(row){var fee=Number(row.estimated_fee_amount||row.fee_amount||0);var net=row.estimated_net_amount===null||row.estimated_net_amount===undefined||row.estimated_net_amount===''?(row.net_amount===null||row.net_amount===undefined||row.net_amount===''?Number(row.amount||0)-fee:Number(row.net_amount||0)):Number(row.estimated_net_amount||0);return [row.occurred_at,row.customers&&row.customers.full_name||'',row.payment_type,row.amount,fee,net,row.fee_is_estimated?'estimated':'actual',row.status,row.stripe_payment_intent_id]});
+exportCsv('yogacloak-accounting.csv',['date','customer','type','gross_amount','stripe_fee','net_amount','fee_source','status','stripe_id'],rows);
 }
 function exportCsv(filename,headers,rows){
 var csv=[headers].concat(rows).map(function(row){return row.map(function(cell){return '"'+String(cell||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');
