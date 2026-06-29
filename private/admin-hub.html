@@ -1605,6 +1605,13 @@ var options=[['general','General'],['customer_reply','Customer reply'],['inquiry
 return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===value?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
 }
 
+function taskProfilePane(task){
+var type=String(task&&task.task_type||task&&task.type||'').toLowerCase();
+if(['payment','final_balance'].includes(type))return 'sales';
+if(['customer_reply','inquiry_followup'].includes(type))return 'messages';
+return 'work';
+}
+
 function dueStatus(task){
 if(task.status==='done')return '<span class="status charged">Completed</span>';
 if(task.status==='archived')return '<span class="status blocked">Archived</span>';
@@ -1619,7 +1626,8 @@ var customerId=task.customer_id||task.customers&&task.customers.id;
 var linked=customerLink(customerId,task.customers&&task.customers.full_name||task.customer_id||'Owner task');
 var context=[task.inquiries&&task.inquiries.inquiry_type,task.reservations&&task.reservations.status,task.description].filter(Boolean).join(' · ');
 var inactive=['done','archived'].includes(task.status);
-var actions=inactive?'<div class="actions">'+openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="open">Reopen</button></div>':'<div class="actions">'+openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="archived">Archive</button></div>';
+var pane=taskProfilePane(task);
+var actions=inactive?'<div class="actions">'+openProfileButton(customerId,'Profile',pane)+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="open">Reopen</button></div>':'<div class="actions">'+openProfileButton(customerId,'Profile',pane)+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="archived">Archive</button></div>';
 return [dueStatus(task),esc(task.title)+'<br><span class="muted">'+esc(context)+'</span>',linked,esc(formatStatus(task.task_type)),esc(formatStatus(task.priority)),esc(date(task.due_at)),actions];
 });
 }
@@ -1657,13 +1665,14 @@ function renderTaskCommand(stats,tasks){
 var customerTasks=tasks.filter(function(task){return task.customer_id||task.customers&&task.customers.id}).length;
 var ownerTasks=tasks.length-customerTasks;
 var overdue=Number(stats.overdue||0);
-var next=overdue?'Clear overdue first.':'Work from customer replies and follow-ups first.';
+var emptyActive=!tasks.length&&state.taskFilter==='active'&&Number(stats.done||0)>0;
+var next=emptyActive?'No active work is waiting. Completed tasks are stored in history if you need to review them.':(overdue?'Clear overdue first.':'Work from customer replies and follow-ups first.');
 return '<section class="task-command"><div class="task-command-main"><h2>Task center</h2><p>Customer replies, inquiry follow-ups, accounting, payroll, inventory, and owner work in one connected queue.</p><div class="task-stat-grid">'+
 taskStatCard('Overdue',overdue,'Needs action now')+
 taskStatCard('Customer work',customerTasks,'Linked to profiles')+
 taskStatCard('Owner work',ownerTasks,'Internal business tasks')+
 taskStatCard('Completed',stats.done||0,'Saved in history')+
-'</div></div><aside class="task-command-side"><div><strong>'+esc(overdue?'Overdue work is waiting':'Queue is under control')+'</strong><p>'+esc(next)+' Open the profile when the task depends on a customer conversation, reservation, or payment.</p></div><div class="task-filters"><select id="taskFilter"><option value="active" '+(state.taskFilter==='active'?'selected':'')+'>Active</option><option value="overdue" '+(state.taskFilter==='overdue'?'selected':'')+'>Overdue</option><option value="" '+(!state.taskFilter?'selected':'')+'>All history</option><option value="done" '+(state.taskFilter==='done'?'selected':'')+'>Completed</option><option value="archived" '+(state.taskFilter==='archived'?'selected':'')+'>Archived</option></select><button class="btn quiet" id="reloadTasks">Refresh</button></div></aside></section>';
+'</div></div><aside class="task-command-side"><div><strong>'+esc(emptyActive?'No active tasks':(overdue?'Overdue work is waiting':'Queue is under control'))+'</strong><p>'+esc(next)+(emptyActive?'':' Open the profile when the task depends on a customer conversation, reservation, or payment.')+'</p></div><div class="task-filters"><select id="taskFilter"><option value="active" '+(state.taskFilter==='active'?'selected':'')+'>Active</option><option value="overdue" '+(state.taskFilter==='overdue'?'selected':'')+'>Overdue</option><option value="" '+(!state.taskFilter?'selected':'')+'>All history</option><option value="done" '+(state.taskFilter==='done'?'selected':'')+'>Completed</option><option value="archived" '+(state.taskFilter==='archived'?'selected':'')+'>Archived</option></select><button class="btn quiet" id="reloadTasks">Refresh</button></div></aside></section>';
 }
 
 function taskCard(task){
@@ -1673,12 +1682,13 @@ var inactive=['done','archived'].includes(task.status);
 var overdue=task.due_at&&Date.parse(task.due_at)<Date.now()&&!inactive;
 var hot=overdue||['urgent','high'].includes(task.priority);
 var waiting=task.status==='waiting';
+var pane=taskProfilePane(task);
 var context=[formatStatus(task.task_type||'task'),formatStatus(task.priority||'normal'),task.due_at?'Due '+date(task.due_at):'No due date'].join(' · ');
 var linked=customerId?customerLink(customerId,customerName):'<span class="muted">Owner-only task</span>';
 var details=[task.inquiries&&task.inquiries.inquiry_type,task.reservations&&task.reservations.status,task.description].filter(Boolean).join(' · ');
-var next=inactive?'This is out of active todos but preserved in history.':(customerId?'Open the customer profile before replying, charging, or logging notes.':'Keep this as internal owner work unless it belongs to a customer.');
-var openAttr=customerId?' data-open-task-customer="'+esc(customerId)+'"':'';
-var actions=inactive?openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="open">Reopen</button>':openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="archived">Archive</button>';
+var next=inactive?'This is out of active todos but preserved in history.':(customerId?(pane==='sales'?'Open Sales on this profile before charging or sending a balance notice.':(pane==='messages'?'Open Messages on this profile before replying.':'Open the customer profile before logging notes or follow-up.')):'Keep this as internal owner work unless it belongs to a customer.');
+var openAttr=customerId?' data-open-task-customer="'+esc(customerId)+'" data-open-task-pane="'+esc(pane)+'"':'';
+var actions=inactive?openProfileButton(customerId,'Profile',pane)+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="open">Reopen</button>':openProfileButton(customerId,'Profile',pane)+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="archived">Archive</button>';
 return '<article class="task-card '+(hot?'hot ':'')+(waiting?'waiting':'')+'"'+openAttr+'>'+
 '<div class="task-card-main"><div class="task-card-title">'+dueStatus(task)+'<strong>'+esc(task.title||'Task')+'</strong></div>'+
 '<div class="task-card-meta"><span class="pill">'+esc(context)+'</span></div>'+
@@ -1703,7 +1713,7 @@ document.getElementById('createTaskBtn').addEventListener('click',createTaskFrom
 bindTaskCustomerPicker();
 bindTaskButtons();
 bindCustomerOpeners();
-document.querySelectorAll('[data-open-task-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary'))return;openCustomer(card.dataset.openTaskCustomer)})});
+document.querySelectorAll('[data-open-task-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary'))return;openCustomer(card.dataset.openTaskCustomer,card.dataset.openTaskPane||'work')})});
 }
 
 async function createTaskFromHub(){
@@ -1946,6 +1956,7 @@ document.querySelectorAll('[data-delete-inquiry]').forEach(function(btn){btn.add
 var importRaw=document.getElementById('importRawCustomerBtn');
 if(importRaw){importRaw.addEventListener('click',async function(){await importRawCustomer(detail.customer.id)})}
 document.querySelectorAll('[data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
+document.querySelectorAll('#customerDetail [data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();if(btn.dataset.focusReservation)state.focusReservation=btn.dataset.focusReservation;setTab(btn.dataset.jumpTab)})});
 document.querySelectorAll('[data-profile-pane]').forEach(function(btn){btn.addEventListener('click',function(){state.customerProfilePane=btn.dataset.profilePane;renderCustomers()});btn.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();state.customerProfilePane=btn.dataset.profilePane;renderCustomers()}})});
 bindProfileCustomerPickers(detail);
 }
