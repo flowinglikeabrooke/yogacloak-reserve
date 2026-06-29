@@ -1,9 +1,9 @@
 import { loadDuplicates } from '../../lib/admin-hub-data.js';
-import { requireOwner } from '../../lib/yogacloak-ops.js';
+import { requireFounder } from '../../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-  if (!requireOwner(req, res)) return;
+  if (!requireFounder(req, res)) return;
 
   try {
     const duplicates = await loadDuplicates();

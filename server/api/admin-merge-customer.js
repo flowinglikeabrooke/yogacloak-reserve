@@ -1,12 +1,12 @@
 import { mergeCustomers } from '../../lib/admin-hub-data.js';
 import { auditAdminAction } from '../../lib/admin-audit.js';
-import { checkRateLimit, rejectLargeRequest, requireOwner } from '../../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest, requireFounder } from '../../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!checkRateLimit(req, res, { maxRequests: 5, windowSeconds: 60, keyPrefix: 'admin-merge' })) return;
   if (rejectLargeRequest(req, res, 8 * 1024)) return;
-  if (!requireOwner(req, res)) return;
+  if (!requireFounder(req, res)) return;
 
   try {
     const sourceCustomerId = String(req.body?.source_customer_id || '').trim();

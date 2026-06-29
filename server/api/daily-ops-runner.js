@@ -12,6 +12,7 @@ import chargeReadyFinalBalances from '../../lib/jobs/charge-ready-final-balances
 import lowInventoryAlert from '../../lib/jobs/low-inventory-alert.js';
 import dailyOwnerDigest from '../../lib/jobs/daily-owner-digest.js';
 import seoHealthCheck from '../../lib/jobs/seo-health-check.js';
+import { notificationEmailsFor } from '../../lib/admin-notifications.js';
 
 const TASKS = [
   ['cleanup-pending-checkouts', cleanupPendingCheckouts],
@@ -24,7 +25,7 @@ const TASKS = [
 ];
 
 function ownerEmail() {
-  return process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || process.env.EMAIL_TO || 'hello@yogacloak.com';
+  return notificationEmailsFor('founder');
 }
 
 // Run a job handler in-process by giving it a minimal req/res it understands.

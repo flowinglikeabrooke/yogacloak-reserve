@@ -5,9 +5,10 @@
 import { chargeFinalBalanceReservation, escapeHtml } from '../../lib/final-balance.js';
 import { auditAdminAction } from '../../lib/admin-audit.js';
 import { checkRateLimit, rejectLargeRequest, requireOwner, sendEmail } from '../../lib/yogacloak-ops.js';
+import { notificationEmailsFor } from '../../lib/admin-notifications.js';
 
 function ownerEmail() {
-  return process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || process.env.EMAIL_TO || 'hello@yogacloak.com';
+  return notificationEmailsFor('owners');
 }
 
 function uniqueReservationIds(value) {

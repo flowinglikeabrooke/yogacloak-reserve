@@ -1,12 +1,12 @@
 import { syncAirtableRawToCrm } from '../../lib/admin-hub-data.js';
 import { auditAdminAction } from '../../lib/admin-audit.js';
-import { checkRateLimit, rejectLargeRequest, requireOwner } from '../../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest, requireFounder } from '../../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!checkRateLimit(req, res, { maxRequests: 4, windowSeconds: 60, keyPrefix: 'admin-sync-raw-airtable' })) return;
   if (rejectLargeRequest(req, res, 4 * 1024)) return;
-  if (!requireOwner(req, res)) return;
+  if (!requireFounder(req, res)) return;
 
   try {
     const limit = Math.min(Math.max(Number(req.body?.limit || 500), 1), 1000);

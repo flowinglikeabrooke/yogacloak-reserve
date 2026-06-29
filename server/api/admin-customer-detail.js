@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     if (!customerId) return res.status(400).json({ error: 'Missing customer id.' });
     const detail = await loadCustomerDetail(customerId);
     if (!detail) return res.status(404).json({ error: 'Customer not found.' });
-    if (req.adminUser?.role !== 'owner') {
+    if (!['founder', 'owner'].includes(req.adminUser?.role)) {
       detail.reservations = [];
       detail.payments = [];
       detail.payment_methods = [];

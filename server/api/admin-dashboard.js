@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   try {
     const dashboard = await loadDashboard();
-    if (req.adminUser?.role !== 'owner' && dashboard?.summary) {
+    if (!['founder', 'owner'].includes(req.adminUser?.role) && dashboard?.summary) {
       dashboard.summary.reservations = 0;
       dashboard.summary.needs_notice = 0;
       dashboard.summary.ready_to_charge = 0;

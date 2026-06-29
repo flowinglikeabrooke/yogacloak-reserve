@@ -123,8 +123,28 @@ tr:last-child td{border-bottom:0}
 .crm-tool strong{display:block;font-size:14px;color:var(--ink);margin-bottom:5px}
 .crm-tool p{font-size:12px;line-height:1.4;margin-bottom:10px}
 .crm-tool.danger{background:rgba(212,148,141,.08);border-color:rgba(130,68,64,.16)}
+.automation-studio{display:grid;grid-template-columns:280px minmax(0,1fr);gap:14px;align-items:start}
+.automation-rail,.automation-builder{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:14px}
+.automation-rail h3,.automation-builder h3{font-size:16px;margin-bottom:8px}
+.automation-rail p,.automation-builder p{font-size:12px;line-height:1.45;color:rgba(var(--cream),.52)}
+.automation-preset{width:100%;display:block;text-align:left;background:rgba(var(--cream),.035);border:1px solid rgba(var(--cream),.08);border-radius:8px;color:rgba(var(--cream),.72);padding:12px;margin-top:8px;box-shadow:none}
+.automation-preset strong{display:block;color:var(--bone);font-size:13px;margin-bottom:4px}
+.automation-preset span{display:block;font-size:11px;line-height:1.35;color:rgba(var(--cream),.48)}
+.automation-preset:hover{background:rgba(var(--cream),.06);transform:translateY(-1px)}
+.automation-builder-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.automation-palette{display:grid;gap:8px;margin-top:8px}
+.automation-choice{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(var(--cream),.1);border-radius:8px;background:rgba(var(--cream),.035);padding:12px}
+.automation-choice strong{color:var(--bone);font-size:13px}
+.automation-choice span{font-size:11px;color:rgba(var(--cream),.5)}
+.automation-plus{min-width:36px;height:36px;border-radius:999px;padding:0;font-size:20px;line-height:1}
+.automation-settings-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:14px;align-items:start}
+.automation-list{display:grid;gap:8px}
+.automation-list button{width:100%;text-align:left;display:block;background:rgba(var(--cream),.035);border:1px solid rgba(var(--cream),.08);border-radius:8px;color:rgba(var(--cream),.68);padding:13px;box-shadow:none}
+.automation-list button.active{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.automation-list strong{display:block;font-size:13px;color:inherit}
+.automation-list span{display:block;margin-top:4px;font-size:11px;color:inherit;opacity:.7;line-height:1.35}
 .automation-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
-.automation-card{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:16px;box-shadow:0 20px 60px -42px rgba(0,0,0,.8)}
+.automation-card{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:18px;box-shadow:0 20px 60px -42px rgba(0,0,0,.8)}
 .automation-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .automation-card h3{font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
 .automation-card p{color:rgba(var(--cream),.5);font-size:12px;line-height:1.45;margin-top:6px}
@@ -140,9 +160,16 @@ tr:last-child td{border-bottom:0}
 .check-row input[type=checkbox]{width:auto;accent-color:var(--sage)}
 .field-help{display:block;margin-top:6px;font-size:11px;letter-spacing:0;text-transform:none;color:rgba(30,35,32,.5);font-weight:400;line-height:1.35}
 .hub-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
-.hub-picker{display:flex;gap:8px;flex-wrap:wrap}
-.hub-picker label{flex-direction:row;align-items:center;gap:6px;border:1px solid rgba(var(--cream),.11);border-radius:999px;padding:7px 10px;background:rgba(var(--cream),.035);font-size:10px;letter-spacing:.08em;color:rgba(var(--cream),.62)}
-.hub-picker input{width:auto;accent-color:#d8c7a2}
+.hub-toolbar .muted{max-width:560px}
+.hub-lenses{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.lens-btn{border:1px solid rgba(var(--cream),.12);border-radius:999px;background:rgba(var(--cream),.035);color:rgba(var(--cream),.62);padding:10px 13px;font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;box-shadow:none}
+.lens-btn:hover{transform:translateY(-1px);border-color:rgba(var(--cream),.22);background:rgba(var(--cream),.07)}
+.lens-btn.active{background:var(--bone);color:var(--ink);border-color:var(--bone);box-shadow:0 18px 45px -34px rgba(251,248,240,.8)}
+.hub-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.hub-card-grid .card{min-height:118px;display:flex;flex-direction:column;justify-content:space-between}
+.hub-card-grid .card strong{font-size:38px;letter-spacing:0}
+.hub-card-grid .card small{color:rgba(var(--cream),.48);font-size:12px;line-height:1.35}
+.hub-card-grid .card.is-hot{border-color:rgba(212,148,141,.28);background:linear-gradient(145deg,rgba(212,148,141,.12),rgba(var(--cream),.03))}
 .hub-work-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
 .automation-card .meta{margin-top:12px}
 .automation-log-body{white-space:pre-wrap;max-width:420px}
@@ -210,13 +237,13 @@ tr:last-child td{border-bottom:0}
 </div>
 <aside class="ops-panel">
 <div class="ops-head">
-<div class="section-title">Today at a glance</div>
+<div class="section-title">Command center</div>
 <div class="utility-actions">
 <button class="utility-btn" id="loadBtn">Update</button>
 <button class="utility-btn" id="logoutBtn">Log out</button>
 </div>
 </div>
-<div id="heroStatus" class="notice">Load the hub to see live counts and setup warnings.</div>
+<div id="heroStatus" class="notice">Update the hub to refresh live data.</div>
 <div class="mini-grid">
 <div class="mini"><span>Current tab</span><strong id="currentTabLabel">Today</strong></div>
 <div class="mini"><span>Session</span><strong id="sessionUserLabel">Private</strong></div>
@@ -261,18 +288,20 @@ var heroStatus=document.getElementById('heroStatus');
 var currentTabLabel=document.getElementById('currentTabLabel');
 var csrfToken='__ADMIN_CSRF_TOKEN__';
 var adminUserRaw='__ADMIN_USER_JSON__';
-var adminUser=adminUserRaw.indexOf('__ADMIN_USER_JSON__')===0?{name:'Preview',role:'owner',email:''}:JSON.parse(adminUserRaw);
-if(!adminUser||typeof adminUser!=='object'||Array.isArray(adminUser)){adminUser={name:'Preview',role:'owner',email:''}}
+var adminUser=adminUserRaw.indexOf('__ADMIN_USER_JSON__')===0?{name:'Preview',role:'founder',email:''}:JSON.parse(adminUserRaw);
+if(!adminUser||typeof adminUser!=='object'||Array.isArray(adminUser)){adminUser={name:'Preview',role:'founder',email:''}}
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,automations:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
+var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,inquiries:[],reservations:[],payments:[],communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false};
 var taskCustomerSearchTimer=null;
-var ownerOnlyTabs=new Set(['reservations','payments','automations','finals','accounting','duplicates','settings']);
-function isOwner(){return adminUser&&adminUser.role==='owner'}
-function canOpenTab(tab){return isOwner()||!ownerOnlyTabs.has(tab)}
+var ownerOnlyTabs=new Set(['reservations','payments','finals','accounting']);
+var founderOnlyTabs=new Set(['automations','duplicates','settings']);
+function isFounder(){return adminUser&&adminUser.role==='founder'}
+function isOwner(){return adminUser&&['founder','owner'].includes(adminUser.role)}
+function canOpenTab(tab){if(isFounder())return true;if(founderOnlyTabs.has(tab))return false;return isOwner()||!ownerOnlyTabs.has(tab)}
 function applyRoleUi(){
 document.getElementById('sessionUserLabel').textContent=(adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff');
-document.getElementById('heroRoleLabel').textContent=isOwner()?'Owner':'Team';
+document.getElementById('heroRoleLabel').textContent=isFounder()?'Founder':(isOwner()?'Owner':'Team');
 document.querySelectorAll('.tab').forEach(function(btn){
 var locked=!canOpenTab(btn.dataset.tab);
 btn.classList.toggle('hide',locked);
@@ -292,8 +321,14 @@ function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
 function tabLabel(tab){return ({today:'Today',tasks:'Tasks',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',automations:'Automations',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
 function health(value){return value?'<span class="health good">On</span>':'<span class="health bad">Missing</span>'}
-function ownerOnlyNotice(tab){return '<section class="panel"><div class="notice warn"><strong>Owner-only area.</strong><br>'+esc(tabLabel(tab))+' includes money, private settings, or destructive CRM controls. Staff profiles can work customers, inquiries, tasks, notes, and messages.</div></section>'}
+function ownerOnlyNotice(tab){return '<section class="panel"><div class="notice warn"><strong>'+esc(founderOnlyTabs.has(tab)?'Founder-only area.':'Owner-only area.')+'</strong><br>'+esc(tabLabel(tab))+' includes '+esc(founderOnlyTabs.has(tab)?'security, automation, duplicate cleanup, or destructive controls.':'money or final-balance controls.')+' Staff profiles can work customers, inquiries, tasks, notes, and messages.</div></section>'}
 function renderHeroStatus(){
+heroStatus.className='notice';
+heroStatus.innerHTML='<strong>Command center</strong><br>Use Update to refresh this workspace. Setup warnings and security status now live in Settings.';
+currentTabLabel.textContent=tabLabel(activeTab);
+}
+
+function commandCenterSettingsPanel(){
 var d=state.dashboard||{};
 var s=d.security_status||{};
 var summary=d.summary||{};
@@ -308,9 +343,7 @@ var needs=Number(summary.needs_notice||0);
 var rawBackup=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
 var className=warnings.length?'notice warn':'notice good';
 var message=warnings.length?warnings[0]:'Private CRM database is connected and admin access is working.';
-heroStatus.className=className;
-heroStatus.innerHTML='<strong>'+esc(message)+'</strong><div class="meta"><span class="pill">Needs notice <strong>'+esc(needs)+'</strong></span><span class="pill">Ready to charge <strong>'+esc(ready)+'</strong></span><span class="pill">Raw-only records <strong>'+esc(rawBackup)+'</strong></span><span class="pill">Stripe <strong>'+esc(s.stripe_mode||'unknown')+'</strong></span><span class="pill">Raw backup <strong>Airtable</strong></span></div>';
-currentTabLabel.textContent=tabLabel(activeTab);
+return '<section class="panel"><div class="section-title">Command center</div><div class="'+esc(className)+'"><strong>'+esc(message)+'</strong><div class="meta"><span class="pill">Needs notice <strong>'+esc(needs)+'</strong></span><span class="pill">Ready to charge <strong>'+esc(ready)+'</strong></span><span class="pill">Raw-only records <strong>'+esc(rawBackup)+'</strong></span><span class="pill">Stripe <strong>'+esc(s.stripe_mode||'unknown')+'</strong></span><span class="pill">Raw backup <strong>Airtable</strong></span><span class="pill">Current tab <strong>'+esc(tabLabel(activeTab))+'</strong></span><span class="pill">Session <strong>'+esc((adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff'))+'</strong></span></div></div></section>';
 }
 
 function setTab(tab){
@@ -384,26 +417,34 @@ return [
 ];
 }
 
-function hubPrefs(){
-try{
-var saved=JSON.parse(localStorage.getItem('yogacloak_hub_cards')||'[]');
-if(Array.isArray(saved)&&saved.length)return new Set(saved);
-}catch(err){}
-return new Set(['customers','new_inquiries','tasks_overdue','tasks_active','needs_notice','ready_to_charge','follow_ups_due','failed_payments']);
+function hubLens(){
+var saved=localStorage.getItem('yogacloak_hub_lens');
+return ['focus','sales','ops','founder'].includes(saved)?saved:'focus';
 }
 
-function saveHubPrefs(){
-var ids=Array.from(document.querySelectorAll('[data-hub-card-toggle]')).filter(function(input){return input.checked}).map(function(input){return input.dataset.hubCardToggle});
-localStorage.setItem('yogacloak_hub_cards',JSON.stringify(ids));
+function hubPrefsForLens(lens){
+var prefs={
+focus:['new_inquiries','tasks_overdue','tasks_active','follow_ups_due','not_contacted','failed_payments'],
+sales:['customers','new_inquiries','needs_notice','ready_to_charge','failed_payments','raw_backup'],
+ops:['tasks_overdue','tasks_active','follow_ups_due','not_contacted','raw_backup','customers'],
+founder:['customers','ready_to_charge','failed_payments','needs_notice','raw_backup','new_inquiries']
+};
+return new Set(prefs[lens]||prefs.focus);
+}
+
+function setHubLens(lens){
+localStorage.setItem('yogacloak_hub_lens',lens);
 renderToday();
 }
 
 function renderHubCards(summary){
-var prefs=hubPrefs();
+var lens=hubLens();
+var prefs=hubPrefsForLens(lens);
 var cards=hubCardDefinitions(summary);
 var visible=cards.filter(function(card){return prefs.has(card.id)});
 if(!visible.length)visible=cards.slice(0,4);
-return '<section class="panel"><div class="hub-toolbar"><div><div class="section-title">Main hub</div><p class="muted">Choose the cards you want to see first. This stays private to your browser.</p></div><div class="hub-picker">'+cards.map(function(card){return '<label><input type="checkbox" data-hub-card-toggle="'+esc(card.id)+'" '+(prefs.has(card.id)?'checked':'')+'> '+esc(card.label)+'</label>'}).join('')+'</div></div><div class="grid">'+visible.map(function(card){return '<div class="card"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></div>'}).join('')+'</div></section>';
+var lenses=[['focus','Focus','What needs your attention now'],['sales','Sales','Deposits, balances, and customer movement'],['ops','Ops','Tasks, follow-ups, and cleanup'],['founder','Founder','Money, risk, and systems']];
+return '<section class="panel"><div class="hub-toolbar"><div><div class="section-title">Command hub</div><p class="muted">Personalized for '+esc(adminUser.name||'you')+'. Pick the lens for how you want to work right now.</p></div><div class="hub-lenses">'+lenses.map(function(item){return '<button class="lens-btn '+(lens===item[0]?'active':'')+'" data-hub-lens="'+esc(item[0])+'" title="'+esc(item[2])+'">'+esc(item[1])+'</button>'}).join('')+'</div></div><div class="hub-card-grid">'+visible.map(function(card){var hot=Number(card.value||0)>0&&['tasks_overdue','failed_payments','ready_to_charge','new_inquiries'].includes(card.id);return '<div class="card '+(hot?'is-hot':'')+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></div>'}).join('')+'</div></section>';
 }
 
 function renderToday(){
@@ -413,14 +454,14 @@ if(!data){root.innerHTML='<div class="empty">Load the hub to see today\'s action
 var tasks=data.tasks||[];
 var summary=data.summary||{};
 var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
-var canSyncRaw=data.database_enabled!==false&&rawBackupCount>0;
+var canSyncRaw=isFounder()&&data.database_enabled!==false&&rawBackupCount>0;
 var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="syncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'';
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
 root.innerHTML=renderHubCards(summary)+syncStatusNotice()+databaseNotice+rawNotice+rawSyncReport()+
 '<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Signal','What happened','Contact','Date','Action'],tasks.map(function(row){return [esc(formatStatus(row.type)),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at)),openProfileButton(row.customer_id,'Open profile')]}),true)+'</section>'+
 '<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Signal','Contact','Details','Date','Action'],(data.recent_events||[]).map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [esc(row.title||row.event_type),customerLink(customerId,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at)),openProfileButton(customerId,'Open timeline')]}),true)+'</section>';
 bindCustomerOpeners();
-document.querySelectorAll('[data-hub-card-toggle]').forEach(function(input){input.addEventListener('change',saveHubPrefs)});
+document.querySelectorAll('[data-hub-lens]').forEach(function(btn){btn.addEventListener('click',function(){setHubLens(btn.dataset.hubLens)})});
 var syncBtn=document.getElementById('syncRawBackupBtn');
 if(syncBtn){syncBtn.addEventListener('click',syncRawAirtable)}
 }
@@ -591,7 +632,7 @@ return Number.isNaN(dateValue.getTime())?'':dateValue.toISOString();
 function renderCustomers(){
 var root=document.getElementById('customers');
 var detail=state.customerDetail;
-var canSync=state.dashboard&&state.dashboard.database_enabled!==false;
+var canSync=isFounder()&&state.dashboard&&state.dashboard.database_enabled!==false;
 if(detail&&detail.customer){
 root.innerHTML='<div class="customer-page-shell"><div class="bar"><div><button class="btn quiet" id="backToCustomers">Back to customers</button></div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'</div></div>'+rawSyncReport()+'<section class="panel detail customer-page" id="customerDetail">'+renderCustomerDetail(detail)+'</section></div>';
 var back=document.getElementById('backToCustomers');
@@ -897,7 +938,7 @@ return rows.map(function(row){return '<option value="'+esc(row.id)+'">'+esc(inqu
 }
 
 function renderCrmManagement(detail){
-if(!isOwner())return '';
+if(!isFounder())return '';
 var c=detail.customer||{};
 var raw=isRawProfile(c);
 var inquiries=detail.inquiries||[];
@@ -1009,7 +1050,7 @@ return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_n
 renderProfileHubs(detail)+
 '<div class="next-action">'+renderRawNextAction(detail,rawEmailHref,rawSmsHref,canImportRaw)+'</div>'+
 renderEditableCustomerRecord(c)+
-(isOwner()?renderCrmManagement(detail):'')+
+renderCrmManagement(detail)+
 (rawEmailHref||rawSmsHref?'<div class="profile-actions">'+(rawEmailHref?'<a class="btn quiet" href="'+esc(rawEmailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(rawSmsHref?'<a class="btn quiet" href="'+esc(rawSmsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>':'')+
 '<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
 '<div class="detail-block"><div class="section-title">Owner note</div><label>Private note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
@@ -1026,7 +1067,7 @@ return '<div class="profile-head"><div><div class="section-title">'+esc(c.full_n
 renderProfileHubs(detail)+
 '<div class="next-action">'+renderNextAction(detail,emailHref,smsHref)+'</div>'+
 renderEditableCustomerRecord(c)+
-(isOwner()?renderCrmManagement(detail):'')+
+renderCrmManagement(detail)+
 '<div class="profile-actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>'+
 '<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
 '<div class="detail-block"><div class="section-title">Relationship notes</div><p class="muted">Use notes, tasks, and message history to keep the relationship moving without losing context.</p><label style="margin-top:8px">Private customer note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
@@ -1227,7 +1268,7 @@ if(!rows.length)return '<div class="empty">No contact-form messages yet. SMS opt
 return table(['Type','Interest','Message','Status','Date','Manage'],rows.slice(0,12).map(function(row){
 var raw=String(row.id||'').indexOf('airtable:')===0||row.raw_backup_only;
 var statusControl=raw?esc(row.status||''):'<select data-inquiry-status="'+esc(row.id)+'">'+inquiryStatusOptions(row.status||'new')+'</select>';
-var manage=raw?'<span class="muted">Import to edit</span>':'<div class="actions"><button class="btn quiet small" data-save-inquiry-status="'+esc(row.id)+'">Save status</button>'+(isOwner()?'<button class="btn quiet small" data-delete-inquiry="'+esc(row.id)+'">Archive</button>':'')+'</div>';
+var manage=raw?'<span class="muted">Import to edit</span>':'<div class="actions"><button class="btn quiet small" data-save-inquiry-status="'+esc(row.id)+'">Save status</button>'+(isFounder()?'<button class="btn quiet small" data-delete-inquiry="'+esc(row.id)+'">Archive</button>':'')+'</div>';
 return [
 esc(formatStatus(row.inquiry_type||'inquiry'))+'<span class="id-line">'+esc(row.id||row.submission_id||'')+'</span>',
 esc(row.product_interest||row.source_page||''),
@@ -1334,7 +1375,33 @@ if(rule&&rule.channel==='task')return value==='auto_send'?'Auto-create':'Draft t
 return value==='auto_send'?'Auto-send':'Draft only';
 }
 
+function automationStudio(){
+var triggers=[
+['inquiry_created','New inquiry','Contact form creates or updates a customer'],
+['sms_opt_in_created','SMS opt-in','Customer gives text permission'],
+['reservation_created','Deposit made','Reservation/payment activity starts'],
+['final_balance_ready','Final balance ready','Notice was sent and wait period passed'],
+['birthday_today','Birthday','Send a warm note or discount later']
+];
+var actions=[
+['task','Create task','Make sure Brooke or Christian follows up'],
+['email','Send email','Owner alert or customer response'],
+['sms','Send text','Only with opt-in and Twilio setup'],
+['note','Add note','Log context on the customer timeline'],
+['charge','Queue charge','Founder-controlled final-balance action']
+];
+var presets=[
+['New inquiry follow-up','Create task, alert owner, draft reply'],
+['SMS opt-in welcome','Create a text task and draft welcome SMS'],
+['Deposit received','Alert owners and add reservation task'],
+['Final balance ready','Notify owner before batch charge'],
+['Birthday love','Draft birthday wish and discount code']
+];
+return '<section class="panel"><div class="bar"><div><div class="section-title">Automation studio</div><p class="muted">Build flows like a CRM: choose what starts it, then stack actions. The saved recipes below are the live rules running today.</p></div><button class="btn" id="newAutomationIdea">+ New automation</button></div><div class="automation-studio"><aside class="automation-rail"><h3>Quick recipes</h3><p>Start from a pattern yogacloak will use often.</p>'+presets.map(function(item){return '<button class="automation-preset" data-automation-idea="'+esc(item[0])+'"><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+'</span></button>'}).join('')+'</aside><div class="automation-builder"><h3>Flow builder</h3><p>Click plus to sketch a flow. Custom multi-step saving comes next; current live rules stay safe and editable below.</p><div class="automation-builder-grid"><div><div class="tiny-label">Triggers</div><div class="automation-palette">'+triggers.map(function(item){return '<div class="automation-choice"><div><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="trigger:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div><div><div class="tiny-label">Actions</div><div class="automation-palette">'+actions.map(function(item){return '<div class="automation-choice"><div><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="action:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div></div><div class="notice" id="automationSketch" style="margin-top:14px"><strong>Sketch an automation.</strong><br>Example: New inquiry -> create task -> send owner email -> draft customer reply.</div></div></div></section>';
+}
+
 function renderAutomationCard(rule){
+if(!rule)return '<div class="empty">Select an automation to edit its settings.</div>';
 var key=rule.key||rule.id;
 var enabledId=automationId(key,'enabled');
 var modeId=automationId(key,'mode');
@@ -1345,13 +1412,18 @@ var autoWarning=rule.channel==='task'?'Auto-create will add a CRM task every tim
 return '<article class="automation-card">'+
 '<header><div><h3>'+esc(rule.name||'Automation')+'</h3><p>'+esc(rule.description||'')+'</p></div><span class="health '+(rule.enabled?'good':'bad')+'">'+esc(rule.enabled?'On':'Off')+'</span></header>'+
 '<div class="automation-flow"><div><span>When</span><strong>'+esc(triggerName(rule.trigger_type))+'</strong></div><div><span>Then</span><strong>'+esc(actionName(rule))+'</strong></div><div><span>For</span><strong>'+esc(formatStatus(rule.target_type))+'</strong></div></div>'+
-'<div class="toggle-row"><label style="flex-direction:row;align-items:center;margin:0"><input id="'+esc(enabledId)+'" type="checkbox" '+(rule.enabled?'checked':'')+'> Enabled</label><label style="min-width:180px;margin:0">Mode<select id="'+esc(modeId)+'"><option value="draft" '+(rule.mode!=='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Draft task':'Draft only')+'</option><option value="auto_send" '+(rule.mode==='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Auto-create':'Auto-send')+'</option></select></label></div>'+
+'<div class="record-grid"><label>Status<select id="'+esc(enabledId)+'"><option value="enabled" '+(rule.enabled?'selected':'')+'>Listening</option><option value="paused" '+(!rule.enabled?'selected':'')+'>Paused</option></select></label><label>Mode<select id="'+esc(modeId)+'"><option value="draft" '+(rule.mode!=='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Draft task':'Draft only')+'</option><option value="auto_send" '+(rule.mode==='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Auto-create':'Auto-send')+'</option></select></label></div>'+
 '<div class="notice '+(rule.mode==='auto_send'?'warn':'')+'"><strong>'+esc(modeName(rule.mode,rule))+'</strong><br>'+esc(rule.mode==='auto_send'?autoWarning:(rule.channel==='task'?'Draft mode logs the task idea without creating it.':'Draft mode logs the message for review before anything is sent.'))+'</div>'+
 '<label>'+esc(rule.channel==='task'?'Task title':'Subject')+'<input id="'+esc(subjectId)+'" value="'+esc(rule.subject_template||'')+'" placeholder="'+esc(rule.channel==='task'?'Task title template':'Only used for email')+'"></label>'+
 '<label>'+esc(rule.channel==='task'?'Task notes':'Message template')+'<textarea id="'+esc(bodyId)+'">'+esc(rule.body_template||'')+'</textarea></label>'+
 '<div class="meta"><span class="pill">Drafted <strong>'+esc(counts.drafted||0)+'</strong></span><span class="pill">Created <strong>'+esc(counts.created||0)+'</strong></span><span class="pill">Sent <strong>'+esc(counts.sent||0)+'</strong></span><span class="pill">Skipped <strong>'+esc(counts.skipped||0)+'</strong></span><span class="pill">Failed <strong>'+esc(counts.failed||0)+'</strong></span></div>'+
 '<div class="actions" style="margin-top:12px"><button class="btn" data-save-automation="'+esc(key)+'" data-automation-id="'+esc(rule.id||'')+'">Save automation</button></div>'+
 '</article>';
+}
+
+function automationSettingsList(rules,activeKey){
+if(!rules.length)return '<div class="empty">No automation rules yet.</div>';
+return '<div class="automation-list">'+rules.map(function(rule){var key=rule.key||rule.id;var detail=triggerName(rule.trigger_type)+' -> '+actionName(rule)+' · '+(rule.enabled?'Listening':'Paused');return '<button data-open-automation="'+esc(key)+'" class="'+(key===activeKey?'active':'')+'"><strong>'+esc(rule.name||'Automation')+'</strong><span>'+esc(detail)+'</span></button>'}).join('')+'</div>';
 }
 
 function automationMetricCards(items){
@@ -1364,6 +1436,9 @@ var data=state.automations;
 if(!data){root.innerHTML='<div class="empty">Load automations to see CRM workflows.</div>';return}
 var rules=data.automations||[];
 var runs=data.runs||[];
+if(rules.length&&!state.activeAutomationKey)state.activeAutomationKey=rules[0].key||rules[0].id;
+var activeRule=rules.find(function(rule){return (rule.key||rule.id)===state.activeAutomationKey})||rules[0]||null;
+var activeKey=activeRule&&(activeRule.key||activeRule.id)||'';
 var enabled=rules.filter(function(rule){return rule.enabled}).length;
 var drafted=runs.filter(function(run){return run.status==='drafted'}).length;
 var sent=runs.filter(function(run){return run.status==='sent'}).length;
@@ -1380,16 +1455,20 @@ root.innerHTML=automationMetricCards([
 ['Owner SMS',data.owner_sms_configured?'On':'Setup','Optional internal alerts'],
 ['Database',data.setup_required?'Setup':'Ready','Rule storage status']
 ])+
-setup+safety+
-'<section class="panel"><div class="bar"><div><div class="section-title">Automation recipes</div><p class="muted">Start in draft mode, review the wording, then turn on auto-send only for flows you trust.</p></div><button class="btn quiet" id="reloadAutomations">Refresh</button></div><div class="automation-board">'+rules.map(renderAutomationCard).join('')+'</div></section>'+
+setup+safety+automationStudio()+
+'<section class="panel"><div class="bar"><div><div class="section-title">Automation settings</div><p class="muted">Click an automation, edit its status, mode, and wording, then save. Live recipes stay tucked inside their own settings.</p></div><button class="btn quiet" id="reloadAutomations">Refresh</button></div><div class="automation-settings-layout"><div>'+automationSettingsList(rules,activeKey)+'</div><div>'+renderAutomationCard(activeRule)+'</div></div></section>'+
 '<section class="panel"><div class="section-title">Recent automation log</div>'+table(['Rule','Customer','Trigger','Status','Channel','Message','Date'],runs.map(function(run){var customerId=run.customer_id||run.customers&&run.customers.id;var ruleName=run.automation_rules&&run.automation_rules.name||run.trigger_type||'Automation';return [esc(ruleName),customerLink(customerId,run.customers&&run.customers.full_name||run.customer_id||'Customer'),esc(triggerName(run.trigger_type)),esc(formatStatus(run.status)),esc(String(run.channel||'').toUpperCase()),'<div class="automation-log-body">'+esc(run.reason||run.subject||run.body||'')+'</div>',esc(date(run.created_at))]}),true)+'</section>';
 document.getElementById('reloadAutomations').addEventListener('click',loadCurrent);
+document.getElementById('newAutomationIdea').addEventListener('click',function(){var sketch=document.getElementById('automationSketch');sketch.className='notice good';sketch.innerHTML='<strong>New automation sketch started.</strong><br>Choose a trigger and one or more actions. Saving custom multi-step rules will use the same safety checks as the live recipes below.'});
+document.querySelectorAll('[data-automation-idea]').forEach(function(btn){btn.addEventListener('click',function(){var sketch=document.getElementById('automationSketch');sketch.className='notice good';sketch.innerHTML='<strong>'+esc(btn.dataset.automationIdea)+'</strong><br>Pick the closest live recipe below and adjust its draft/auto mode, wording, and channel.'})});
+document.querySelectorAll('[data-builder-piece]').forEach(function(btn){btn.addEventListener('click',function(){var sketch=document.getElementById('automationSketch');var piece=btn.dataset.builderPiece.split(':');sketch.className='notice good';sketch.innerHTML='<strong>Added '+esc(piece[0])+'.</strong><br>'+esc(formatStatus(piece[1]))+' is part of this sketch. Use the live recipe cards below to activate the matching safe workflow.'})});
+document.querySelectorAll('[data-open-automation]').forEach(function(btn){btn.addEventListener('click',function(){state.activeAutomationKey=btn.dataset.openAutomation;renderAutomations()})});
 document.querySelectorAll('[data-save-automation]').forEach(function(btn){btn.addEventListener('click',async function(){await saveAutomation(btn.dataset.saveAutomation,btn.dataset.automationId)})});
 bindCustomerOpeners();
 }
 
 async function saveAutomation(key,id){
-var enabled=document.getElementById(automationId(key,'enabled')).checked;
+var enabled=document.getElementById(automationId(key,'enabled')).value==='enabled';
 var mode=document.getElementById(automationId(key,'mode')).value;
 var subject=document.getElementById(automationId(key,'subject')).value;
 var body=document.getElementById(automationId(key,'body')).value;
@@ -1445,7 +1524,7 @@ var s=(state.dashboard&&state.dashboard.security_status)||{};
 var sync=(state.dashboard&&state.dashboard.sync_status)||{};
 function yes(value){return value?'<span class="ok">On</span>':'<span class="error">Missing</span>'}
 function bool(value){return value?'<span class="ok">Yes</span>':'<span class="muted">No</span>'}
-document.getElementById('settings').innerHTML='<section class="panel"><div class="section-title">Security status</div><table><tbody>'+
+document.getElementById('settings').innerHTML=commandCenterSettingsPanel()+'<section class="panel"><div class="section-title">Security status</div><table><tbody>'+
 row('Admin session secret',yes(s.admin_session_secret_configured))+
 row('Admin token',yes(s.admin_token_configured))+
 row('Private CRM database',s.supabase_configured?'<span class="ok">Primary</span>':'<span class="muted">Not connected; add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel Production</span>')+
@@ -1453,6 +1532,8 @@ row('Airtable raw backup','<span class="ok">Active when Airtable env vars are se
 row('Raw backup sync log',sync.error?'<span class="error">Needs latest schema</span>':(sync.enabled?'<span class="ok">On</span>':'<span class="muted">Waiting for private CRM</span>'))+
 row('Last raw sync',sync.last_synced_at?date(sync.last_synced_at):'<span class="muted">Not recorded yet</span>')+
 row('Automation hub','<span class="ok">Private CRM rules, drafts, and logs</span>')+
+row('Founder alerts','Founder-only failures, SEO checks, and setup warnings route to Brooke by default. Override with FOUNDER_EMAIL if needed.')+
+row('Owner/operator updates','Daily digests, inventory, reconciliation, final-balance summaries, and inquiry owner alerts route to Brooke plus CHRISTIAN_EMAIL / owner users when configured.')+
 row('Stripe mode',s.stripe_mode||'missing')+
 row('Stripe webhook secret',yes(s.stripe_webhook_secret_configured))+
 row('Live final charging enabled',bool(s.allow_live_final_charges))+

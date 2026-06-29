@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Invalid profile access code.' });
   }
 
-  const adminUser = adminUserForToken(token) || { id: 'owner-token', name: process.env.OWNER_ADMIN_NAME || 'Brooke', email: process.env.OWNER_ADMIN_EMAIL || '', role: 'owner' };
+  const adminUser = adminUserForToken(token) || { id: 'owner-token', name: process.env.OWNER_ADMIN_NAME || 'Brooke', email: process.env.OWNER_ADMIN_EMAIL || '', role: 'founder' };
   req.adminUser = adminUser;
   const csrf = createCsrfToken();
   res.setHeader('Set-Cookie', [sessionCookie(createAdminSession(adminUser)), csrfCookie(csrf)]);
