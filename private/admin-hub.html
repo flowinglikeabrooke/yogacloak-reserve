@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1E2320;--ink-2:#252b27;--panel:#151618;--panel2:#1a1d1b;--bone:#fbf8f0;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--gold:#d8c7a2;--rose:#d4948d;--blue:#9aadb9;--line:rgba(251,248,240,.09);--muted:rgba(251,248,240,.58);--soft:rgba(251,248,240,.06);--cream:251,248,240;--phi:1.618;--page-max:1618px;--read-max:1000px;--side-max:618px;--space-1:5px;--space-2:8px;--space-3:13px;--space-4:21px;--space-5:34px;--space-6:55px;--space-7:89px;--gutter:clamp(21px,3.4vw,55px);--radius-sm:5px;--radius:8px;--radius-lg:13px;--main-col:minmax(0,1.618fr);--side-col:minmax(360px,1fr);--shadow:0 34px 90px -48px rgba(0,0,0,.72)}
+:root{--ink:#1E2320;--ink-2:#252b27;--panel:#151618;--panel2:#1a1d1b;--bone:#fbf8f0;--sage:#7C8C82;--clay:#9A8E86;--fog:#C4C9C5;--gold:#d8c7a2;--rose:#d4948d;--blue:#9aadb9;--line:rgba(251,248,240,.09);--muted:rgba(251,248,240,.58);--soft:rgba(251,248,240,.06);--cream:251,248,240;--phi:1.618;--page-max:min(1880px,calc(100vw - 72px));--read-max:1000px;--side-max:618px;--space-1:5px;--space-2:8px;--space-3:13px;--space-4:21px;--space-5:34px;--space-6:55px;--space-7:89px;--gutter:clamp(21px,2.4vw,44px);--radius-sm:5px;--radius:8px;--radius-lg:13px;--main-col:minmax(0,1.618fr);--side-col:minmax(360px,1fr);--shadow:0 34px 90px -48px rgba(0,0,0,.72)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{min-height:100vh;background:var(--ink);color:var(--bone);font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:0;overflow-x:hidden}
 a{color:inherit}
@@ -1226,11 +1226,43 @@ body{background:linear-gradient(180deg,#1c231f 0%,#18201c 42%,#202820 100%)}
 .customer-duplicate-hub{background:rgba(17,19,20,.58)}
 .command-title{font-size:clamp(48px,5vw,76px)}
 .sub{font-size:15px;color:rgba(var(--cream),.62)}
+/* Wide work surfaces: use the page like a CRM, not a narrow report. */
+.shell{width:100%;max-width:var(--page-max);padding:clamp(22px,2.2vw,38px) var(--gutter) var(--space-7)}
+.top{width:100%;max-width:var(--page-max);margin:clamp(24px,3vw,48px) auto var(--space-4)}
+.hero{grid-template-columns:minmax(180px,.34fr) minmax(0,1fr);align-items:end;column-gap:var(--space-5);row-gap:var(--space-2)}
+.wordmark{grid-column:1;font-size:clamp(30px,2.1vw,38px)}
+.eyebrow{grid-column:1;margin:8px 0 0}
+.command-title{grid-column:2;grid-row:1 / span 2;align-self:end;margin:0;font-size:clamp(44px,4vw,72px);line-height:.98}
+.sub{grid-column:2;margin-top:0;max-width:720px}
+.view{width:100%;max-width:var(--page-max)}
+.tabs{width:fit-content;max-width:min(100%,1040px);margin:var(--space-3) auto var(--space-5)}
+.finals-page{width:100%;max-width:none;gap:var(--space-4)}
+.finals-hero{padding:var(--space-5);gap:var(--space-4);background:linear-gradient(135deg,rgba(var(--cream),.052),rgba(0,0,0,.16) 58%,rgba(154,170,136,.035))}
+.finals-command-grid{grid-template-columns:minmax(0,1.618fr) minmax(420px,1fr);gap:var(--space-4)}
+.finals-command-card{min-height:100%;padding:var(--space-5);background:rgba(17,19,20,.7);border-color:rgba(var(--cream),.075)}
+.finals-command-card.primary{background:linear-gradient(135deg,rgba(var(--cream),.055),rgba(0,0,0,.15))}
+.finals-command-title{font-size:clamp(32px,2.8vw,50px)}
+.finals-next-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-3)}
+.finals-next-item{padding:var(--space-3)}
+.finals-summary{grid-template-columns:repeat(4,minmax(150px,1fr));gap:var(--space-3)}
+.finals-toolbar{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-3)}
+.finals-action-step{padding:var(--space-4);background:rgba(var(--cream),.018)}
+.finals-workflow{grid-template-columns:minmax(0,1.618fr) minmax(380px,1fr);gap:var(--space-4);align-items:start}
+.finals-primary-lanes,.finals-reference-lanes{grid-template-columns:1fr;gap:var(--space-4)}
+.finals-lane{background:rgba(17,19,20,.68);border-color:rgba(var(--cream),.065)}
+.finals-lane-head{padding:var(--space-4) var(--space-5)}
+.finals-records{padding:0 var(--space-5);gap:var(--space-4)}
+.final-card{padding:var(--space-4);background:linear-gradient(135deg,rgba(var(--cream),.034),rgba(0,0,0,.12))}
+.final-card.manual{background:linear-gradient(135deg,rgba(212,148,141,.1),rgba(0,0,0,.12));border-color:rgba(212,148,141,.24)}
+.finals-decision{grid-template-columns:minmax(150px,.42fr) minmax(0,1.618fr) minmax(220px,.7fr);gap:var(--space-3)}
+.final-decision-copy,.final-decision-money,.final-next-box{background:rgba(var(--cream),.018)}
+.final-decision-actions{align-content:start;padding-top:2px}
+.finals-reference-lanes .finals-lane:not([open]){min-height:96px}
 .hide{display:none!important}
 .select-cell{width:42px}.select-cell input{width:auto}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
 .section-title{font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
-@media(max-width:980px){.shell{padding:20px}.top{margin-top:64px}.login,.split{display:block}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.corner-actions{right:14px;top:12px}.corner-status{display:none}.ops-panel{margin-top:12px}.tabs{padding-left:0;padding-right:0}}
+@media(max-width:980px){.shell{padding:20px}.top{margin-top:64px}.hero{grid-template-columns:1fr}.wordmark,.eyebrow,.command-title,.sub{grid-column:1;grid-row:auto}.command-title{margin-top:var(--space-4)}.login,.split{display:block}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.corner-actions{right:14px;top:12px}.corner-status{display:none}.ops-panel{margin-top:12px}.tabs{padding-left:0;padding-right:0}}
 @media(max-width:900px){.finals-command-head{display:block}.finals-command-grid,.finals-money-row,.finals-summary,.finals-toolbar,.finals-action-step,.finals-workflow,.final-card,.final-card-top,.final-action-row,.final-context-grid,.finals-route-panel,.finals-decision,.payment-summary,.payment-card,.reservation-ops,.reservation-summary,.reservation-card{grid-template-columns:1fr}.finals-toolbar{max-width:none}.finals-action-step .actions,.final-card-actions,.final-action-box,.final-action-box .actions{justify-content:flex-start;justify-items:start}.final-decision-actions{justify-items:start}.final-decision-actions .btn{width:auto}.final-money{border-left:0;border-top:1px solid rgba(var(--cream),.08);padding-left:0;padding-top:14px}.inquiry-card-side{border-left:0;border-top:1px solid rgba(var(--cream),.07);padding-left:0;padding-top:12px}.payment-actions,.reservation-actions{justify-content:flex-start}}
 @media(max-width:1100px){.customer-card-row,.customer-filter-panel,.task-command,.task-board,.inquiry-card,.comms-command,.comms-layout,.message-card,.payment-command{grid-template-columns:1fr}.customer-card-actions,.task-filters,.task-card-actions,.inquiry-actions,.message-actions{justify-content:flex-start}.inquiry-card-side{border-left:0;border-top:1px solid rgba(var(--cream),.07);padding-left:0;padding-top:12px}}
 @media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-briefing,.today-brief-side,.today-signal-strip,.today-command,.today-workspace,.customer-workspace-head,.customer-brain-grid,.customer-focus-grid,.customer-pane-grid,.customer-work-strip,.customer-activity-grid,.customer-operating-grid,.customer-message-workspace,.profile-inquiry-card,.priority-headline,.priority-row,.duplicate-command,.duplicate-stat-grid,.duplicate-hub-grid,.customer-command-grid,.customer-command-hero,.customer-command-signal,.relationship-mini,.payment-money,.reservation-money,.comms-stats,.task-stat-grid,.customer-task-mini{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.command-title{font-size:42px}.tabs{padding-left:0;padding-right:0}.customer-status-stack{justify-content:flex-start}}
@@ -3950,6 +3982,8 @@ var pendingNet=pendingAmount>0?Math.max(0,pendingAmount-pendingFee):0;
 var manualCount=groups.Blocked.length;
 var batchRouteCount=groups['Ready to Charge'].length+groups['Waiting Period'].length+groups['Needs Notice'].filter(function(row){return row.stripe_payment_method_saved&&row.future_charge_authorized}).length;
 var manualAmount=groups.Blocked.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
+var selectableIds=new Set(rows.filter(finalBatchSelectable).map(function(row){return row.id}));
+Array.from(state.selected).forEach(function(id){if(!selectableIds.has(id))state.selected.delete(id)});
 var nextHeadline=groups['Ready to Charge'].length?'Dry run the ready balances.':(groups['Needs Notice'].length?'Start with balance notices.':(groups['Waiting Period'].length?'Wait window is running.':(manualCount?'Send payment links for these balances.':'Final balances are clear.')));
 var nextCopy=groups['Ready to Charge'].length?'These records have passed the notice window. Run the dry check first, then charge only records that pass every safety check.':(groups['Needs Notice'].length?'These customers owe the remaining balance, but the required email has to go out before collection.':(groups['Waiting Period'].length?'The email has been sent. The CRM will not treat the record as safe until the notice window passes.':(manualCount?'Money is still owed, but these orders are not approved for automatic final collection yet. Contact the customer and send a secure Stripe invoice or payment link.':'No customer needs a final-balance action right now.')));
 var stats=[
@@ -3974,17 +4008,18 @@ var toolbar='<div class="finals-toolbar"><span class="sr-only">Select needs noti
 '<div class="finals-action-step"><div><span>2. Dry run</span><strong>Check Stripe safety</strong><p>Confirms saved card, future-charge permission, notice age, and duplicate protection.</p></div><div class="actions"><button class="btn quiet" id="selectReady">Pick ready</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run picked</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Dry run all ready</button></div></div>'+
 '<div class="finals-action-step"><div><span>3. Charge</span><strong>Collect approved balances</strong><p>Picked: '+selectedCount+'. Orders that need a payment link stay out of batch charging.</p></div><div class="actions"><button class="btn" id="chargeBatch"'+disabled+'>Charge picked</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge all emailed + ready</button></div></div>'+
 '</div>';
-var command='<div class="finals-command-grid"><div class="finals-command-card"><div><div class="finals-command-title">Balance <span>command</span></div><p><strong>'+esc(nextHeadline)+'</strong> '+esc(nextCopy)+'</p></div>'+renderFinalsNextList(groups,readyAmount,pendingAmount)+'</div><div class="finals-command-card"><div><h3>Cash after Stripe</h3><p>Pending balance means money still owed, not failed. Stripe fees are estimated until Stripe creates the final charge.</p></div><div class="finals-money-row"><div><span>Customers owe</span><strong>'+money(pendingAmount)+'</strong></div><div><span>Stripe fees est.</span><strong>'+money(pendingFee)+'</strong></div><div><span>You keep est.</span><strong>'+money(pendingNet)+'</strong></div></div><div class="finals-route-panel"><div class="finals-route batch"><span>Can batch charge</span><strong>'+esc(batchRouteCount)+' record(s)</strong><p>Can move through notice, wait, dry run, and batch charge when Stripe permission exists.</p></div><div class="finals-route manual"><span>Needs payment link</span><strong>'+money(manualAmount)+'</strong><p>Still owed, but collect with a secure Stripe invoice or payment link unless the customer completes checkout with later-charge permission.</p></div></div><div class="actions" style="margin-top:12px">'+stripePaymentsLink('Open Stripe payments')+'</div><div class="finals-money-note"><strong>'+money(readyAmount)+' can enter batch review.</strong> If all ready balances collect, estimated net is '+money(readyNet)+' after '+money(readyFee)+' in Stripe fees.</div></div></div>';
-document.getElementById('finals').innerHTML='<div class="finals-page"><section class="panel finals-hero"><div class="finals-command-head"><div><p class="muted">Notice first. Wait 24 hours. Dry run. Then collect only the balances that pass Stripe safety checks.</p></div><span class="pill">Stripe-safe workflow</span></div>'+command+'<div class="finals-summary">'+stats+'</div>'+toolbar+'</section>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+'<div class="finals-workflow"><div class="finals-primary-lanes">'+primaryLanes+'</div><div class="finals-reference-lanes">'+referenceLanes+'</div></div></div>';
+var command='<div class="finals-command-grid"><div class="finals-command-card primary"><div><div class="finals-command-title">Final balance <span>workspace</span></div><p><strong>'+esc(nextHeadline)+'</strong> '+esc(nextCopy)+'</p></div>'+renderFinalsNextList(groups,readyAmount,pendingAmount)+'</div><div class="finals-command-card money-card"><div><h3>Cash after Stripe</h3><p>Pending means the customer still owes money. It is not a failed payment. Stripe fees are estimated until Stripe creates the real charge.</p></div><div class="finals-money-row"><div><span>Customers owe</span><strong>'+money(pendingAmount)+'</strong></div><div><span>Stripe fees est.</span><strong>'+money(pendingFee)+'</strong></div><div><span>You keep est.</span><strong>'+money(pendingNet)+'</strong></div></div><div class="finals-route-panel"><div class="finals-route batch"><span>Can batch charge</span><strong>'+esc(batchRouteCount)+' record(s)</strong><p>These can move through email, wait, dry run, then batch charge when Stripe permission exists.</p></div><div class="finals-route manual"><span>Needs payment link</span><strong>'+money(manualAmount)+'</strong><p>Still owed, but collect with a secure Stripe invoice or payment link unless the customer completes checkout with later-charge permission.</p></div></div><div class="actions" style="margin-top:12px">'+stripePaymentsLink('Open Stripe payments')+'</div><div class="finals-money-note"><strong>'+money(readyAmount)+' can enter batch review.</strong> If all ready balances collect, estimated net is '+money(readyNet)+' after '+money(readyFee)+' in Stripe fees.</div></div></div>';
+document.getElementById('finals').innerHTML='<div class="finals-page"><section class="panel finals-hero"><div class="finals-command-head"><div><p class="muted">Use this only when you are ready to collect final balances: send the email, wait 24 hours, dry run, then collect only records that pass Stripe safety checks.</p></div><span class="pill">Stripe-safe workflow</span></div>'+command+'<div class="finals-summary">'+stats+'</div>'+toolbar+'</section>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+'<div class="finals-workflow"><div class="finals-primary-lanes">'+primaryLanes+'</div><div class="finals-reference-lanes">'+referenceLanes+'</div></div></div>';
 document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
-document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
-document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
+document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return finalBatchSelectable(row)&&row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
+document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return finalBatchSelectable(row)&&row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('sendNotices').addEventListener('click',sendNotices);
 document.getElementById('dryRun').addEventListener('click',function(){runBatch(true)});
 document.getElementById('chargeBatch').addEventListener('click',function(){runBatch(false)});
 document.getElementById('autoDryRun').addEventListener('click',function(){runAutoFinalBalance(true)});
 document.getElementById('autoChargeReady').addEventListener('click',function(){runAutoFinalBalance(false)});
 document.querySelectorAll('#finals [data-final-action]').forEach(function(btn){btn.addEventListener('click',async function(){await runCustomerFinalAction(btn.dataset.finalAction,btn.dataset.reservationId)})});
+bindFinalDraftButtons();
 bindCustomerOpeners();
 focusFinalReservation();
 }
@@ -4038,6 +4073,10 @@ var body=manual?
 return {subject:subject,body:body};
 }
 
+function finalBatchSelectable(row){
+return row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:')&&!row.blocked_reason;
+}
+
 function finalDraftButton(row){
 if(!row.customer_id)return '';
 var draft=finalBalanceDraft(row);
@@ -4056,8 +4095,8 @@ openCustomer(btn.dataset.draftCustomer,'messages');
 }
 
 function finalBalanceCard(row){
-var pickable=row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:');
-var manual=!pickable||row.blocked_reason;
+var pickable=finalBatchSelectable(row);
+var manual=!pickable;
 var checkbox=!manual&&pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for batch</label>':'<span class="status blocked">Payment link path</span>';
 var card=row.stripe_payment_method_saved?'Card saved for later charge':'No card saved for later charge';
 var auth=row.future_charge_authorized?'Customer approved the later charge':'Customer has not approved the later charge';
