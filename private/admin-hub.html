@@ -237,6 +237,27 @@ tr:last-child td{border-bottom:0}
 .message-row.inbound{border-left-color:rgba(215,184,114,.75);background:rgba(215,184,114,.055)}
 .today-side{display:grid;gap:14px}
 .hub-work-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+.duplicate-command{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.55fr);gap:14px;align-items:stretch}
+.duplicate-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.duplicate-stat{border:1px solid rgba(var(--cream),.09);border-radius:8px;background:rgba(var(--cream),.03);padding:14px}
+.duplicate-stat span{display:block;font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:800}
+.duplicate-stat strong{display:block;margin-top:8px;font-size:28px;font-weight:500;letter-spacing:-.025em}
+.duplicate-board{display:grid;gap:12px}
+.duplicate-card{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:16px;box-shadow:var(--shadow)}
+.duplicate-card header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;margin-bottom:12px}
+.duplicate-card h3{font-size:20px;font-weight:500;letter-spacing:-.025em;line-height:1.12}
+.duplicate-card p{font-size:12px;line-height:1.45;color:rgba(var(--cream),.54);margin-top:5px}
+.duplicate-candidates{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.candidate-pill{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(var(--cream),.12);border-radius:999px;background:rgba(var(--cream),.035);color:rgba(var(--cream),.68);font-size:11px;padding:7px 10px}
+.candidate-pill code{font-size:10px;color:rgba(var(--cream),.52)}
+.merge-drawer{border:1px solid rgba(var(--cream),.09);border-radius:8px;background:rgba(var(--cream),.026);margin-top:12px;overflow:hidden}
+.merge-drawer summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;list-style:none;font-weight:800;color:rgba(var(--cream),.78)}
+.merge-drawer summary::-webkit-details-marker{display:none}
+.merge-drawer summary:after{content:'+';width:24px;height:24px;border:1px solid rgba(var(--cream),.13);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:rgba(var(--cream),.58);font-size:16px}
+.merge-drawer[open] summary:after{content:'-'}
+.merge-body{padding:0 14px 14px}
+.merge-body .record-grid{margin-top:10px}
+.manual-merge{background:rgba(var(--cream),.026)}
 .automation-card .meta{margin-top:12px}
 .automation-log-body{white-space:pre-wrap;max-width:420px}
 .id-line{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:rgba(30,35,32,.52);word-break:break-all;margin-top:4px}
@@ -320,7 +341,7 @@ tr:last-child td{border-bottom:0}
 .section-title{font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 @media(max-width:980px){.shell{padding:20px}.top,.login,.split{display:block;margin-top:64px}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.corner-actions{right:14px;top:12px}.corner-status{display:none}.ops-panel{margin-top:12px}.tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}}
 @media(max-width:900px){.finals-hero,.finals-summary,.final-card{grid-template-columns:1fr}.finals-toolbar{justify-content:flex-start;max-width:none}.final-card .actions{justify-content:flex-start}}
-@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-workspace,.customer-workspace-head,.customer-focus-grid,.customer-pane-grid,.customer-work-strip,.priority-row{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}.customer-status-stack{justify-content:flex-start}}
+@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-workspace,.customer-workspace-head,.customer-focus-grid,.customer-pane-grid,.customer-work-strip,.priority-row,.duplicate-command,.duplicate-stat-grid{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}.customer-status-stack{justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -439,7 +460,7 @@ document.addEventListener('click',function(event){if(!event.target.closest('.pro
 document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
 
 function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]})}
-function money(value){return '$'+Number(value||0).toFixed(0)}
+function money(value){var n=Number(value||0);return '$'+(Math.abs(n-Math.round(n))>.004?n.toFixed(2):n.toFixed(0))}
 function date(value){return value?String(value).slice(0,10):''}
 function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok)throw new Error(data.error||'Could not load');return data})}
 function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207){var err=new Error(data.error||'Request failed');err.step=data.step||'';err.details=data.details||'';throw err}return data})}
@@ -1585,7 +1606,7 @@ bindCustomerOpeners();
 }
 
 function renderPayments(){
-document.getElementById('payments').innerHTML='<div class="bar"><div><div class="section-title">Payments</div><p class="muted">Gross is what the customer paid. Fee is Stripe processing. Net is what yogacloak keeps before other costs.</p></div></div>'+stripeRecoveryPanel()+table(['Customer','Type','Gross','Stripe fee','Net','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;var fee=Number(row.fee_amount||0);var net=row.net_amount===null||row.net_amount===undefined||row.net_amount===''?Number(row.amount||0)-fee:Number(row.net_amount||0);return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),money(fee),money(net),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
+document.getElementById('payments').innerHTML='<div class="bar"><div><div class="section-title">Payments</div><p class="muted">Gross is what the customer paid. Fee is Stripe processing. Net is what yogacloak keeps before other costs.</p></div></div>'+stripeRecoveryPanel()+table(['Customer','Type','Gross','Stripe fee','Net','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;var fee=Number(row.estimated_fee_amount||row.fee_amount||0);var net=row.estimated_net_amount===null||row.estimated_net_amount===undefined||row.estimated_net_amount===''?(row.net_amount===null||row.net_amount===undefined||row.net_amount===''?Number(row.amount||0)-fee:Number(row.net_amount||0)):Number(row.estimated_net_amount||0);var feeLabel=money(fee)+(row.fee_is_estimated?' est.':'');return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),esc(feeLabel),money(net),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
 var syncStripeBtn=document.getElementById('syncStripePaymentBtn');
 if(syncStripeBtn){syncStripeBtn.addEventListener('click',syncStripePayment)}
 bindCustomerOpeners();
@@ -1841,10 +1862,78 @@ document.getElementById('accounting').innerHTML=renderAccountingCards(t)+
 document.getElementById('exportCsv').addEventListener('click',exportAccountingCsv);
 }
 
+function parseMetadata(value){
+if(!value)return {};
+if(typeof value==='object'&&!Array.isArray(value))return value;
+try{return JSON.parse(value)}catch(err){return {}}
+}
+
+function duplicateCandidateIds(row){
+var meta=parseMetadata(row.metadata);
+var ids=[];
+if(meta.possible_duplicate_customer_ids&&Array.isArray(meta.possible_duplicate_customer_ids))ids=ids.concat(meta.possible_duplicate_customer_ids);
+if(meta.source_customer_id)ids.push(meta.source_customer_id);
+if(meta.target_customer_id)ids.push(meta.target_customer_id);
+var current=row.customer_id||row.customers&&row.customers.id;
+return Array.from(new Set(ids.filter(Boolean).filter(function(id){return id!==current})));
+}
+
+function duplicateReviewCard(row,index){
+var customerId=row.customer_id||row.customers&&row.customers.id||'';
+var name=row.customers&&row.customers.full_name||row.customer_name||'Customer';
+var email=row.customers&&row.customers.email||'';
+var phone=row.customers&&row.customers.phone||'';
+var candidates=duplicateCandidateIds(row);
+var candidatePills=candidates.length?candidates.map(function(id){return '<button class="candidate-pill" type="button" data-fill-target="'+esc(id)+'" data-card-index="'+esc(index)+'"><span>Possible match</span><code>'+esc(id)+'</code></button>'}).join(''):'<span class="candidate-pill">No candidate ID attached yet</span>';
+var context=[email,phone].filter(Boolean).join(' · ')||'Missing email or phone';
+return '<article class="duplicate-card" data-duplicate-card data-card-index="'+esc(index)+'">'+
+'<header><div><h3>'+customerLink(customerId,name)+'</h3><p>'+esc(context)+'</p><p>'+esc(row.details||'Review whether this is the same person as another customer profile.')+'</p></div><div class="actions">'+openProfileButton(customerId,'Open profile')+'</div></header>'+
+'<div class="duplicate-candidates">'+candidatePills+'</div>'+
+'<details class="merge-drawer"><summary>Review + merge customer profiles</summary><div class="merge-body"><div class="notice warn"><strong>Merge only when you are sure.</strong><br>The source profile is archived and its inquiries, reservations, payments, messages, notes, and timeline move to the profile you keep.</div><div class="record-grid"><label>Archive this source customer<input data-merge-source value="'+esc(customerId)+'" placeholder="Source customer ID"></label><label>Keep this target customer<input data-merge-target placeholder="Choose or paste target customer ID"></label></div><div class="actions" style="margin-top:10px"><button class="btn warn small" data-merge-card>Merge into target</button></div></div></details>'+
+'<div class="meta"><span class="pill">Detected <strong>'+esc(date(row.occurred_at))+'</strong></span><span class="pill">Founder review <strong>required</strong></span></div>'+
+'</article>';
+}
+
+function bindDuplicateButtons(){
+document.querySelectorAll('[data-fill-target]').forEach(function(btn){
+btn.addEventListener('click',function(){
+var card=btn.closest('[data-duplicate-card]');
+var target=card&&card.querySelector('[data-merge-target]');
+if(target){target.value=btn.dataset.fillTarget||'';target.focus()}
+});
+});
+document.querySelectorAll('[data-merge-card]').forEach(function(btn){
+btn.addEventListener('click',async function(){
+var card=btn.closest('[data-duplicate-card]');
+var source=card&&card.querySelector('[data-merge-source]')&&card.querySelector('[data-merge-source]').value.trim();
+var target=card&&card.querySelector('[data-merge-target]')&&card.querySelector('[data-merge-target]').value.trim();
+await mergeCustomerProfiles(source,target);
+});
+});
+var manual=document.getElementById('manualMergeBtn');
+if(manual){manual.addEventListener('click',async function(){await mergeCustomerProfiles(document.getElementById('manualSourceCustomer').value.trim(),document.getElementById('manualTargetCustomer').value.trim())})}
+}
+
+async function mergeCustomerProfiles(source,target){
+if(!source||!target){statusText.innerHTML='<span class="error">Choose both a source customer and target customer before merging.</span>';return}
+if(source===target){statusText.innerHTML='<span class="error">Source and target are the same. Pick the profile you want to keep as the target.</span>';return}
+if(!confirm('Merge this customer profile into the target profile? The source profile will be archived and all connected CRM history will move to the target.'))return;
+setBusy('Merging customer profiles...');
+try{
+await post('/api/admin-merge-customer',{source_customer_id:source,target_customer_id:target});
+statusText.innerHTML='<span class="ok">Customer profiles merged.</span>';
+loadCurrent();
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not merge customers.')+'</span>'}
+}
+
 function renderDuplicates(){
-document.getElementById('duplicates').innerHTML='<section class="panel"><div class="section-title">Possible duplicates</div>'+table(['Customer','Details','Date'],state.duplicates.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.customer_id||'Customer'),esc(row.details),esc(date(row.occurred_at))]}),true)+'</section><section class="panel"><div class="section-title">Merge customers</div><div class="login"><label>Source customer ID<input id="sourceCustomer"></label><label>Target customer ID<input id="targetCustomer"></label><button class="btn warn" id="mergeBtn">Merge</button></div></section>';
+var rows=state.duplicates||[];
+var people=new Set(rows.map(function(row){return row.customer_id||row.customers&&row.customers.id}).filter(Boolean));
+var candidateCount=rows.reduce(function(total,row){return total+duplicateCandidateIds(row).length},0);
+var board=rows.length?'<div class="duplicate-board">'+rows.map(duplicateReviewCard).join('')+'</div>':'<div class="empty">No duplicate warnings right now. Exact same full-name matches are already merged during intake when the CRM is confident.</div>';
+document.getElementById('duplicates').innerHTML='<section class="panel"><div class="duplicate-command"><div><div class="section-title">Duplicate cleanup</div><p class="muted">Use this to keep one real person as one customer profile. The CRM auto-merges confident exact-name matches; this queue is for anything that still needs founder review.</p><div class="duplicate-stat-grid"><div class="duplicate-stat"><span>Warnings</span><strong>'+esc(rows.length)+'</strong></div><div class="duplicate-stat"><span>People flagged</span><strong>'+esc(people.size)+'</strong></div><div class="duplicate-stat"><span>Possible matches</span><strong>'+esc(candidateCount)+'</strong></div></div></div><div class="notice warn"><strong>Merge with care.</strong><br>When you merge, the source profile is archived and its inquiries, reservations, payments, messages, notes, and events move into the target profile. Money records are preserved.</div></div></section><section class="panel"><div class="bar"><div><div class="section-title">Review queue</div><p class="muted">Open the profile first, then use Review + merge only when it is clearly the same person.</p></div></div>'+board+'</section><details class="panel merge-drawer manual-merge"><summary>Manual merge by customer ID</summary><div class="merge-body"><div class="record-grid"><label>Archive this source customer<input id="manualSourceCustomer" placeholder="Source customer ID"></label><label>Keep this target customer<input id="manualTargetCustomer" placeholder="Target customer ID"></label></div><div class="actions" style="margin-top:10px"><button class="btn warn" id="manualMergeBtn">Merge into target</button></div></div></details>';
 bindCustomerOpeners();
-document.getElementById('mergeBtn').addEventListener('click',async function(){await post('/api/admin-merge-customer',{source_customer_id:document.getElementById('sourceCustomer').value.trim(),target_customer_id:document.getElementById('targetCustomer').value.trim()});statusText.innerHTML='<span class="ok">Customers merged.</span>';loadCurrent()});
+bindDuplicateButtons();
 }
 
 function renderSettings(){
