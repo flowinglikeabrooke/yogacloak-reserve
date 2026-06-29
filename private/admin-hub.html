@@ -474,6 +474,20 @@ var items=[
 return '<div class="grid">'+items.map(function(item){return '<div class="card"><span>'+esc(item[0])+'</span><strong>'+esc(item[1]===undefined?0:item[1])+'</strong></div>'}).join('')+'</div>';
 }
 
+function renderAccountingCards(t){
+var items=[
+['Unpaid reservations',t.unpaid_reservations||0],
+['Pending balances',money(t.pending_balances||t.outstanding_balances||0)],
+['Failed payments',t.failed_payments||0],
+['Unfulfilled',t.unfulfilled||0],
+['Deposits collected',money(t.deposits_collected||0)],
+['Final balances collected',money(t.final_balances_collected||0)],
+['Net collected',money(t.estimated_net_collected||0)],
+['Converted / fulfilled',t.fulfilled_or_converted||0]
+];
+return '<div class="grid">'+items.map(function(item){return '<div class="card"><span>'+esc(item[0])+'</span><strong>'+esc(item[1])+'</strong></div>'}).join('')+'</div>';
+}
+
 function hubCardDefinitions(summary){
 return [
 {id:'customers',label:'Customers',value:summary.customers||0,note:'People in CRM'},
@@ -1708,8 +1722,8 @@ function renderAccounting(){
 var data=state.accounting;
 if(!data){document.getElementById('accounting').innerHTML='<div class="empty">Load accounting to see totals.</div>';return}
 var t=data.totals||{};
-document.getElementById('accounting').innerHTML=renderCards({customers:t.unpaid_reservations,inquiries:t.failed_payments,needs_notice:t.unfulfilled,ready_to_charge:t.fulfilled_or_converted,deposits_collected:t.deposits_collected,final_balances_collected:t.final_balances_collected,failed_payments:money(t.outstanding_balances),possible_duplicates:money(t.estimated_net_collected)})+
-'<section class="panel"><div class="bar"><div class="section-title">Accounting export</div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Estimated Stripe fees',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Outstanding balances',money(t.outstanding_balances)]])+'</section>';
+document.getElementById('accounting').innerHTML=renderAccountingCards(t)+
+'<section class="panel"><div class="bar"><div class="section-title">Accounting export</div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Estimated Stripe fees',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Pending balances',money(t.pending_balances||t.outstanding_balances)],['Failed payments',t.failed_payments||0]])+'</section>';
 document.getElementById('exportCsv').addEventListener('click',exportAccountingCsv);
 }
 
@@ -1789,7 +1803,8 @@ var eligible=row.charge_eligible?'<br><span class="ok">Charge eligible</span>':'
 var attempt=row.final_balance_last_attempt_at?'<br><span class="muted">Last attempt</span> '+esc(row.final_balance_last_attempt_at):'';
 var attemptError=row.final_balance_last_error?'<br><span class="error">'+esc(row.final_balance_last_error)+'</span>':'';
 var finalStatus=row.final_balance_status?'<br><span class="muted">Final status</span> '+esc(row.final_balance_status):'';
-return '<tr>'+(selectable?'<td class="select-cell"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'></td>':'')+
+var pickable=row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:');
+return '<tr>'+(selectable?'<td class="select-cell">'+(pickable?'<input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'>':'<span class="muted">Manual</span>')+'</td>':'')+
 '<td><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span><br><span class="muted">'+esc(row.notice_status||'')+'</span>'+eligible+wait+finalStatus+attempt+block+attemptError+'</td>'+
 '<td>'+customerLink(row.customer_id,row.customer_name||row.email||'Customer')+'<br><span class="muted">'+esc(row.email)+'</span></td>'+
 '<td>'+esc(row.product)+'<br><span class="muted">'+esc(row.size)+'</span></td>'+

@@ -65,6 +65,20 @@ function futureChargeAuthorized(paymentIntent, metadata) {
   return metadata.future_charge_authorized === 'true' || paymentIntent.setup_future_usage === 'off_session';
 }
 
+function productListFromMetadata(metadata, depositTotal, finalBalanceTotal) {
+  const explicit = String(metadata.products || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  if (explicit.length) return explicit;
+
+  const retailTotal = Number(metadata.full_price_total || 0) || Number(depositTotal || 0) + Number(finalBalanceTotal || 0);
+  if (Math.abs(retailTotal - 68) < 0.01) return ['wrap'];
+  if (Math.abs(retailTotal - 98) < 0.01) return ['cloak'];
+  if (Math.abs(retailTotal - 166) < 0.01) return ['cloak', 'wrap'];
+  return [];
+}
+
 async function step(name, fn) {
   try {
     return await fn();
@@ -210,6 +224,8 @@ export default async function handler(req, res) {
     const metadata = metadataFrom(paymentIntent, checkoutSession);
     const finalBalanceTotal = numberFrom(metadata.final_balance_total, req.body?.final_balance_total);
     const depositTotal = numberFrom(metadata.deposit_total, dollars(paymentIntent.amount_received || paymentIntent.amount || checkoutSession?.amount_total || 0));
+    const recoveredProducts = productListFromMetadata(metadata, depositTotal, finalBalanceTotal);
+    const recoveredRetailTotal = Number(metadata.full_price_total || 0) || Number(depositTotal || 0) + Number(finalBalanceTotal || 0);
     const futureAuthorized = futureChargeAuthorized(paymentIntent, metadata);
     const stripeCustomerId = objectId(paymentIntent.customer) || objectId(checkoutSession?.customer);
     const stripeCustomer = typeof paymentIntent.customer === 'object' ? paymentIntent.customer : await customerFromStripe(stripeCustomerId);
@@ -247,11 +263,11 @@ export default async function handler(req, res) {
         stripe_payment_method_id: paymentMethodId,
         future_charge_authorized: futureAuthorized,
         notes: {
-          products: String(metadata.products || '').split(',').map((item) => item.trim()).filter(Boolean),
-          product_selection: String(metadata.products || '').split(',').map((item) => item.trim()).filter(Boolean).join(' + '),
+          products: recoveredProducts,
+          product_selection: recoveredProducts.join(' + '),
           cloak_size: metadata.cloak_size || '',
           deposit_total: depositTotal,
-          full_price_total: Number(metadata.full_price_total || 0),
+          full_price_total: recoveredRetailTotal,
           final_balance_total: finalBalanceTotal,
           recovered_from_stripe_at: new Date().toISOString()
         }
@@ -265,10 +281,10 @@ export default async function handler(req, res) {
         airtableReservationId: metadata.reservation_record_id || '',
         airtableContactId: metadata.contact_record_id || '',
         status: status === 'paid' ? 'Reserved' : 'Pending Payment',
-        products: String(metadata.products || '').split(',').map((item) => item.trim()).filter(Boolean),
+        products: recoveredProducts,
         size: metadata.cloak_size || '',
         depositAmount: depositTotal,
-        finalRetailTotal: Number(metadata.full_price_total || 0),
+        finalRetailTotal: recoveredRetailTotal,
         finalBalanceTotal,
         checkoutSessionId: checkoutSession?.id || '',
         paymentIntentId: paymentIntent.id,
@@ -277,7 +293,7 @@ export default async function handler(req, res) {
         futureChargeAuthorized: futureAuthorized,
         eventTitle: 'Stripe payment recovered',
         eventDetails: 'Existing Stripe payment was imported into the CRM.',
-        metadata: { checkout_session: checkoutSession?.id || '', recovered_from_stripe: true }
+        metadata: { checkout_session: checkoutSession?.id || '', recovered_from_stripe: true, inferred_products: recoveredProducts }
       }));
     }
 
@@ -328,7 +344,9 @@ export default async function handler(req, res) {
       checkoutSession,
       metadata: {
         ...metadata,
+        products: recoveredProducts.join(','),
         deposit_total: depositTotal || metadata.deposit_total || '',
+        full_price_total: recoveredRetailTotal || metadata.full_price_total || '',
         final_balance_total: finalBalanceTotal || metadata.final_balance_total || '',
         future_charge_authorized: futureAuthorized ? 'true' : metadata.future_charge_authorized
       },

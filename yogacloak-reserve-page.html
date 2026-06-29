@@ -616,7 +616,9 @@ Back
 </main>
 
 <script>
-const TOTAL = 100;
+const CLOAK_TOTAL = 100;
+const WRAP_TOTAL = 101;
+function productTotal(key){return key === 'wrap' ? WRAP_TOTAL : CLOAK_TOTAL}
 const PRODUCTS = {
 cloak: { name:'The Cloak', deposit:20, price:98, img:'cloak-card.jpg', alt:'The Cloak hooded after-yoga cover-up for hot yoga, mats, towels, and the drive home', desc:'Hooded, open-front, mid-thigh.' },
 wrap: { name:'The Wrap', deposit:15, price:68, img:'wrap-card.jpg', alt:'The Wrap oversized after-yoga layer and yoga towel alternative for leaving class', desc:'Oversized rectangular drape. Packs down to nothing.' }
@@ -625,7 +627,7 @@ const TRAY_KEY = 'yc_reservation_tray_v1';
 const TRAY_TTL = 1000 * 60 * 60 * 24 * 14;
 
 let selectedProducts = [];
-let availability = { cloak: TOTAL, wrap: TOTAL };
+let availability = { cloak: CLOAK_TOTAL, wrap: WRAP_TOTAL };
 
 function showSuccessState() {
 const params = new URLSearchParams(window.location.search);
@@ -715,7 +717,7 @@ try {
 const res = await fetch('/api/availability');
 if (!res.ok) throw new Error('availability failed');
 const data = await res.json();
-availability = { cloak: data.cloak ?? TOTAL, wrap: data.wrap ?? TOTAL };
+availability = { cloak: data.cloak ?? CLOAK_TOTAL, wrap: data.wrap ?? WRAP_TOTAL };
 updateAvailabilityUI();
 } catch (e) {
 ['Cloak','Wrap'].forEach(function(cap){
@@ -753,7 +755,7 @@ card.classList.remove('soldout');
 thumb.classList.remove('soldout-thumb');
 thumb.setAttribute('data-action', 'select-product');
 if (cta) cta.textContent = key === 'cloak' ? "I'll Take the Cloak" : "I'll Take the Wrap";
-} else if (remaining < TOTAL) {
+} else if (remaining < productTotal(key)) {
 label.textContent = remaining + ' pieces remain';
 label.className = 'pcard-availability';
 card.classList.remove('soldout');
@@ -761,7 +763,7 @@ thumb.classList.remove('soldout-thumb');
 thumb.setAttribute('data-action', 'select-product');
 if (cta) cta.textContent = key === 'cloak' ? "I'll Take the Cloak" : "I'll Take the Wrap";
 } else {
-label.textContent = TOTAL + '-piece first drop';
+label.textContent = productTotal(key) + '-piece first drop';
 label.className = 'pcard-availability';
 card.classList.remove('soldout');
 thumb.classList.remove('soldout-thumb');
