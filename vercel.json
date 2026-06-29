@@ -3,11 +3,26 @@
     {
       "source": "/yogacloak-admin.html",
       "destination": "/api/admin-page"
+    },
+    {
+      "source": "/private/:path*",
+      "destination": "/api/admin-page"
     }
   ],
   "headers": [
     {
       "source": "/yogacloak-admin.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive, nosnippet" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" }
+      ]
+    },
+    {
+      "source": "/private/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
         { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive, nosnippet" },

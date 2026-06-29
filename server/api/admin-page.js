@@ -19,10 +19,16 @@ function securityHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com; connect-src 'self' https://accounts.google.com; frame-src https://accounts.google.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+}
+
+function safeAttr(value) {
+  return String(value || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
 
 function loginPage() {
+  const googleClientId = process.env.GOOGLE_ADMIN_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '';
+  const googleEnabled = Boolean(googleClientId);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,14 +44,27 @@ p{color:rgba(251,248,240,.58);line-height:1.5}
 label{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(251,248,240,.48);font-weight:700;margin-top:18px}
 input{width:100%;box-sizing:border-box;background:rgba(251,248,240,.055);border:1px solid rgba(251,248,240,.14);color:#fbf8f0;border-radius:8px;padding:13px;margin-top:8px}
 button{width:100%;border:0;border-radius:999px;background:#fbf8f0;color:#1e2320;font-weight:700;padding:13px;margin-top:14px;cursor:pointer}
+.google-box{margin-top:18px;padding:14px;border:1px solid rgba(251,248,240,.12);border-radius:8px;background:rgba(251,248,240,.04)}
+.divider{display:flex;gap:10px;align-items:center;margin:18px 0 0;color:rgba(251,248,240,.42);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.divider:before,.divider:after{content:"";height:1px;background:rgba(251,248,240,.12);flex:1}
+.fine{font-size:12px;color:rgba(251,248,240,.45);margin:10px 0 0}
 .error{color:#d4948d;font-size:13px;margin-top:12px}
 </style>
+${googleEnabled ? '<script src="https://accounts.google.com/gsi/client" async defer></script>' : ''}
 </head>
 <body>
 <main>
 <p style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#7c8c82">yogacloak</p>
 <h1>Private admin.</h1>
 <p>This CRM is blocked until your work profile is verified.</p>
+${googleEnabled ? `<div class="google-box">
+<div id="g_id_onload"
+  data-client_id="${safeAttr(googleClientId)}"
+  data-callback="handleGoogleLogin"
+  data-auto_prompt="false"></div>
+<div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black" data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
+<p class="fine">Only approved yogacloak team emails can open the admin hub.</p>
+</div><div class="divider">backup code</div>` : ''}
 <label>Profile access code<input id="token" type="password" autocomplete="off" autofocus></label>
 <button id="login">Open admin hub</button>
 <div id="msg" class="error"></div>
@@ -60,6 +79,14 @@ var res=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'a
 if(res.ok){location.reload();return}
 var data=await res.json().catch(function(){return {}});
 msg.textContent=(data.error||'Could not log in.')+' If you just changed profile codes in Vercel, redeploy Production and refresh this page.';
+}
+async function handleGoogleLogin(response){
+var msg=document.getElementById('msg');
+msg.textContent='';
+var res=await fetch('/api/admin-login-google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response&&response.credential})});
+if(res.ok){location.reload();return}
+var data=await res.json().catch(function(){return {}});
+msg.textContent=data.error||'Google login failed.';
 }
 </script>
 </body>

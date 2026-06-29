@@ -13,6 +13,7 @@ import adminDuplicates from '../server/api/admin-duplicates.js';
 import adminImportRawCustomer from '../server/api/admin-import-raw-customer.js';
 import adminInquiries from '../server/api/admin-inquiries.js';
 import adminLogin from '../server/api/admin-login.js';
+import adminLoginGoogle from '../server/api/admin-login-google.js';
 import adminLogout from '../server/api/admin-logout.js';
 import adminMergeCustomer from '../server/api/admin-merge-customer.js';
 import adminMergeInquiries from '../server/api/admin-merge-inquiries.js';
@@ -72,6 +73,7 @@ const routes = {
   'admin-import-raw-customer': adminImportRawCustomer,
   'admin-inquiries': adminInquiries,
   'admin-login': adminLogin,
+  'admin-login-google': adminLoginGoogle,
   'admin-logout': adminLogout,
   'admin-merge-customer': adminMergeCustomer,
   'admin-merge-inquiries': adminMergeInquiries,
@@ -116,10 +118,32 @@ function routeName(req) {
   return String(req.url || '').split('?')[0].replace(/^\/api\/?/, '').replace(/^\/+/, '');
 }
 
-function readRawBody(req) {
+function maxBodyBytesForRoute(name) {
+  if (name === 'stripe-webhook') return 256 * 1024;
+  if (name === 'email-webhook') return 64 * 1024;
+  if (name === 'twilio-sms-webhook') return 16 * 1024;
+  if (name === 'reserve') return 64 * 1024;
+  if (name === 'contact') return 16 * 1024;
+  if (name === 'sms-optin') return 8 * 1024;
+  if (String(name || '').startsWith('admin-')) return 64 * 1024;
+  return 64 * 1024;
+}
+
+function readRawBody(req, maxBytes = 64 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    let total = 0;
+    req.on('data', (chunk) => {
+      total += chunk.length;
+      if (total > maxBytes) {
+        const error = new Error('Request body too large');
+        error.statusCode = 413;
+        req.destroy(error);
+        reject(error);
+        return;
+      }
+      chunks.push(Buffer.from(chunk));
+    });
     req.on('end', () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
   });
@@ -127,7 +151,14 @@ function readRawBody(req) {
 
 async function hydrateBody(req, name) {
   if (req.method === 'GET' || req.method === 'HEAD' || name === 'stripe-webhook') return;
-  const raw = await readRawBody(req);
+  const contentLength = Number(req.headers['content-length'] || 0);
+  const maxBytes = maxBodyBytesForRoute(name);
+  if (contentLength > maxBytes) {
+    const error = new Error('Request body too large');
+    error.statusCode = 413;
+    throw error;
+  }
+  const raw = await readRawBody(req, maxBytes);
   const text = raw.toString('utf8');
   const contentType = String(req.headers['content-type'] || '').toLowerCase();
 
@@ -151,6 +182,7 @@ export default async function handler(req, res) {
     await hydrateBody(req, name);
     return target(req, res);
   } catch (err) {
+    if (err.statusCode === 413) return res.status(413).json({ error: 'Request too large' });
     if (err instanceof SyntaxError) return res.status(400).json({ error: 'Invalid request body' });
     console.error('API dispatcher error:', err);
     return res.status(500).json({ error: 'Server error' });

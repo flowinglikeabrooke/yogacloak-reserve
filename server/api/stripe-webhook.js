@@ -23,10 +23,21 @@ const TABLES = {
   payments: process.env.AIRTABLE_PAYMENTS_TABLE || 'tblc9s0jZj549dIGJ'
 };
 
-function readRawBody(req) {
+function readRawBody(req, maxBytes = 256 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    let total = 0;
+    req.on('data', (chunk) => {
+      total += chunk.length;
+      if (total > maxBytes) {
+        const error = new Error('Request body too large');
+        error.statusCode = 413;
+        req.destroy(error);
+        reject(error);
+        return;
+      }
+      chunks.push(Buffer.from(chunk));
+    });
     req.on('end', () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
   });
@@ -137,7 +148,7 @@ export default async function handler(req, res) {
   if (rejectLargeRequest(req, res, 256 * 1024)) return;
 
   try {
-    const rawBody = await readRawBody(req);
+    const rawBody = await readRawBody(req, 256 * 1024);
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || process.env.RESERVE_STRIPE_WEBHOOK_SECRET;
 
     if (!verifyStripeSignature(rawBody, req.headers['stripe-signature'], webhookSecret)) {

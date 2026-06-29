@@ -151,6 +151,32 @@ Fix it in this order:
 
 If the page opens but asks for a login, the admin route is working. Use the exact `ADMIN_TOKEN` value saved in Vercel Production.
 
+Optional stronger login: Google approved-email sign-in
+
+You can let Brooke and Christian log in with Google instead of only a shared access code. The backend verifies the Google login, then only opens the admin hub if the email is on the approved list.
+
+Add these Vercel Production environment variables:
+
+```text
+GOOGLE_ADMIN_CLIENT_ID=your-google-oauth-web-client-id
+OWNER_ADMIN_EMAIL=Brookebein@gmail.com
+OWNER_ADMIN_NAME=Brooke
+ADMIN_USERS_JSON=[
+  {"name":"Brooke","email":"Brookebein@gmail.com","role":"founder","token":"keep-a-backup-code"},
+  {"name":"Christian","email":"christian@example.com","role":"owner","token":"keep-a-backup-code"}
+]
+```
+
+The `token` values stay as backup login codes. The approved Google emails come from `OWNER_ADMIN_EMAIL`, `FOUNDER_EMAIL`, `ADMIN_ALLOWED_EMAILS`, and `ADMIN_USERS_JSON`.
+
+Google setup notes:
+
+1. Create a Google OAuth web client in Google Cloud.
+2. Add `https://www.yogacloak.com` as an authorized JavaScript origin.
+3. Copy the web client ID into `GOOGLE_ADMIN_CLIENT_ID` in Vercel.
+4. Redeploy Production.
+5. Open the admin page and choose the Google sign-in button.
+
 Security layers:
 
 - Admin token is submitted only to `/api/admin-login`.
