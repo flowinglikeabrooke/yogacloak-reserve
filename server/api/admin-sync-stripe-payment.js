@@ -65,6 +65,15 @@ function futureChargeAuthorized(paymentIntent, metadata) {
   return metadata.future_charge_authorized === 'true' || paymentIntent.setup_future_usage === 'off_session';
 }
 
+async function step(name, fn) {
+  try {
+    return await fn();
+  } catch (err) {
+    err.step = err.step || name;
+    throw err;
+  }
+}
+
 async function checkoutSessionForPaymentIntent(paymentIntentId) {
   try {
     const sessions = await stripeRequest(`checkout/sessions?payment_intent=${encodeURIComponent(paymentIntentId)}&limit=1`);
@@ -194,10 +203,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Paste a Stripe payment intent ID that starts with pi_.' });
     }
 
-    const paymentIntent = await stripeRequest(
+    const paymentIntent = await step('load_stripe_payment', () => stripeRequest(
       `payment_intents/${encodeURIComponent(paymentIntentId)}?expand[]=payment_method&expand[]=customer`
-    );
-    const checkoutSession = await checkoutSessionForPaymentIntent(paymentIntent.id);
+    ));
+    const checkoutSession = await step('load_checkout_session', () => checkoutSessionForPaymentIntent(paymentIntent.id));
     const metadata = metadataFrom(paymentIntent, checkoutSession);
     const finalBalanceTotal = numberFrom(metadata.final_balance_total, req.body?.final_balance_total);
     const depositTotal = numberFrom(metadata.deposit_total, dollars(paymentIntent.amount_received || paymentIntent.amount || checkoutSession?.amount_total || 0));
@@ -216,7 +225,7 @@ export default async function handler(req, res) {
     const email = clean(sessionDetails.email || billing.email || stripeCustomer?.email || paymentIntent.receipt_email || metadata.email, 240).toLowerCase();
     const phone = clean(sessionDetails.phone || billing.phone || stripeCustomer?.phone || metadata.phone, 80);
 
-    const identity = await findOrCreateCustomer({
+    const identity = await step('connect_customer', () => findOrCreateCustomer({
       fullName,
       email,
       phone,
@@ -224,13 +233,13 @@ export default async function handler(req, res) {
       status: status === 'paid' ? 'reserved' : 'lead',
       source: 'Stripe',
       reason: 'Recovered an existing Stripe payment into the CRM.'
-    });
+    }));
     const customerId = identity.customer?.id;
     if (!customerId) throw new Error('Could not create or find the CRM customer.');
 
     let databaseReservation = null;
     if (metadata.reservation_record_id) {
-      const rows = await updateReservationByAirtableId(metadata.reservation_record_id, {
+      const rows = await step('update_airtable_linked_reservation', () => updateReservationByAirtableId(metadata.reservation_record_id, {
         customer_id: customerId,
         status: status === 'paid' ? 'Reserved' : 'Pending Payment',
         payment_intent_id: paymentIntent.id,
@@ -246,12 +255,12 @@ export default async function handler(req, res) {
           final_balance_total: finalBalanceTotal,
           recovered_from_stripe_at: new Date().toISOString()
         }
-      });
+      }));
       databaseReservation = rows[0] || null;
     }
 
     if (!databaseReservation) {
-      databaseReservation = await upsertReservation({
+      databaseReservation = await step('connect_reservation', () => upsertReservation({
         customerId,
         airtableReservationId: metadata.reservation_record_id || '',
         airtableContactId: metadata.contact_record_id || '',
@@ -269,10 +278,10 @@ export default async function handler(req, res) {
         eventTitle: 'Stripe payment recovered',
         eventDetails: 'Existing Stripe payment was imported into the CRM.',
         metadata: { checkout_session: checkoutSession?.id || '', recovered_from_stripe: true }
-      });
+      }));
     }
 
-    const payment = await recordPayment({
+    const payment = await step('record_payment', () => recordPayment({
       customerId,
       reservationId: databaseReservation?.id || null,
       stripePaymentIntentId: paymentIntent.id,
@@ -286,10 +295,10 @@ export default async function handler(req, res) {
         airtable_reservation_id: metadata.reservation_record_id || '',
         recovered_from_stripe: true
       }
-    });
+    }));
 
     if (paymentMethodId) {
-      await upsertPaymentMethod({
+      await step('save_payment_method', () => upsertPaymentMethod({
         customerId,
         stripeCustomerId,
         stripePaymentMethodId: paymentMethodId,
@@ -298,10 +307,10 @@ export default async function handler(req, res) {
         expMonth: paymentMethod?.card?.exp_month || null,
         expYear: paymentMethod?.card?.exp_year || null,
         futureChargeAuthorized: futureAuthorized
-      });
+      }));
     }
 
-    await createCustomerEvent({
+    await step('write_customer_timeline', () => createCustomerEvent({
       customerId,
       type: 'stripe_payment_recovered',
       title: 'Stripe payment recovered',
@@ -312,9 +321,9 @@ export default async function handler(req, res) {
         reservation_id: databaseReservation?.id || null,
         airtable_reservation_id: metadata.reservation_record_id || ''
       }
-    });
+    }));
 
-    const airtable = await mirrorAirtable({
+    const airtable = await step('mirror_airtable_backup', () => mirrorAirtable({
       paymentIntent,
       checkoutSession,
       metadata: {
@@ -326,7 +335,7 @@ export default async function handler(req, res) {
       customer: identity.customer,
       amount,
       status
-    });
+    }));
     const canChargeRemainingLater = Boolean(metadata.reservation_record_id && stripeCustomerId && paymentMethodId && futureAuthorized && finalBalanceTotal > 0);
     const blockedReasons = [];
     if (!metadata.reservation_record_id) blockedReasons.push('No yogacloak reservation ID found on the Stripe payment.');
@@ -334,7 +343,7 @@ export default async function handler(req, res) {
     if (!futureAuthorized) blockedReasons.push('Future-charge authorization was not found on the Stripe payment.');
     if (!finalBalanceTotal) blockedReasons.push('No final-balance amount found on the Stripe payment.');
 
-    await auditAdminAction(req, {
+    await step('audit_admin_action', () => auditAdminAction(req, {
       actionType: 'sync_stripe_payment',
       title: 'Admin recovered Stripe payment into CRM',
       customerId,
@@ -346,7 +355,7 @@ export default async function handler(req, res) {
         can_charge_remaining_later: canChargeRemainingLater,
         blocked_reasons: blockedReasons
       }
-    });
+    }));
 
     return res.status(200).json({
       ok: true,
@@ -359,6 +368,12 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Admin Stripe payment sync error:', err);
-    return res.status(400).json({ error: err.message || 'Could not recover Stripe payment.' });
+    return res.status(400).json({
+      error: err.step
+        ? `Stripe recovery failed while trying to ${err.step.replace(/_/g, ' ')}. ${err.message || ''}`.trim()
+        : err.message || 'Could not recover Stripe payment.',
+      step: err.step || '',
+      details: err.body || err.message || ''
+    });
   }
 }

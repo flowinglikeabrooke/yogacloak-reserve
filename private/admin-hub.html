@@ -387,7 +387,7 @@ function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){ret
 function money(value){return '$'+Number(value||0).toFixed(0)}
 function date(value){return value?String(value).slice(0,10):''}
 function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok)throw new Error(data.error||'Could not load');return data})}
-function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207)throw new Error(data.error||'Request failed');return data})}
+function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207){var err=new Error(data.error||'Request failed');err.step=data.step||'';err.details=data.details||'';throw err}return data})}
 function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
 function tabLabel(tab){return ({today:'Today',tasks:'Tasks',customers:'Customers',inquiries:'Inquiries',reservations:'Reservations',payments:'Payments',communications:'Comms',automations:'Automations',finals:'Final Balances',accounting:'Accounting',duplicates:'Duplicates',settings:'Settings'}[tab]||tab)}
@@ -1493,6 +1493,9 @@ if(!isOwner())return '';
 var result=state.stripeRecoveryResult;
 var report='';
 if(result){
+if(result.error){
+report='<div class="notice warn"><strong>Stripe recovery did not finish.</strong><br>'+esc(result.error)+(result.step?'<p class="muted">Failed step: '+esc(result.step.replace(/_/g,' '))+'</p>':'')+(result.details?'<p class="muted">'+esc(String(result.details).slice(0,700))+'</p>':'')+'</div>';
+}else{
 var customer=result.customer||{};
 var reservation=result.reservation||{};
 var reasons=result.blocked_reasons||[];
@@ -1501,6 +1504,7 @@ report='<div class="notice '+(result.can_charge_remaining_later?'good':'warn')+'
 (reservation.id?' · Reservation connected':'')+
 (reasons.length?'<ul class="mini-list">'+reasons.map(function(reason){return '<li>'+esc(reason)+'</li>'}).join('')+'</ul>':'<p class="muted">Send the final-balance notice first. The charge stays locked until the notice wait has passed.</p>')+
 '</div>';
+}
 }
 return '<section class="panel"><div class="bar"><div><div class="section-title">Recover missing Stripe payment</div><p class="muted">Use this when Stripe shows a payment but the CRM does not. It imports the payment/customer/reservation links; it does not charge anyone.</p></div></div>'+
 '<div class="login"><label>Stripe payment intent<input id="stripePaymentIntentInput" placeholder="pi_..." value="pi_3TmR97KcKQy9WmP60XIIPd0d"></label><label>Payment type<select id="stripePaymentType"><option value="deposit">Deposit</option><option value="final_balance">Final balance</option></select></label><label>Remaining balance, if missing<input id="stripeFinalBalanceInput" type="number" min="0" step="0.01" placeholder="0.00"></label><button class="btn" id="syncStripePaymentBtn">Recover payment</button></div>'+report+'</section>';
@@ -1520,6 +1524,8 @@ state.payments=(await endpoint('/api/admin-payments')).payments||[];
 renderPayments();
 statusText.innerHTML='<span class="ok">Stripe payment recovered into the CRM.</span>';
 }catch(err){
+state.stripeRecoveryResult={error:err.message||'Could not recover Stripe payment.',step:err.step||'',details:err.details||''};
+renderPayments();
 statusText.innerHTML='<span class="error">'+esc(err.message||'Could not recover Stripe payment.')+'</span>';
 }
 }
