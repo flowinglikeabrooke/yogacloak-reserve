@@ -1205,6 +1205,9 @@ body{background:linear-gradient(180deg,#1c231f 0%,#18201c 42%,#202820 100%)}
 .today-flow-row.hot,.today-flow-row.money{background:rgba(251,248,240,.026);border-color:rgba(var(--cream),.065)}
 .today-flow-kind strong,.today-flow-copy strong{font-size:15px}
 .today-flow-route{background:transparent!important;border-color:rgba(var(--cream),.1)}
+.priority-meta-trail{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-4)}
+.priority-meta-trail span{display:inline-flex!important;align-items:center;gap:var(--space-2);width:max-content;max-width:100%;padding:var(--space-2) var(--space-3);border:1px solid rgba(var(--cream),.08);border-radius:999px;background:rgba(var(--cream),.026);font-size:10px!important;letter-spacing:.07em!important;text-transform:uppercase;color:rgba(var(--cream),.56)!important}
+.priority-meta-trail strong{font-size:10px;color:rgba(var(--cream),.84)}
 .today-side{gap:var(--space-4)}
 .work-row{padding:var(--space-4);background:rgba(251,248,240,.024);border-color:rgba(var(--cream),.06)}
 .signal-drawer{background:rgba(17,19,20,.42);border-color:rgba(var(--cream),.06)}
@@ -1214,7 +1217,7 @@ body{background:linear-gradient(180deg,#1c231f 0%,#18201c 42%,#202820 100%)}
 .customer-queue-chip{padding:var(--space-3) var(--space-4);background:rgba(var(--cream),.026)}
 .customer-filter-panel{grid-template-columns:minmax(220px,.618fr) minmax(360px,1.618fr) auto auto;gap:var(--space-3)}
 .customer-list{gap:var(--space-4)}
-.customer-card-row{padding:var(--space-4);background:rgba(17,19,20,.68);border-color:rgba(var(--cream),.06);box-shadow:0 21px 55px -48px rgba(0,0,0,.72)}
+.customer-card-row{padding:var(--space-4);background:rgba(17,19,20,.68);border-color:rgba(var(--cream),.06);box-shadow:0 21px 55px -48px rgba(0,0,0,.72);cursor:pointer}
 .customer-card-row:hover{background:rgba(251,248,240,.04);border-color:rgba(var(--cream),.13)}
 .customer-card-main strong{font-size:18px}
 .customer-card-meta,.customer-card-contact,.next-read{background:rgba(251,248,240,.018);border:1px solid rgba(var(--cream),.055);border-radius:var(--radius);padding:var(--space-3)}
@@ -1295,7 +1298,7 @@ var adminUser=adminUserRaw.indexOf('__ADMIN_USER_JSON__')===0?{name:'Preview',ro
 if(!adminUser||typeof adminUser!=='object'||Array.isArray(adminUser)){adminUser={name:'Preview',role:'founder',email:''}}
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
-var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,customerProfilePane:'work',customerQueueFilter:'all',inquiryQueueFilter:'all',inquiries:[],reservations:[],payments:[],paymentFilter:'all',communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false,focusReservation:''};
+var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,customerProfilePane:'work',customerMessageDraft:null,customerQueueFilter:'all',inquiryQueueFilter:'all',inquiries:[],reservations:[],payments:[],paymentFilter:'all',communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false,focusReservation:''};
 var STRIPE_PAYMENTS_URL='https://dashboard.stripe.com/acct_1ThK1eKcKQy9WmP6/payments';
 var taskCustomerSearchTimer=null;
 var ownerOnlyTabs=new Set(['reservations','payments','finals','accounting']);
@@ -1303,13 +1306,16 @@ var founderOnlyTabs=new Set(['automations','duplicates','settings']);
 function isFounder(){return adminUser&&adminUser.role==='founder'}
 function isOwner(){return adminUser&&['founder','owner'].includes(adminUser.role)}
 function canOpenTab(tab){if(isFounder())return true;if(founderOnlyTabs.has(tab))return false;return isOwner()||!ownerOnlyTabs.has(tab)}
+function roleLabel(role){
+return ({founder:'Founder admin',owner:'Owner / Operator',manager:'Manager',staff:'Staff'}[String(role||'staff').toLowerCase()]||formatStatus(role||'staff'));
+}
 function applyRoleUi(){
-var label=(adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff');
+var label=(adminUser.name||'Team')+' · '+roleLabel(adminUser.role||'staff');
 document.getElementById('sessionUserLabel').textContent=label;
 document.getElementById('heroRoleLabel').textContent='command';
 document.getElementById('profileMenuLabel').textContent=adminUser.name||'Profile';
 document.getElementById('profileMenuName').textContent=adminUser.name||'Team';
-document.getElementById('profileMenuRole').textContent=formatStatus(adminUser.role||'staff');
+document.getElementById('profileMenuRole').textContent=roleLabel(adminUser.role||'staff');
 document.getElementById('profileInitial').textContent=String(adminUser.name||'Y').trim().slice(0,1).toUpperCase()||'Y';
 document.getElementById('profileAutomations').classList.toggle('hide',!canOpenTab('automations'));
 document.getElementById('profileSettings').classList.toggle('hide',!canOpenTab('settings'));
@@ -1358,7 +1364,7 @@ function setBusy(text){statusText.textContent=text}
 function readyClass(group){if(group==='Ready to Charge')return 'ready';if(group==='Needs Notice')return 'needs';if(group==='Waiting Period')return 'waiting';if(group==='Already Charged')return 'charged';return 'blocked'}
 function tabLabel(tab){return ({today:'Today',tasks:'To-Do',customers:'Customers',inquiries:'Leads',reservations:'Orders',payments:'Accounting: payments',communications:'Messaging',automations:'Automations',finals:'Accounting: final balances',accounting:'Accounting',duplicates:'Customer duplicates',settings:'Settings'}[tab]||tab)}
 function health(value){return value?'<span class="health good">On</span>':'<span class="health bad">Missing</span>'}
-function ownerOnlyNotice(tab){return '<section class="panel"><div class="notice warn"><strong>'+esc(founderOnlyTabs.has(tab)?'Founder-only area.':'Owner-only area.')+'</strong><br>'+esc(tabLabel(tab))+' includes '+esc(founderOnlyTabs.has(tab)?'security, automation, duplicate cleanup, or destructive controls.':'money or final-balance controls.')+' Staff profiles can work customers, leads, To-Do items, notes, and messages.</div></section>'}
+function ownerOnlyNotice(tab){return '<section class="panel"><div class="notice warn"><strong>'+esc(founderOnlyTabs.has(tab)?'Founder admin area.':'Owner / Operator area.')+'</strong><br>'+esc(tabLabel(tab))+' includes '+esc(founderOnlyTabs.has(tab)?'settings, security, automations, duplicate cleanup, merges, archive/delete, or other structural controls.':'money, orders, accounting, or final-balance controls.')+' Owner / Operator profiles can work customers, leads, To-Do items, notes, messages, orders, payments, final balances, and accounting. Founder admin keeps final system authority.</div></section>'}
 function renderHeroStatus(){
 currentTabLabel.textContent=tabLabel(activeTab);
 }
@@ -1378,7 +1384,7 @@ var needs=Number(summary.needs_notice||0);
 var rawBackup=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
 var className=warnings.length?'notice warn':'notice good';
 var message=warnings.length?warnings[0]:'Private CRM database is connected and admin access is working.';
-return '<section class="panel"><div class="section-title">Command center</div><div class="'+esc(className)+'"><strong>'+esc(message)+'</strong><div class="meta"><span class="pill">Needs notice <strong>'+esc(needs)+'</strong></span><span class="pill">Ready to charge <strong>'+esc(ready)+'</strong></span><span class="pill">Raw-only records <strong>'+esc(rawBackup)+'</strong></span><span class="pill">Stripe <strong>'+esc(s.stripe_mode||'unknown')+'</strong></span><span class="pill">Raw backup <strong>Airtable</strong></span><span class="pill">Current tab <strong>'+esc(tabLabel(activeTab))+'</strong></span><span class="pill">Session <strong>'+esc((adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff'))+'</strong></span></div></div></section>';
+return '<section class="panel"><div class="section-title">Command center</div><div class="'+esc(className)+'"><strong>'+esc(message)+'</strong><div class="meta"><span class="pill">Needs notice <strong>'+esc(needs)+'</strong></span><span class="pill">Ready to charge <strong>'+esc(ready)+'</strong></span><span class="pill">Raw-only records <strong>'+esc(rawBackup)+'</strong></span><span class="pill">Stripe <strong>'+esc(s.stripe_mode||'unknown')+'</strong></span><span class="pill">Raw backup <strong>Airtable</strong></span><span class="pill">Current tab <strong>'+esc(tabLabel(activeTab))+'</strong></span><span class="pill">Session <strong>'+esc((adminUser.name||'Team')+' · '+roleLabel(adminUser.role||'staff'))+'</strong></span></div></div></section>';
 }
 
 function setTab(tab){
@@ -1537,6 +1543,19 @@ if(item.tab==='accounting'||item.tab==='payments'||item.tab==='finals')return ta
 return tabLabel(item.tab||'today');
 }
 
+function priorityRowAttrs(item){
+if(item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money'))return 'data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'"';
+if(item.customer_id)return 'data-open-customer="'+esc(item.customer_id)+'" data-open-customer-pane="'+esc(item.profile_pane||'work')+'"';
+return 'data-jump-tab="'+esc(item.tab||'today')+'"';
+}
+
+function priorityMetaTrail(item){
+var action=item.reservation_id?'Balance plan':(item.customer_id?paneActionLabel(item.profile_pane||'work'):'Open workspace');
+var priority=item.hot?'Needs action':'Review';
+var parts=[['Where',priorityDestinationLabel(item)],['Action',action],['State',priority]];
+return '<div class="priority-meta-trail">'+parts.map(function(part){return '<span>'+esc(part[0])+' <strong>'+esc(part[1])+'</strong></span>'}).join('')+'</div>';
+}
+
 function collectPriorityItems(data){
 var summary=data.summary||{};
 var items=[];
@@ -1553,7 +1572,7 @@ var raw=firstDashboardTask(data,['raw_backup']);
 var message=(data.message_preview||[]).find(function(row){return row.customer_id||row.customers&&row.customers.id});
 if(Number(summary.tasks_overdue||0)>0)add('To-Do',summary.tasks_overdue+' overdue task(s)',overdue&&overdue.detail?overdue.detail:'Start here before anything slips.','tasks',true,overdue,'work');
 if(Number(summary.follow_ups_due||0)>0)add('Follow-up',follow&&follow.detail?'Follow up with '+follow.detail:summary.follow_ups_due+' follow-up(s) due',follow&&follow.created_at?'Due '+date(follow.created_at):'Customers waiting for the next touch.','tasks',true,follow,'work');
-if(Number(summary.new_inquiries||0)>0)add('Sales',inquiry&&inquiry.detail?'New lead from '+inquiry.detail:summary.new_inquiries+' new '+(Number(summary.new_inquiries||0)===1?'lead':'leads'),inquiry&&inquiry.title?inquiry.title:'Fresh website activity to qualify.','inquiries',true,inquiry,'messages');
+if(Number(summary.new_inquiries||0)>0)add('Lead',inquiry&&inquiry.detail?'New lead from '+inquiry.detail:summary.new_inquiries+' new '+(Number(summary.new_inquiries||0)===1?'lead':'leads'),inquiry&&inquiry.title?inquiry.title:'Fresh website activity to qualify.','inquiries',true,inquiry,'messages');
 if(message){var messageCustomer=message.customer_id||message.customers&&message.customers.id;items.push({kind:'Messages',title:'New '+String(message.channel||'message').toUpperCase()+' from '+(message.customers&&message.customers.full_name||'customer'),detail:message.subject||message.body||'Open Messages and reply.',tab:'communications',hot:true,customer_id:messageCustomer,profile_pane:'messages'});}
 if(Number(summary.needs_notice||0)>0)add('Balances',notice&&notice.detail?'Send balance notice for '+notice.detail:summary.needs_notice+' final-balance notice(s) needed','Send notice before any remaining-balance collection.','finals',false,notice,'sales');
 if(Number(summary.ready_to_charge||0)>0)add('Money',charge&&charge.detail?'Dry run final balance for '+charge.detail:summary.ready_to_charge+' ready for dry run','Verify before charging any remaining balance.','finals',true,charge,'sales');
@@ -1575,7 +1594,7 @@ var cards=[
 {label:'Money watch',value:Number(summary.needs_notice||0)+Number(summary.ready_to_charge||0)+Number(summary.failed_payments||0),note:'Final balances and payment cleanup',tab:'finals',hot:Number(summary.ready_to_charge||0)>0||Number(summary.failed_payments||0)>0},
 {label:'CRM cleanup',value:Number(summary.tasks_overdue||0)+rawBackup+Number(summary.duplicate_candidates||0),note:'Overdue work, raw records, duplicate review',tab:'tasks',hot:Number(summary.tasks_overdue||0)>0}
 ];
-return '<section class="today-briefing"><div class="today-start '+(start.hot?'hot':'')+'"><div><span>Start here · '+esc(start.kind)+'</span><h2>'+esc(start.title)+'</h2><p>'+esc(start.detail)+'</p></div><div class="actions">'+startAction+'<button class="btn quiet" data-jump-tab="tasks">Open To-Do</button></div></div><div class="today-brief-side">'+cards.map(function(card){return '<button class="brief-card '+(card.hot?'hot':'')+'" data-jump-tab="'+esc(card.tab)+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></button>'}).join('')+'</div></section>';
+return '<section class="today-briefing"><div class="today-start '+(start.hot?'hot':'')+'"><div><span>Start here · '+esc(start.kind)+'</span><h2>'+esc(start.title)+'</h2><p>'+esc(start.detail)+'</p>'+priorityMetaTrail(start)+'</div><div class="actions">'+startAction+'<button class="btn quiet" data-jump-tab="tasks">Open To-Do</button></div></div><div class="today-brief-side">'+cards.map(function(card){return '<button class="brief-card '+(card.hot?'hot':'')+'" data-jump-tab="'+esc(card.tab)+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></button>'}).join('')+'</div></section>';
 }
 
 function todayTaskTab(row){
@@ -1609,7 +1628,7 @@ var type=String(row.type||'').toLowerCase();
 if(row.charge_id&&moneyTaskType(type))return 'Opens Accounting > Final balances';
 if(row.customer_id){
 var pane=todayTaskPane(row);
-if(pane==='sales')return 'Opens customer > Sales';
+if(pane==='sales')return 'Opens customer > Money';
 if(pane==='messages')return 'Opens customer > Messages';
 if(pane==='work')return 'Opens customer > To-Do';
 return 'Opens customer profile';
@@ -1723,7 +1742,7 @@ return '<div class="work-list">'+rows.map(function(row){var customerId=row.custo
 function renderTodayQuickQueue(data){
 var items=collectPriorityItems(data).slice(0,5);
 if(!items.length)return '<div class="empty">No exact work links waiting right now.</div>';
-return '<div class="work-list">'+items.map(function(item){var label=item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money')?'Open balance plan':(item.customer_id?paneActionLabel(item.profile_pane||'work'):'Open');return '<div class="work-row"><div><strong>'+esc(item.title)+'</strong><span>'+esc(priorityDestinationLabel(item)+' · '+item.kind+' · '+item.detail)+'</span></div>'+priorityButton(item,label,'btn quiet small')+'</div>'}).join('')+'</div>';
+return '<div class="work-list">'+items.map(function(item){var label=item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money')?'Open balance plan':(item.customer_id?paneActionLabel(item.profile_pane||'work'):'Open');return '<div class="work-row clickable" '+priorityRowAttrs(item)+' role="button" tabindex="0"><div><strong>'+esc(item.title)+'</strong><span>'+esc(priorityDestinationLabel(item)+' · '+item.kind+' · '+item.detail)+'</span></div>'+priorityButton(item,label,'btn quiet small')+'</div>'}).join('')+'</div>';
 }
 
 function renderPriorityQueue(data){
@@ -1740,9 +1759,8 @@ if(!data){root.innerHTML='<div class="empty">Load the hub to see today\'s action
 var tasks=data.tasks||[];
 var summary=data.summary||{};
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
-var diagnostics='<details class="signal-drawer"><summary>Review live counters</summary><div class="signal-drawer-body">'+renderTodaySignals(summary,data)+'</div></details>';
 root.innerHTML='<div class="today-command">'+databaseNotice+renderTodayBriefing(data)+'</div>'+
-'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Today\'s work queue</h2><p class="muted">Grouped by what you need to do next: reply, move a customer forward, clean up a profile, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messages needing reply</h2><p class="muted">Open the customer profile so the reply stays attached to the right person.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Messaging</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Exact links</h2><p class="muted">Jump straight to the customer, lead, or balance plan behind today\'s alerts.</p></div></header>'+renderTodayQuickQueue(data)+'</section>'+diagnostics+'</div></div>';
+'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Today\'s work queue</h2><p class="muted">Grouped by what you need to do next: reply, move a customer forward, clean up a profile, or handle money safely.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messages needing reply</h2><p class="muted">Open the customer profile so the reply stays attached to the right person.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Messaging</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Next paths</h2><p class="muted">Jump straight to the exact customer, lead, or balance plan behind today\'s work.</p></div></header>'+renderTodayQuickQueue(data)+'</section></div></div>';
 bindCustomerOpeners();
 bindTaskButtons();
 document.querySelectorAll('[data-hub-lens]').forEach(function(btn){btn.addEventListener('click',function(){setHubLens(btn.dataset.hubLens)})});

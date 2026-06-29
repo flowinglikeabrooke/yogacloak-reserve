@@ -155,6 +155,11 @@ Admin login: Google approved-email sign-in
 
 Brooke and Christian can log in with Google. The backend verifies the Google login, then only opens the admin hub if the email is on the approved list. A backup code can remain available for emergencies.
 
+Role model:
+
+- Brooke is the `founder` admin: final system authority for settings, security, automations, duplicate cleanup, merges, archive/delete, and structural controls.
+- Christian is an `owner` admin / Owner Operator: high-trust operating authority for customer work, tasks, notes, contact status, messages, orders, payments, final balances, and accounting visibility.
+
 Add these Vercel Production environment variables:
 
 ```text
@@ -163,11 +168,11 @@ OWNER_ADMIN_EMAIL=Brookebein@gmail.com
 OWNER_ADMIN_NAME=Brooke
 ADMIN_USERS_JSON=[
   {"name":"Brooke","email":"Brookebein@gmail.com","role":"founder","token":"keep-a-long-backup-code"},
-  {"name":"Christian","email":"christian@example.com","role":"owner","token":"keep-a-long-backup-code"}
+  {"name":"Christian","email":"christian@example.com","role":"owner","token":"keep-a-long-christian-backup-code"}
 ]
 ```
 
-The approved Google emails come from `OWNER_ADMIN_EMAIL`, `FOUNDER_EMAIL`, `ADMIN_ALLOWED_EMAILS`, and `ADMIN_USERS_JSON`. The `token` values are backup access codes only.
+Replace `christian@example.com` with Christian's real Google email before deploying. The approved Google emails come from `OWNER_ADMIN_EMAIL`, `FOUNDER_EMAIL`, `ADMIN_ALLOWED_EMAILS`, and `ADMIN_USERS_JSON`. The `token` values are backup access codes only.
 
 Google setup notes:
 
