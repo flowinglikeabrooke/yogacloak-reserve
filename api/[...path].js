@@ -5,6 +5,7 @@ import adminAutomations from '../server/api/admin-automations.js';
 import adminCommunications from '../server/api/admin-communications.js';
 import adminCustomerDetail from '../server/api/admin-customer-detail.js';
 import adminCustomers from '../server/api/admin-customers.js';
+import adminCreateLead from '../server/api/admin-create-lead.js';
 import adminCreateTask from '../server/api/admin-create-task.js';
 import adminDashboard from '../server/api/admin-dashboard.js';
 import adminDeleteCustomer from '../server/api/admin-delete-customer.js';
@@ -65,6 +66,7 @@ const routes = {
   'admin-communications': adminCommunications,
   'admin-customer-detail': adminCustomerDetail,
   'admin-customers': adminCustomers,
+  'admin-create-lead': adminCreateLead,
   'admin-create-task': adminCreateTask,
   'admin-dashboard': adminDashboard,
   'admin-delete-customer': adminDeleteCustomer,
