@@ -31,7 +31,11 @@ includes(adminData, 'delete sharedPatch.add_note', 'raw Airtable internal notes 
 includes(adminData, 'Private CRM customer is ${customer.status}; import will not reactivate it.', 'raw import does not reactivate archived CRM customers');
 includes(adminData, 'if (rawCustomer.status) customerPatch.status = rawCustomer.status', 'raw customer lifecycle status imports into CRM');
 includes(adminData, 'if (rawCustomer.status) patch.status = rawCustomer.status', 'raw customer lifecycle status syncs into CRM');
+includes(adminData, 'duplicate_candidates: duplicateCandidateIds(row)', 'duplicate cleanup API enriches possible match details for the hub');
 includes(identity, "['deleted', 'merged'].includes(existingStatus) ? existing.status : row.status", 'submission replay does not reactivate deleted or merged inquiries');
+includes(identity, 'full_name.ilike.${cleanFullName}', 'customer identity lookup searches full name for exact normalized duplicate matching');
+includes(identity, 'Same normalized full name during intake.', 'same full-name customer duplicates are merged during intake');
+includes(adminData, 'Customer profile edited in the admin hub.', 'profile edits run through customer identity reconciliation');
 includes(communications, "markCustomerContacted(customer.id, 'emailed')", 'sending customer email updates contact status');
 includes(communications, "markCustomerContacted(customer.id, 'texted')", 'sending customer SMS updates contact status');
 
@@ -81,6 +85,7 @@ includes(adminHub, '/api/admin-sync-raw-airtable', 'admin hub exposes raw backup
 includes(adminHub, '/api/admin-delete-customer', 'admin hub can archive contacts');
 includes(adminHub, '/api/admin-delete-inquiry', 'admin hub can archive inquiries');
 includes(adminHub, '/api/admin-merge-customer', 'admin hub can merge customers');
+includes(adminHub, 'Keep match', 'duplicate cleanup offers guided keep-profile merge actions');
 includes(adminHub, '/api/admin-merge-inquiries', 'admin hub can merge inquiries');
 includes(adminHub, '/api/admin-move-inquiry', 'admin hub can move inquiries between customers');
 includes(adminHub, '/api/admin-update-inquiry-status', 'admin hub can edit inquiry status from the customer profile');
