@@ -145,7 +145,8 @@ tr:last-child td{border-bottom:0}
 .task-lane-count{justify-self:end;margin-right:40px}
 .task-lane-body{display:grid;gap:10px;padding:0 14px}
 .task-lane-empty{padding:0 16px 14px;color:rgba(var(--cream),.4);font-size:13px}
-.task-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.28fr);gap:14px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px;min-height:126px}
+.task-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,.32fr);gap:12px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:13px;min-height:112px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.task-card:hover{background:rgba(var(--cream),.035);border-color:rgba(var(--cream),.16);transform:translateY(-1px)}
 .task-card.hot{border-color:rgba(212,148,141,.24);background:linear-gradient(135deg,rgba(212,148,141,.085),rgba(var(--cream),.02))}
 .task-card.waiting{border-color:rgba(219,186,123,.18)}
 .task-card-main{display:grid;gap:7px;min-width:0}
@@ -154,8 +155,9 @@ tr:last-child td{border-bottom:0}
 .task-card-main p{color:rgba(var(--cream),.5);font-size:12px;line-height:1.4}
 .task-card-context{border-left:2px solid rgba(var(--cream),.12);padding-left:9px}
 .task-card-meta{display:flex;gap:6px;flex-wrap:wrap}
-.task-card-owner{border:1px solid rgba(var(--cream),.07);border-radius:8px;background:rgba(var(--cream),.025);padding:10px;color:rgba(var(--cream),.52);font-size:12px;line-height:1.35}
-.task-card-owner strong{display:block;color:var(--bone);font-size:13px;margin-bottom:4px}
+.task-card-owner{border:1px solid rgba(var(--cream),.07);border-radius:8px;background:rgba(var(--cream),.025);padding:10px;color:rgba(var(--cream),.52);font-size:11px;line-height:1.35}
+.task-card-owner span{display:block;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:800;margin-bottom:4px}
+.task-card-owner strong{display:block;color:var(--bone);font-size:13px;margin-bottom:3px}
 .task-card-actions{display:grid;gap:7px;justify-items:stretch}
 .task-card-actions .btn{width:100%}
 .task-composer-panel{margin-bottom:14px}
@@ -164,19 +166,25 @@ tr:last-child td{border-bottom:0}
 .task-composer-panel summary:after{content:'+';width:28px;height:28px;border:1px solid rgba(var(--cream),.13);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:rgba(var(--cream),.62);font-size:18px}
 .task-composer-panel[open] summary:after{content:'-'}
 .task-composer-panel .record-grid{margin-top:14px}
-.inquiry-queue{display:grid;gap:12px}
-.inquiry-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.42fr);gap:14px;align-items:stretch;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:16px;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.inquiry-queue{display:grid;gap:10px}
+.inquiry-card{display:grid;grid-template-columns:minmax(240px,.62fr) minmax(0,1.25fr) minmax(260px,.45fr);gap:12px;align-items:stretch;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:12px;transition:background .16s ease,border-color .16s ease,transform .16s ease;cursor:pointer}
 .inquiry-card:hover{background:rgba(var(--cream),.035);border-color:rgba(var(--cream),.16);transform:translateY(-1px)}
 .inquiry-card.new{border-color:rgba(219,186,123,.22)}
 .inquiry-card.needs-review{border-color:rgba(212,148,141,.24);background:linear-gradient(135deg,rgba(212,148,141,.075),rgba(var(--cream),.02))}
-.inquiry-card-main{display:grid;gap:12px;min-width:0}
-.inquiry-card-side{display:grid;gap:10px;align-content:start;border-left:1px solid rgba(var(--cream),.07);padding-left:14px}
-.inquiry-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.inquiry-card-main{display:grid;gap:9px;min-width:0;align-content:start}
+.inquiry-card-side{display:grid;gap:8px;align-content:start;border-left:1px solid rgba(var(--cream),.07);padding-left:12px}
+.inquiry-card-head{display:grid;gap:8px;align-content:start}
 .inquiry-person strong,.inquiry-message strong,.inquiry-meta strong{display:block;color:var(--bone);font-size:15px;line-height:1.25}
-.inquiry-person strong{font-size:21px;letter-spacing:-.02em}
+.inquiry-person strong{font-size:17px;letter-spacing:-.01em}
 .inquiry-person span,.inquiry-message span,.inquiry-meta span{display:block;margin-top:5px;color:rgba(var(--cream),.48);font-size:12px;line-height:1.4}
-.inquiry-message{border:1px solid rgba(var(--cream),.075);border-radius:8px;background:rgba(var(--cream),.024);padding:12px}
-.inquiry-message p{margin-top:7px;color:rgba(var(--cream),.7);font-size:14px;line-height:1.5;max-width:860px}
+.inquiry-message{border:1px solid rgba(var(--cream),.075);border-radius:8px;background:rgba(var(--cream),.024);padding:12px;min-width:0}
+.inquiry-message p{margin-top:7px;color:rgba(var(--cream),.7);font-size:14px;line-height:1.5;max-width:880px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.inquiry-quick-meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.inquiry-quick-meta .pill{font-size:10px;padding:6px 8px;background:rgba(var(--cream),.026)}
+.inquiry-next-compact{border:1px solid rgba(var(--cream),.075);border-radius:8px;background:rgba(var(--cream),.022);padding:10px;display:grid;gap:4px}
+.inquiry-next-compact span{display:block;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:800}
+.inquiry-next-compact strong{display:block;color:var(--bone);font-size:13px;line-height:1.25}
+.inquiry-next-compact small{display:block;color:rgba(var(--cream),.48);font-size:11px;line-height:1.35}
 .inquiry-context-row{display:flex;gap:7px;flex-wrap:wrap}
 .inquiry-context-row .pill{font-size:10px;padding:6px 8px;background:rgba(var(--cream),.026)}
 .inquiry-actions{display:flex;gap:7px;justify-content:flex-start;flex-wrap:wrap}
@@ -184,9 +192,9 @@ tr:last-child td{border-bottom:0}
 .inquiry-why span{display:block;font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:800}
 .inquiry-why strong{display:block;color:var(--bone);font-size:14px;line-height:1.25}
 .inquiry-why small{display:block;color:rgba(var(--cream),.48);font-size:12px;line-height:1.38}
-.inquiry-status-edit{border:1px solid rgba(var(--cream),.075);border-radius:8px;background:rgba(var(--cream),.022);padding:11px;display:grid;gap:8px}
+.inquiry-status-edit{border:1px solid rgba(var(--cream),.075);border-radius:8px;background:rgba(var(--cream),.022);padding:9px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:end}
 .inquiry-status-edit label{font-size:8px;letter-spacing:.16em}
-.inquiry-status-edit select{padding:10px 11px}
+.inquiry-status-edit select{padding:9px 10px}
 .inquiry-status-edit .btn{width:max-content}
 .inquiry-empty{border:1px dashed rgba(var(--cream),.12);border-radius:8px;background:rgba(var(--cream),.018);padding:34px;text-align:center;color:rgba(var(--cream),.48)}
 .inquiry-command{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.45fr);gap:14px;align-items:start;margin-bottom:14px}
@@ -222,13 +230,14 @@ tr:last-child td{border-bottom:0}
 .comms-guidance .actions{justify-content:flex-start}
 .comms-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:14px}
 .message-list{display:grid;gap:10px}
-.message-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,.34fr);gap:14px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px}
+.message-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,.34fr);gap:12px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:13px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.message-card:hover{background:rgba(var(--cream),.035);border-color:rgba(var(--cream),.16);transform:translateY(-1px)}
 .message-card.inbound{border-color:rgba(219,186,123,.2);background:linear-gradient(135deg,rgba(219,186,123,.07),rgba(var(--cream),.018))}
 .message-card.outbound{border-color:rgba(154,170,136,.18)}
 .message-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
 .message-head strong{font-size:15px;color:var(--bone);line-height:1.25}
 .message-subhead{display:block;color:rgba(var(--cream),.45);font-size:12px;line-height:1.35;margin-bottom:8px}
-.message-body{color:rgba(var(--cream),.68);font-size:13px;line-height:1.45;white-space:pre-wrap}
+.message-body{color:rgba(var(--cream),.68);font-size:13px;line-height:1.45;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .message-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
 .message-actions{display:grid;gap:8px;justify-items:stretch}
 .message-actions .btn{width:100%}
@@ -251,7 +260,8 @@ tr:last-child td{border-bottom:0}
 .payment-stat strong{display:block;margin-top:10px;font-family:'Hanken Grotesk',sans-serif;font-size:30px;font-weight:500;letter-spacing:-.02em}
 .payment-stat small{display:block;margin-top:7px;color:rgba(var(--cream),.42);font-size:12px;line-height:1.35}
 .payment-ledger{display:grid;gap:10px}
-.payment-card{display:grid;grid-template-columns:minmax(230px,1fr) minmax(260px,1.2fr) minmax(190px,.72fr) auto;gap:14px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px}
+.payment-card{display:grid;grid-template-columns:minmax(230px,1fr) minmax(260px,1.2fr) minmax(190px,.72fr) auto;gap:14px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.payment-card:hover{background:rgba(var(--cream),.035);border-color:rgba(var(--cream),.16);transform:translateY(-1px)}
 .payment-card.failed{border-color:rgba(212,148,141,.25);background:linear-gradient(135deg,rgba(212,148,141,.085),rgba(var(--cream),.02))}
 .payment-card.pending{border-color:rgba(219,186,123,.22)}
 .payment-person strong,.payment-money strong,.payment-context strong{display:block;color:var(--bone);font-size:15px;line-height:1.25}
@@ -285,7 +295,8 @@ tr:last-child td{border-bottom:0}
 .accounting-side-row span{display:block;color:rgba(var(--cream),.5);font-size:12px;line-height:1.35}
 .accounting-side-row strong{color:var(--bone);font-size:15px;white-space:nowrap}
 .accounting-ledger{display:grid;gap:10px}
-.accounting-card{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.1fr) minmax(230px,.9fr) auto;gap:14px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px}
+.accounting-card{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.1fr) minmax(230px,.9fr) auto;gap:14px;align-items:start;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.accounting-card:hover{background:rgba(var(--cream),.035);border-color:rgba(var(--cream),.16);transform:translateY(-1px)}
 .accounting-card.failed{border-color:rgba(212,148,141,.25);background:linear-gradient(135deg,rgba(212,148,141,.085),rgba(var(--cream),.02))}
 .accounting-card.pending{border-color:rgba(219,186,123,.22)}
 .accounting-person strong,.accounting-money strong,.accounting-context strong{display:block;color:var(--bone);font-size:15px;line-height:1.25}
@@ -316,7 +327,8 @@ tr:last-child td{border-bottom:0}
 .reservation-stat strong{display:block;margin-top:10px;font-family:'Hanken Grotesk',sans-serif;font-size:30px;font-weight:500;letter-spacing:-.02em}
 .reservation-stat small{display:block;margin-top:7px;color:rgba(var(--cream),.42);font-size:12px;line-height:1.35}
 .reservation-board{display:grid;gap:10px}
-.reservation-card{display:grid;grid-template-columns:minmax(230px,.85fr) minmax(230px,.85fr) minmax(250px,.75fr) minmax(260px,1fr);gap:14px;align-items:stretch;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px}
+.reservation-card{display:grid;grid-template-columns:minmax(230px,.85fr) minmax(230px,.85fr) minmax(250px,.75fr) minmax(260px,1fr);gap:14px;align-items:stretch;border:1px solid rgba(var(--cream),.08);border-radius:8px;background:#111314;padding:14px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.reservation-card:hover{background:rgba(var(--cream),.035);border-color:rgba(var(--cream),.16);transform:translateY(-1px)}
 .reservation-card.needs{border-color:rgba(219,186,123,.22);background:linear-gradient(135deg,rgba(219,186,123,.07),rgba(var(--cream),.018))}
 .reservation-card.blocked{border-color:rgba(212,148,141,.24);background:linear-gradient(135deg,rgba(212,148,141,.08),rgba(var(--cream),.018))}
 .reservation-card.ready{border-color:rgba(154,170,136,.22)}
@@ -829,6 +841,7 @@ tr:last-child td{border-bottom:0}
 .customer-pane{min-height:360px}
 .customer-pane-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .customer-pane .detail-block{margin-bottom:12px}
+.customer-pane>.profile-drawer{margin-top:10px}
 .customer-command-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(340px,.52fr);gap:14px;align-items:start}
 .customer-command-main,.customer-command-side{display:grid;gap:12px}
 .customer-command-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.34fr);gap:12px;border:1px solid rgba(124,140,130,.18);border-radius:8px;background:linear-gradient(135deg,#f3f0e7,#fffaf0);padding:14px}
@@ -896,8 +909,8 @@ tr:last-child td{border-bottom:0}
 .section-title{font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 @media(max-width:980px){.shell{padding:20px}.top{margin-top:64px}.login,.split{display:block}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.corner-actions{right:14px;top:12px}.corner-status{display:none}.ops-panel{margin-top:12px}.tabs{padding-left:0;padding-right:0}}
 @media(max-width:900px){.finals-command-head{display:block}.finals-command-grid,.finals-money-row,.finals-summary,.finals-toolbar,.finals-action-step,.finals-workflow,.final-card,.final-card-top,.final-action-row,.final-context-grid,.finals-route-panel,.finals-decision,.payment-summary,.payment-card,.reservation-ops,.reservation-summary,.reservation-card{grid-template-columns:1fr}.finals-toolbar{max-width:none}.finals-action-step .actions,.final-card-actions,.final-action-box,.final-action-box .actions{justify-content:flex-start;justify-items:start}.final-decision-actions{justify-items:start}.final-decision-actions .btn{width:auto}.final-money{border-left:0;border-top:1px solid rgba(var(--cream),.08);padding-left:0;padding-top:14px}.inquiry-card-side{border-left:0;border-top:1px solid rgba(var(--cream),.07);padding-left:0;padding-top:12px}.payment-actions,.reservation-actions{justify-content:flex-start}}
-@media(max-width:1100px){.customer-card-row,.customer-filter-panel,.task-command,.task-board,.inquiry-card,.comms-command,.comms-layout,.message-card,.payment-command{grid-template-columns:1fr}.customer-card-actions,.task-filters,.task-card-actions,.inquiry-actions,.message-actions{justify-content:flex-start}}
-@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-briefing,.today-brief-side,.today-signal-strip,.today-command,.today-workspace,.customer-workspace-head,.customer-focus-grid,.customer-pane-grid,.customer-work-strip,.customer-activity-grid,.customer-operating-grid,.customer-message-workspace,.profile-inquiry-card,.priority-headline,.priority-row,.duplicate-command,.duplicate-stat-grid,.customer-command-grid,.customer-command-hero,.customer-command-signal,.relationship-mini,.payment-money,.reservation-money,.comms-stats,.task-stat-grid,.customer-task-mini{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.command-title{font-size:42px}.tabs{padding-left:0;padding-right:0}.customer-status-stack{justify-content:flex-start}}
+@media(max-width:1100px){.customer-card-row,.customer-filter-panel,.task-command,.task-board,.inquiry-card,.comms-command,.comms-layout,.message-card,.payment-command{grid-template-columns:1fr}.customer-card-actions,.task-filters,.task-card-actions,.inquiry-actions,.message-actions{justify-content:flex-start}.inquiry-card-side{border-left:0;border-top:1px solid rgba(var(--cream),.07);padding-left:0;padding-top:12px}}
+@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-briefing,.today-brief-side,.today-signal-strip,.today-command,.today-workspace,.customer-workspace-head,.customer-brain-grid,.customer-focus-grid,.customer-pane-grid,.customer-work-strip,.customer-activity-grid,.customer-operating-grid,.customer-message-workspace,.profile-inquiry-card,.priority-headline,.priority-row,.duplicate-command,.duplicate-stat-grid,.customer-command-grid,.customer-command-hero,.customer-command-signal,.relationship-mini,.payment-money,.reservation-money,.comms-stats,.task-stat-grid,.customer-task-mini{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.command-title{font-size:42px}.tabs{padding-left:0;padding-right:0}.customer-status-stack{justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -1405,11 +1418,12 @@ var context=[formatStatus(task.task_type||'task'),formatStatus(task.priority||'n
 var linked=customerId?customerLink(customerId,customerName):'<span class="muted">Owner-only task</span>';
 var details=[task.inquiries&&task.inquiries.inquiry_type,task.reservations&&task.reservations.status,task.description].filter(Boolean).join(' · ');
 var next=customerId?'Open the customer profile before replying, charging, or logging notes.':'Keep this as internal owner work unless it belongs to a customer.';
-return '<article class="task-card '+(hot?'hot ':'')+(waiting?'waiting':'')+'">'+
+var openAttr=customerId?' data-open-task-customer="'+esc(customerId)+'"':'';
+return '<article class="task-card '+(hot?'hot ':'')+(waiting?'waiting':'')+'"'+openAttr+'>'+
 '<div class="task-card-main"><div class="task-card-title">'+dueStatus(task)+'<strong>'+esc(task.title||'Task')+'</strong></div>'+
 '<div class="task-card-meta"><span class="pill">'+esc(context)+'</span></div>'+
 '<p>'+linked+'</p>'+(details?'<p class="task-card-context">'+esc(details)+'</p>':'')+'</div>'+
-'<div class="task-card-actions"><div class="task-card-owner"><strong>'+esc(customerId?'Customer task':'Owner task')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Done</button></div>'+
+'<div class="task-card-actions"><div class="task-card-owner"><span>Next</span><strong>'+esc(customerId?'Open profile':'Owner work')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Done</button></div>'+
 '</article>';
 }
 
@@ -1429,6 +1443,7 @@ document.getElementById('createTaskBtn').addEventListener('click',createTaskFrom
 bindTaskCustomerPicker();
 bindTaskButtons();
 bindCustomerOpeners();
+document.querySelectorAll('[data-open-task-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary'))return;openCustomer(card.dataset.openTaskCustomer)})});
 }
 
 async function createTaskFromHub(){
@@ -2276,19 +2291,52 @@ renderRelationshipSnapshot(detail)+
 '</aside></div></div>';
 }
 
+function renderCustomerSalesSnapshot(detail){
+var reservations=detail.reservations||[];
+var payments=detail.payments||[];
+var methods=detail.payment_methods||[];
+var outstanding=profileOutstanding(detail);
+var collected=sumPayments(payments);
+var saved=methods.some(function(row){return row.stripe_payment_method_id&&row.future_charge_authorized});
+var needsNotice=reservations.filter(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id}).length;
+var ready=reservations.filter(function(row){return finalBalanceReady(row)&&reservationChargeId(row)}).length;
+var next=ready?'Dry run before collecting any final balance.':(needsNotice?'Send the required balance notice before collecting.':(outstanding?'Review the reservation before taking payment.':'No money action is waiting.'));
+return '<section class="detail-block profile-snapshot-block"><div class="bar"><div><div class="section-title">Sales snapshot</div><p class="muted">'+esc(next)+'</p></div><button class="btn quiet small" data-profile-pane="history">Open timeline</button></div><div class="profile-overview">'+
+'<div class="profile-stat"><span>Collected</span><strong>'+money(collected)+'</strong></div>'+
+'<div class="profile-stat"><span>Outstanding</span><strong>'+money(outstanding)+'</strong></div>'+
+'<div class="profile-stat"><span>Reservations</span><strong>'+esc(reservations.length)+'</strong></div>'+
+'<div class="profile-stat"><span>Saved card</span><strong>'+esc(saved?'Authorized':'Not ready')+'</strong></div>'+
+'<div class="profile-stat"><span>Needs notice</span><strong>'+esc(needsNotice)+'</strong></div>'+
+'<div class="profile-stat"><span>Ready check</span><strong>'+esc(ready)+'</strong></div>'+
+'</div></section>';
+}
+
+function renderCustomerHistorySnapshot(detail){
+var notes=detail.internal_notes||[];
+var items=timelineItems(detail);
+var last=items[0];
+var nextNote=notes[0];
+return '<section class="detail-block profile-snapshot-block"><div class="bar"><div><div class="section-title">History snapshot</div><p class="muted">Newest context first. Add notes only when there is real relationship or operational context to remember.</p></div></div><div class="profile-overview">'+
+'<div class="profile-stat"><span>Timeline events</span><strong>'+esc(items.length)+'</strong></div>'+
+'<div class="profile-stat"><span>Internal notes</span><strong>'+esc(notes.length)+'</strong></div>'+
+'<div class="profile-stat"><span>Last touch</span><strong>'+esc(last?date(last.at):'None yet')+'</strong><p class="muted">'+esc(last?last.title:'No activity recorded')+'</p></div>'+
+'<div class="profile-stat"><span>Latest note</span><strong>'+esc(nextNote?formatStatus(nextNote.note_type||'note'):'None yet')+'</strong><p class="muted">'+esc(nextNote?String(nextNote.body||'').slice(0,90):'Use the drawer below to add one.')+'</p></div>'+
+'</div></section>';
+}
+
 function renderCustomerPane(detail,raw,emailHref,smsHref){
 var pane=activeProfilePane(detail,raw);
 if(pane==='profile'){
 return '<div class="customer-pane"><section class="detail-block profile-snapshot-block"><div class="bar"><div><div class="section-title">Profile snapshot</div><p class="muted">The customer record everything else connects to.</p></div></div><div class="profile-overview">'+renderProfileOverview(detail)+'</div>'+renderProfileHubs(detail)+'</section><details class="profile-drawer"><summary>Edit customer record</summary><div class="profile-drawer-body">'+renderEditableCustomerRecord(detail.customer||{})+'</div></details></div>';
 }
 if(pane==='messages'){
-return '<div class="customer-pane">'+(raw?'<div class="notice warn"><strong>Raw backup profile.</strong><br>Organize this person into the private CRM before sending tracked messages from the hub.</div>':renderMessagePortal(detail,emailHref,smsHref))+'<div class="detail-block"><div class="section-title">Contact form messages</div>'+renderProfileInquiries(detail.inquiries||[])+'</div></div>';
+return '<div class="customer-pane">'+(raw?'<div class="notice warn"><strong>Raw backup profile.</strong><br>Organize this person into the private CRM before sending tracked messages from the hub.</div>':renderMessagePortal(detail,emailHref,smsHref))+'<details class="profile-drawer"><summary>Contact-form message history</summary><div class="profile-drawer-body">'+renderProfileInquiries(detail.inquiries||[])+'</div></details></div>';
 }
 if(pane==='sales'&&isOwner()){
-return '<div class="customer-pane"><div class="detail-block"><div class="section-title">Reservations + final balance</div>'+renderProfileReservations(detail.reservations||[])+'</div><div class="detail-block"><div class="section-title">Payments</div>'+renderProfilePayments(detail.payments||[])+'</div><div class="detail-block"><div class="section-title">Saved payment methods</div>'+renderPaymentMethods(detail.payment_methods||[])+'</div></div>';
+return '<div class="customer-pane">'+renderCustomerSalesSnapshot(detail)+'<div class="detail-block"><div class="section-title">Reservations + final balance</div>'+renderProfileReservations(detail.reservations||[])+'</div><details class="profile-drawer"><summary>Payment ledger</summary><div class="profile-drawer-body">'+renderProfilePayments(detail.payments||[])+'</div></details><details class="profile-drawer"><summary>Saved payment methods</summary><div class="profile-drawer-body">'+renderPaymentMethods(detail.payment_methods||[])+'</div></details></div>';
 }
 if(pane==='history'){
-return '<div class="customer-pane">'+renderInternalNotesBlock(detail)+'<div class="detail-block"><div class="section-title">Relationship timeline</div>'+renderTimeline(detail)+'</div></div>';
+return '<div class="customer-pane">'+renderCustomerHistorySnapshot(detail)+'<details class="profile-drawer"><summary>Add or review internal notes</summary><div class="profile-drawer-body">'+renderInternalNotesBlock(detail)+'</div></details><div class="detail-block"><div class="section-title">Relationship timeline</div>'+renderTimeline(detail)+'</div></div>';
 }
 if(pane==='cleanup'){
 return '<div class="customer-pane"><div class="notice warn"><strong>Cleanup tools.</strong><br>Use these only when you are fixing duplicates, archiving old records, or moving an inquiry to the correct person.</div>'+renderCrmManagement(detail)+'</div>';
@@ -2822,11 +2870,12 @@ var source=inquirySource(row);
 var relationship=inquiryRelationship(row);
 var next=inquiryNextAction(row);
 var status=formatStatus(row.status||'new');
-return '<article class="inquiry-card '+inquiryMatchClass(row)+'">'+
-'<div class="inquiry-card-main"><div class="inquiry-card-head"><div class="inquiry-person">'+inquirySignal(row)+'<strong>'+customerLink(customerId,name)+'</strong><span>'+esc(contact)+'</span></div><div class="inquiry-meta"><strong>'+esc(status)+'</strong><span>'+esc(date(row.created_at))+'</span></div></div>'+
-'<div class="inquiry-message"><strong>'+esc(row.product_interest||formatStatus(row.inquiry_type||'Website message'))+'</strong><p>'+esc(message)+'</p></div>'+
-'<div class="inquiry-context-row"><span class="pill">Source <strong>'+esc(source)+'</strong></span><span class="pill">Reason <strong>'+esc(relationship.title)+'</strong></span><span class="pill">Type <strong>'+esc(formatStatus(row.inquiry_type||'inquiry'))+'</strong></span></div></div>'+
-'<aside class="inquiry-card-side"><div class="inquiry-why"><span>Why it is here</span><strong>'+esc(relationship.title)+'</strong><small>'+esc(relationship.detail)+'</small></div><div class="next-read"><span>Next action</span><strong>'+esc(next.title)+'</strong><small>'+esc(next.detail)+'</small></div><div class="inquiry-status-edit">'+statusEdit+'</div><div class="inquiry-actions">'+openProfileButton(customerId,'Open profile')+taskAction+'</div></aside>'+
+var openAttr=customerId?' data-open-inquiry-customer="'+esc(customerId)+'"':'';
+return '<article class="inquiry-card '+inquiryMatchClass(row)+'"'+openAttr+'>'+
+'<div class="inquiry-card-main"><div class="inquiry-card-head"><div class="inquiry-person">'+inquirySignal(row)+'<strong>'+customerLink(customerId,name)+'</strong><span>'+esc(contact)+'</span></div><div class="inquiry-quick-meta"><span class="pill">'+esc(status)+'</span><span class="pill">'+esc(date(row.created_at))+'</span><span class="pill">'+esc(source)+'</span></div></div>'+
+'<div class="inquiry-next-compact"><span>Why it is here</span><strong>'+esc(relationship.title)+'</strong><small>'+esc(relationship.detail)+'</small></div></div>'+
+'<div class="inquiry-message"><strong>'+esc(row.product_interest||formatStatus(row.inquiry_type||'Website message'))+'</strong><p>'+esc(message)+'</p><div class="inquiry-context-row"><span class="pill">Type <strong>'+esc(formatStatus(row.inquiry_type||'inquiry'))+'</strong></span><span class="pill">Source <strong>'+esc(source)+'</strong></span></div></div>'+
+'<aside class="inquiry-card-side"><div class="inquiry-next-compact"><span>Next action</span><strong>'+esc(next.title)+'</strong><small>'+esc(next.detail)+'</small></div><div class="inquiry-status-edit">'+statusEdit+'</div><div class="inquiry-actions">'+openProfileButton(customerId,'Open profile')+taskAction+'</div></aside>'+
 '</article>';
 }
 
@@ -2836,6 +2885,7 @@ var otherRows=(state.inquiries||[]).filter(function(row){return !contactMessageI
 var otherNotice=otherRows.length?'<details class="crm-drawer"><summary>Other CRM signals ('+esc(otherRows.length)+')</summary>'+table(['Customer','Signal','Interest','Status','Date'],otherRows.slice(0,30).map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.email||row.phone||'Customer'),inquiryListRead(row),esc(row.product_interest||row.source_page||''),esc(row.status),esc(date(row.created_at))]}),true)+'</details>':'';
 document.getElementById('inquiries').innerHTML='<div class="bar"><div><div class="section-title">Inquiries</div><p class="muted">A focused intake queue for website messages that should become customer work.</p></div><button class="btn quiet" id="exportInquiries">Export CSV</button></div>'+inquiryIntakeSummary(contactRows,otherRows)+renderInquiryFilterBar(contactRows)+inquiryQueue(filteredInquiryRows(contactRows))+otherNotice;
 bindCustomerOpeners();
+document.querySelectorAll('[data-open-inquiry-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea'))return;openCustomer(card.dataset.openInquiryCustomer)})});
 document.querySelectorAll('[data-inquiry-queue-filter]').forEach(function(btn){btn.addEventListener('click',function(){state.inquiryQueueFilter=btn.dataset.inquiryQueueFilter||'all';renderInquiries()})});
 document.querySelectorAll('[data-task-from-inquiry]').forEach(function(btn){btn.addEventListener('click',async function(){await createTaskForInquiry(btn.dataset.taskFromInquiry,btn.dataset.taskCustomer)})});
 document.querySelectorAll('#inquiries [data-save-inquiry-status]').forEach(function(btn){btn.addEventListener('click',async function(){await saveInquiryStatusFromProfile(btn.dataset.saveInquiryStatus,'')})});
@@ -2850,6 +2900,7 @@ document.getElementById('refreshReservations').addEventListener('click',loadCurr
 var miniRefresh=document.getElementById('refreshReservationsMini');
 if(miniRefresh)miniRefresh.addEventListener('click',loadCurrent);
 bindCustomerOpeners();
+document.querySelectorAll('[data-open-reservation-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary,details'))return;openCustomer(card.dataset.openReservationCustomer)})});
 document.querySelectorAll('#reservations [data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.jumpTab)})});
 }
 
@@ -2885,7 +2936,8 @@ var card=row.stripe_payment_method_saved?'Saved card':'No saved card';
 var next=row.charge_eligible?'Run dry run before charging':(row.notice_required?'Send final-balance notice':(row.blocked_reason?'Manual review needed':(row.final_balance_notice_sent_at?'Waiting / already notified':'No urgent action')));
 var nextHelp=row.charge_eligible?'Ready only means safe to check. Dry run before collecting.':(row.notice_required?'This customer must receive the balance email before any charge attempt.':(row.blocked_reason?'Use the customer profile and Stripe context before taking action.':'Keep connected to the customer profile for fulfillment.'));
 var actions='<div class="reservation-actions">'+openProfileButton(row.customer_id,'Open profile')+'<button class="btn quiet small" data-jump-tab="finals">Final balance</button></div>';
-return '<article class="reservation-card '+className+'">'+
+var openAttr=row.customer_id?' data-open-reservation-customer="'+esc(row.customer_id)+'"':'';
+return '<article class="reservation-card '+className+'"'+openAttr+'>'+
 '<div class="reservation-person"><span class="status '+readyClass(group)+'">'+esc(group)+'</span><strong>'+customerLink(row.customer_id,customer)+'</strong><span>'+esc(row.email||'No email')+'</span><span>'+esc(row.status||'Reservation')+'</span></div>'+
 '<div class="reservation-product"><strong>'+product+'</strong><span>Started '+esc(date(row.checkout_started_at||row.reservation_date)||'Unknown')+'</span><span>Deposit paid '+esc(row.paid_at?date(row.paid_at):'Not recorded')+'</span><span>Notice '+esc(row.final_balance_notice_sent_at?date(row.final_balance_notice_sent_at):'Not sent')+'</span></div>'+
 '<div class="reservation-money"><div><span>Deposit</span><strong>'+money(row.deposit_amount||0)+'</strong></div><div><span>Final balance</span><strong>'+money(row.final_balance_total||0)+'</strong></div></div>'+
@@ -2901,6 +2953,7 @@ var syncStripeBtn=document.getElementById('syncStripePaymentBtn');
 if(syncStripeBtn){syncStripeBtn.addEventListener('click',syncStripePayment)}
 document.querySelectorAll('#payments [data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(){activeTab=btn.dataset.jumpTab;loadCurrent()})});
 bindCustomerOpeners();
+document.querySelectorAll('[data-open-payment-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary,details'))return;openCustomer(card.dataset.openPaymentCustomer)})});
 }
 
 function paymentAmounts(row){
@@ -2953,7 +3006,8 @@ var amounts=paymentAmounts(row);
 var feeLabel=money(amounts.fee)+(amounts.estimated?' est.':'');
 var label=failed?'Payment needs review':(pending?'Payment is still processing':'Payment recorded');
 var context=failed?'Review this before fulfillment or any customer promise.':(pending?'Do not count this as settled cash until Stripe finishes processing.':'Connected to the customer money timeline.');
-return '<article class="payment-card '+(failed?'failed ':pending?'pending ':'')+'">'+
+var openAttr=customerId?' data-open-payment-customer="'+esc(customerId)+'"':'';
+return '<article class="payment-card '+(failed?'failed ':pending?'pending ':'')+'"'+openAttr+'>'+
 '<div class="payment-person"><span class="status '+(failed?'blocked':pending?'waiting':'ready')+'">'+esc(formatStatus(row.status||'paid'))+'</span><strong>'+customerLink(customerId,customer)+'</strong><span>'+esc(formatStatus(row.payment_type||'payment'))+' · '+esc(date(row.occurred_at))+'</span></div>'+
 '<div class="payment-money"><div><span>Gross</span><strong>'+money(amounts.gross)+'</strong></div><div><span>Stripe fee</span><strong>'+esc(feeLabel)+'</strong></div><div><span>Net</span><strong>'+money(amounts.net)+'</strong></div></div>'+
 '<div class="payment-context"><strong>'+esc(label)+'</strong><span>'+esc(context)+'</span><details class="payment-card-more"><summary>Stripe details</summary><span>'+esc(row.stripe_customer_id||'No Stripe customer shown')+'</span><code>'+esc(row.stripe_payment_intent_id||'No payment intent shown')+'</code></details></div>'+
@@ -3025,6 +3079,7 @@ document.getElementById('exportMessages').addEventListener('click',function(){ex
 document.getElementById('exportSmsOptins').addEventListener('click',function(){exportCsv('yogacloak-sms-optins.csv',['customer','phone','status','source','date'],optins.map(function(row){return [row.customers&&row.customers.full_name||row.phone,row.phone,row.status,row.source_page,row.created_at]}))});
 document.querySelectorAll('#communications [data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.jumpTab)})});
 bindCustomerOpeners();
+document.querySelectorAll('[data-open-message-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary'))return;openCustomer(card.dataset.openMessageCustomer)})});
 }
 
 function renderCommsCommand(data,comms,optins,inbound){
@@ -3064,7 +3119,8 @@ var body=row.subject||row.body||row.status||'Message logged';
 var label=direction==='inbound'?'Customer replied':'Sent from hub';
 var contact=[row.customers&&row.customers.email,row.customers&&row.customers.phone].filter(Boolean).join(' · ')||'Open profile for contact details';
 var next=direction==='inbound'?'Reply, add a note, or create a follow-up task.':'Logged for relationship history.';
-return '<article class="message-card '+esc(direction)+'"><div><div class="message-head"><span class="status '+(direction==='inbound'?'needs':'ready')+'">'+esc(label)+'</span><strong>'+customerLink(customerId,customer)+'</strong></div><span class="message-subhead">'+esc(contact)+'</span><div class="message-body">'+esc(body)+'</div><div class="message-meta"><span class="pill">'+esc(channel)+'</span><span class="pill">'+esc(formatStatus(row.status||direction))+'</span><span class="pill">'+esc(date(row.created_at))+'</span></div></div><div class="message-actions"><div class="message-next"><strong>'+esc(direction==='inbound'?'Next best action':'Saved context')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,direction==='inbound'?'Reply in profile':'Open profile')+'</div></article>';
+var openAttr=customerId?' data-open-message-customer="'+esc(customerId)+'"':'';
+return '<article class="message-card '+esc(direction)+'"'+openAttr+'><div><div class="message-head"><span class="status '+(direction==='inbound'?'needs':'ready')+'">'+esc(label)+'</span><strong>'+customerLink(customerId,customer)+'</strong></div><span class="message-subhead">'+esc(contact)+'</span><div class="message-body">'+esc(body)+'</div><div class="message-meta"><span class="pill">'+esc(channel)+'</span><span class="pill">'+esc(formatStatus(row.status||direction))+'</span><span class="pill">'+esc(date(row.created_at))+'</span></div></div><div class="message-actions"><div class="message-next"><strong>'+esc(direction==='inbound'?'Next best action':'Saved context')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,direction==='inbound'?'Reply in profile':'Open profile')+'</div></article>';
 }
 
 function renderSmsOptinCards(optins){
@@ -3311,6 +3367,7 @@ document.getElementById('accounting').innerHTML=
 '<details class="accounting-drawer"><summary>Open accounting export details</summary><div class="accounting-drawer-body">'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Stripe fees actual + estimated',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Pending balances',money(t.pending_balances||t.outstanding_balances)],['Failed payments',t.failed_payments||0],['Unpaid reservations',t.unpaid_reservations||0],['Unfulfilled reservations',t.unfulfilled||0],['Converted / fulfilled',t.fulfilled_or_converted||0]])+'</div></details>';
 document.getElementById('exportCsv').addEventListener('click',exportAccountingCsv);
 bindCustomerOpeners();
+document.querySelectorAll('[data-open-accounting-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary,details'))return;openCustomer(card.dataset.openAccountingCustomer)})});
 }
 
 function renderAccountingFocus(t){
@@ -3365,7 +3422,8 @@ var customer=row.customers||{};
 var status=String(row.status||'').toLowerCase();
 var klass=status.includes('fail')?'failed':(status.includes('pending')?'pending':'');
 var feeSource=row.fee_is_estimated?'Estimated fee':'Stripe fee';
-return '<article class="accounting-card '+klass+'"><div class="accounting-person"><strong>'+customerLink(customer.id,customer.full_name||'Customer')+'</strong><span>'+esc(customer.email||customer.phone||'No contact info')+'</span><span>'+esc(date(row.occurred_at))+'</span></div><div class="accounting-money"><div><span>Gross</span><strong>'+money(amount)+'</strong></div><div><span>'+esc(feeSource)+'</span><strong>'+money(fee)+'</strong></div><div><span>Net</span><strong>'+money(net)+'</strong></div></div><div class="accounting-context"><strong>'+esc(titleCase(row.payment_type||'payment'))+' · '+esc(row.status||'unknown')+'</strong><span>'+esc(row.fee_is_estimated?'Fee estimated until Stripe balance transaction data is available.':'Fee came from Stripe or saved transaction data.')+'</span><code>'+esc(row.stripe_payment_intent_id||'No Stripe ID saved')+'</code></div><div class="accounting-actions">'+openProfileButton(customer.id,'Open profile')+'</div></article>';
+var openAttr=customer.id?' data-open-accounting-customer="'+esc(customer.id)+'"':'';
+return '<article class="accounting-card '+klass+'"'+openAttr+'><div class="accounting-person"><strong>'+customerLink(customer.id,customer.full_name||'Customer')+'</strong><span>'+esc(customer.email||customer.phone||'No contact info')+'</span><span>'+esc(date(row.occurred_at))+'</span></div><div class="accounting-money"><div><span>Gross</span><strong>'+money(amount)+'</strong></div><div><span>'+esc(feeSource)+'</span><strong>'+money(fee)+'</strong></div><div><span>Net</span><strong>'+money(net)+'</strong></div></div><div class="accounting-context"><strong>'+esc(titleCase(row.payment_type||'payment'))+' · '+esc(row.status||'unknown')+'</strong><span>'+esc(row.fee_is_estimated?'Fee estimated until Stripe balance transaction data is available.':'Fee came from Stripe or saved transaction data.')+'</span><code>'+esc(row.stripe_payment_intent_id||'No Stripe ID saved')+'</code></div><div class="accounting-actions">'+openProfileButton(customer.id,'Open profile')+'</div></article>';
 }
 
 function titleCase(value){
