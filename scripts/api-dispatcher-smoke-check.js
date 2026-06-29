@@ -52,11 +52,11 @@ async function call(options) {
 
 const session = await call({ route: 'admin-session' });
 assert.equal(session.statusCode, 200);
-assert.deepEqual(session.body, { ok: true, authenticated: false });
+assert.deepEqual(session.body, { ok: true, authenticated: false, user: null });
 
 const sessionFromUrl = await call({ route: 'admin-session', queryPath: undefined });
 assert.equal(sessionFromUrl.statusCode, 200);
-assert.deepEqual(sessionFromUrl.body, { ok: true, authenticated: false });
+assert.deepEqual(sessionFromUrl.body, { ok: true, authenticated: false, user: null });
 
 const adminPage = await call({ route: 'admin-page' });
 assert.equal(adminPage.statusCode, 401);
@@ -84,7 +84,7 @@ const parsedJson = await call({
   headers: { 'content-type': 'application/json' }
 });
 assert.equal(parsedJson.statusCode, 401);
-assert.deepEqual(parsedJson.body, { error: 'Invalid admin token.' });
+assert.deepEqual(parsedJson.body, { error: 'Invalid profile access code.' });
 
 const twilio = await call({
   method: 'POST',

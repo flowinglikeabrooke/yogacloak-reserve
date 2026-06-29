@@ -14,6 +14,7 @@ alter table if exists payment_methods enable row level security;
 alter table if exists customer_events enable row level security;
 alter table if exists communications enable row level security;
 alter table if exists internal_notes enable row level security;
+alter table if exists admin_users enable row level security;
 alter table if exists admin_actions enable row level security;
 alter table if exists airtable_sync_log enable row level security;
 alter table if exists automation_rules enable row level security;
@@ -27,6 +28,7 @@ comment on table payments is 'Private operational payment records. Stripe remain
 comment on table payment_methods is 'Non-card payment method references only. No raw card data.';
 comment on table communications is 'Private inbound/outbound customer communication history.';
 comment on table internal_notes is 'Private owner CRM notes.';
+comment on table admin_users is 'Private admin team profiles. RLS enabled; owner-controlled server access only.';
 comment on table admin_actions is 'Private admin audit trail.';
 comment on table airtable_sync_log is 'Private Airtable raw backup reconciliation log.';
 comment on table automation_rules is 'Private CRM automation rules. RLS enabled; server-only access via service role.';

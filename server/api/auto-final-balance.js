@@ -3,13 +3,13 @@
 
 import { auditAdminAction } from '../../lib/admin-audit.js';
 import { autoChargeReadyFinalBalances } from '../../lib/final-balance-auto-charge.js';
-import { checkRateLimit, rejectLargeRequest, requireAdmin } from '../../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest, requireOwner } from '../../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ error: 'Method not allowed' });
   if (!checkRateLimit(req, res, { maxRequests: 2, windowSeconds: 60, keyPrefix: 'auto-final-balance' })) return;
   if (rejectLargeRequest(req, res, 12 * 1024)) return;
-  if (!requireAdmin(req, res)) return;
+  if (!requireOwner(req, res)) return;
 
   try {
     const dryRun = req.method === 'GET' || req.body?.dry_run === true;

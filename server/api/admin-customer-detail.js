@@ -10,6 +10,15 @@ export default async function handler(req, res) {
     if (!customerId) return res.status(400).json({ error: 'Missing customer id.' });
     const detail = await loadCustomerDetail(customerId);
     if (!detail) return res.status(404).json({ error: 'Customer not found.' });
+    if (req.adminUser?.role !== 'owner') {
+      detail.reservations = [];
+      detail.payments = [];
+      detail.payment_methods = [];
+      if (detail.customer) {
+        delete detail.customer.stripe_customer_id;
+      }
+      detail.money_redacted = true;
+    }
     return res.status(200).json({ ok: true, ...detail });
   } catch (err) {
     console.error('Admin customer detail error:', err);

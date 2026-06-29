@@ -4,7 +4,7 @@
 
 import { chargeFinalBalanceReservation, escapeHtml } from '../../lib/final-balance.js';
 import { auditAdminAction } from '../../lib/admin-audit.js';
-import { checkRateLimit, rejectLargeRequest, requireAdmin, sendEmail } from '../../lib/yogacloak-ops.js';
+import { checkRateLimit, rejectLargeRequest, requireOwner, sendEmail } from '../../lib/yogacloak-ops.js';
 
 function ownerEmail() {
   return process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || process.env.EMAIL_TO || 'hello@yogacloak.com';
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!checkRateLimit(req, res, { maxRequests: 3, windowSeconds: 60, keyPrefix: 'money-batch' })) return;
   if (rejectLargeRequest(req, res, 32 * 1024)) return;
-  if (!requireAdmin(req, res)) return;
+  if (!requireOwner(req, res)) return;
 
   const reservationIds = uniqueReservationIds(req.body?.reservation_record_ids);
   const dryRun = req.body?.dry_run === true;

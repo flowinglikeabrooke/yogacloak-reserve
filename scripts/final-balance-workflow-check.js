@@ -98,7 +98,7 @@ includes(apiDispatcher, "'auto-final-balance': autoFinalBalance", 'API dispatche
 includes(apiDispatcher, 'bodyParser: false', 'API dispatcher preserves raw-body support for Stripe webhooks');
 includes(apiDispatcher, "name === 'stripe-webhook'", 'API dispatcher does not pre-parse Stripe webhook raw body');
 notIncludes(batchEndpoint, "stripeRequest('payment_intents'", 'batch endpoint must not duplicate Stripe charge logic');
-includes(batchEndpoint, 'requireAdmin(req, res)', 'batch endpoint requires admin authorization');
+includes(batchEndpoint, 'requireOwner(req, res)', 'batch endpoint requires owner authorization');
 includes(batchEndpoint, "const skipCode = skipReasonCode(message)", 'unsafe records are classified before reporting');
 notIncludes(batchEndpoint, "dryRun ||", 'dry runs must not hide true backend failures as skipped records');
 includes(batchEndpoint, "status: skipCode ? 'skipped' : 'failed'", 'unsafe records are skipped instead of treated as charged');
@@ -121,7 +121,7 @@ includes(batchEndpoint, 'if (dryRun) return;', 'dry runs do not email owner summ
 includes(batchEndpoint, 'owner_summary_email: ownerSummaryEmail', 'batch response reports owner summary email status');
 includes(batchEndpoint, 'escapeHtml(summaryRows(results))', 'owner summary result rows are HTML escaped');
 includes(autoEndpoint, 'autoChargeReadyFinalBalances({ dryRun, limit })', 'auto final-balance endpoint uses shared auto-charge helper');
-includes(autoEndpoint, 'requireAdmin(req, res)', 'auto final-balance endpoint requires admin authorization');
+includes(autoEndpoint, 'requireOwner(req, res)', 'auto final-balance endpoint requires owner authorization');
 includes(autoEndpoint, 'checkRateLimit(req, res', 'auto final-balance endpoint is rate limited');
 includes(autoCharge, 'readiness.charge_eligible && !readiness.already_charged', 'auto final-balance only selects emailed-and-ready uncharged reservations');
 includes(autoCharge, 'chargeFinalBalanceReservation(item.id, { dryRun })', 'auto final-balance reuses shared Stripe charge logic');

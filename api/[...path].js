@@ -1,4 +1,5 @@
 import adminAccounting from '../server/api/admin-accounting.js';
+import adminActions from '../server/api/admin-actions.js';
 import adminAddInternalNote from '../server/api/admin-add-internal-note.js';
 import adminAutomations from '../server/api/admin-automations.js';
 import adminCommunications from '../server/api/admin-communications.js';
@@ -56,6 +57,7 @@ export const config = {
 
 const routes = {
   'admin-accounting': adminAccounting,
+  'admin-actions': adminActions,
   'admin-add-internal-note': adminAddInternalNote,
   'admin-automations': adminAutomations,
   'admin-communications': adminCommunications,

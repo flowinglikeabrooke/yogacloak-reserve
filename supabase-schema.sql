@@ -69,6 +69,7 @@ create table if not exists inquiries (
 );
 
 create index if not exists inquiries_status_created_at_idx on inquiries (status, created_at desc);
+create index if not exists inquiries_customer_type_updated_idx on inquiries (customer_id, inquiry_type, updated_at desc);
 create unique index if not exists inquiries_submission_id_idx
   on inquiries ((metadata->>'submission_id'))
   where metadata ? 'submission_id';
@@ -195,16 +196,43 @@ create table if not exists internal_notes (
   created_at timestamptz default now()
 );
 
+create table if not exists admin_users (
+  id uuid primary key default gen_random_uuid(),
+  email text unique,
+  full_name text not null,
+  role text not null default 'staff',
+  status text not null default 'active',
+  permissions jsonb default '{}'::jsonb,
+  last_login_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists admin_users_role_status_idx on admin_users (role, status);
+
 create table if not exists admin_actions (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid references customers(id) on delete set null,
   reservation_id uuid references reservations(id) on delete set null,
+  admin_user_id text,
+  admin_user_email text,
+  admin_user_name text,
+  admin_user_role text,
   action_type text,
   title text,
   details text,
   metadata jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
+
+alter table if exists admin_actions
+  add column if not exists admin_user_id text,
+  add column if not exists admin_user_email text,
+  add column if not exists admin_user_name text,
+  add column if not exists admin_user_role text;
+
+create index if not exists admin_actions_user_created_idx on admin_actions (admin_user_email, created_at desc);
+create index if not exists admin_actions_role_created_idx on admin_actions (admin_user_role, created_at desc);
 
 create table if not exists airtable_sync_log (
   id uuid primary key default gen_random_uuid(),

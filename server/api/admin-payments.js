@@ -1,9 +1,9 @@
 import { loadPayments } from '../../lib/admin-hub-data.js';
-import { requireAdmin } from '../../lib/yogacloak-ops.js';
+import { requireOwner } from '../../lib/yogacloak-ops.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-  if (!requireAdmin(req, res)) return;
+  if (!requireOwner(req, res)) return;
 
   try {
     const payments = await loadPayments();

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { CSRF_COOKIE, hasAdminSession } from '../../lib/admin-auth.js';
+import { CSRF_COOKIE, getAdminSession } from '../../lib/admin-auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,8 +45,8 @@ button{width:100%;border:0;border-radius:999px;background:#fbf8f0;color:#1e2320;
 <main>
 <p style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#7c8c82">yogacloak</p>
 <h1>Private admin.</h1>
-<p>This CRM is blocked until your admin session is verified.</p>
-<label>Admin token<input id="token" type="password" autocomplete="off" autofocus></label>
+<p>This CRM is blocked until your work profile is verified.</p>
+<label>Profile access code<input id="token" type="password" autocomplete="off" autofocus></label>
 <button id="login">Open admin hub</button>
 <div id="msg" class="error"></div>
 </main>
@@ -59,7 +59,7 @@ msg.textContent='';
 var res=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:document.getElementById('token').value.trim()})});
 if(res.ok){location.reload();return}
 var data=await res.json().catch(function(){return {}});
-msg.textContent=(data.error||'Could not log in.')+' If you just changed ADMIN_TOKEN in Vercel, redeploy Production and refresh this page.';
+msg.textContent=(data.error||'Could not log in.')+' If you just changed profile codes in Vercel, redeploy Production and refresh this page.';
 }
 </script>
 </body>
@@ -78,14 +78,18 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end('Method not allowed');
   securityHeaders(res);
 
-  if (!hasAdminSession(req)) {
+  const session = getAdminSession(req);
+  if (!session) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(401).send(loginPage());
   }
 
   const htmlPath = path.join(__dirname, '..', '..', 'private', 'admin-hub.html');
   const csrf = parseCookies(req)[CSRF_COOKIE] || '';
-  const html = fs.readFileSync(htmlPath, 'utf8').replace('__ADMIN_CSRF_TOKEN__', csrf);
+  const safeUserJson = JSON.stringify(session).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/</g, '\\u003c');
+  const html = fs.readFileSync(htmlPath, 'utf8')
+    .replace('__ADMIN_CSRF_TOKEN__', csrf)
+    .replace('__ADMIN_USER_JSON__', safeUserJson);
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   return res.status(200).send(html);
 }

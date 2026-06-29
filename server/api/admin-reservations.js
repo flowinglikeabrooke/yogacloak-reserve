@@ -10,7 +10,7 @@ import {
   listRecords,
   parseNotes,
   productLabel,
-  requireAdmin,
+  requireOwner,
   statusFormula
 } from '../../lib/yogacloak-ops.js';
 import { readinessForFields } from '../../lib/final-balance.js';
@@ -48,7 +48,7 @@ function finalBalanceSummary(rows) {
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-  if (!requireAdmin(req, res)) return;
+  if (!requireOwner(req, res)) return;
 
   try {
     const status = String(req.query?.status || '').trim();
