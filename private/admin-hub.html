@@ -372,8 +372,13 @@ menu.classList.toggle('hide',!open);
 document.getElementById('profileMenuBtn').setAttribute('aria-expanded',open?'true':'false');
 }
 async function endAdminSession(){
-await fetch('/api/admin-logout',{method:'POST'});
-location.reload();
+try{
+await post('/api/admin-logout',{});
+}catch(err){
+statusText.innerHTML='<span class="error">'+esc(err.message||'Could not end session.')+'</span>';
+return;
+}
+location.href='/yogacloak-admin.html';
 }
 document.getElementById('profileMenuBtn').addEventListener('click',function(event){event.stopPropagation();toggleProfileMenu()});
 document.getElementById('profileRefresh').addEventListener('click',function(){closeProfileMenu();loadCurrent()});
