@@ -908,6 +908,55 @@ tr:last-child td{border-bottom:0}
 .timeline-item strong{display:block;color:var(--ink);font-size:13px;margin-bottom:2px}
 .timeline-item span{display:block;color:rgba(30,35,32,.46);font-size:11px}
 .timeline-item .status{margin-top:6px;color:rgba(30,35,32,.58);border-color:rgba(30,35,32,.14)}
+.customer-page.detail{background:linear-gradient(180deg,#fffaf0,#f6f1e6);border-color:rgba(30,35,32,.075);box-shadow:0 38px 86px -58px rgba(0,0,0,.62)}
+.customer-page .detail-block,
+.customer-page .profile-drawer,
+.customer-page .task-composer,
+.customer-page .task-history-drawer,
+.customer-page .customer-operating-board,
+.customer-page .customer-task-preview,
+.customer-page .relationship-card,
+.customer-page .message-compose-card,
+.customer-page .message-history-card,
+.customer-page .profile-inquiries-card,
+.customer-page .customer-command-hero{border-color:rgba(30,35,32,.065);background:rgba(255,250,240,.62);box-shadow:none}
+.customer-page .detail-block{padding:16px;margin-top:12px}
+.customer-page .customer-workspace-head{border-bottom-color:rgba(30,35,32,.065);margin-bottom:12px;padding-bottom:16px}
+.customer-page .customer-pane-tabs{border-top-color:rgba(30,35,32,.055);border-bottom-color:rgba(30,35,32,.055);margin:10px 0 14px}
+.customer-page .customer-command-grid{gap:18px}
+.customer-page .customer-command-main,.customer-page .customer-command-side{gap:10px}
+.customer-page .customer-command-hero{background:linear-gradient(135deg,rgba(243,240,231,.68),rgba(255,250,240,.88));padding:12px}
+.customer-page .customer-next-panel{border-color:transparent;background:transparent;padding:12px;min-height:150px}
+.customer-page .customer-next-panel strong{font-size:28px}
+.customer-page .customer-fast-panel,
+.customer-page .customer-operating-card,
+.customer-page .customer-task-mini div,
+.customer-page .customer-task-next,
+.customer-page .relationship-mini div,
+.customer-page .profile-stat,
+.customer-page .profile-hub,
+.customer-page .customer-task-card,
+.customer-page .profile-message-card,
+.customer-page .profile-inquiry-card,
+.customer-page .crm-tool{border-color:rgba(30,35,32,.058);background:rgba(30,35,32,.018)}
+.customer-page .customer-fast-panel{background:rgba(30,35,32,.022)}
+.customer-page .customer-operating-board header,
+.customer-page .customer-task-preview header{border-bottom:1px solid rgba(30,35,32,.055);padding-bottom:10px}
+.customer-page .customer-operating-grid{gap:1px;border:1px solid rgba(30,35,32,.055);border-radius:8px;overflow:hidden;background:rgba(30,35,32,.055)}
+.customer-page .customer-operating-card{border:0;border-radius:0;background:rgba(255,250,240,.86);min-height:126px}
+.customer-page .customer-operating-card:hover{background:#fffaf0;transform:none}
+.customer-page .customer-operating-card.hot,
+.customer-page .customer-task-card.urgent,
+.customer-page .customer-brain-card.hot{background:rgba(212,148,141,.07);border-color:rgba(130,68,64,.14)}
+.customer-page .customer-operating-card.money,
+.customer-page .customer-brain-card.money{background:rgba(219,186,123,.065);border-color:rgba(164,132,68,.14)}
+.customer-page .profile-drawer summary,
+.customer-page .task-composer summary,
+.customer-page .task-history-drawer summary{background:rgba(255,250,240,.34);font-weight:700}
+.customer-page .profile-drawer[open] summary,
+.customer-page .task-composer[open] summary,
+.customer-page .task-history-drawer[open] summary{border-bottom:1px solid rgba(30,35,32,.055)}
+.customer-page .notice.warn{background:rgba(124,140,130,.075);border-color:rgba(124,140,130,.18)}
 .hide{display:none!important}
 .select-cell{width:42px}.select-cell input{width:auto}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
@@ -1396,7 +1445,8 @@ var lanes=[
 tasks.forEach(function(task){
 var type=String(task.task_type||'general');
 var customerId=task.customer_id||task.customers&&task.customers.id;
-var overdue=task.due_at&&Date.parse(task.due_at)<Date.now()&&task.status!=='done';
+var inactive=['done','archived'].includes(task.status);
+var overdue=task.due_at&&Date.parse(task.due_at)<Date.now()&&!inactive;
 if(overdue||task.priority==='urgent')lanes[0].rows.push(task);
 else if(['payment','final_balance','operations','accounting','payroll','inventory'].includes(type))lanes[2].rows.push(task);
 else if(customerId||['customer_reply','inquiry_followup'].includes(type))lanes[1].rows.push(task);
@@ -1422,25 +1472,27 @@ taskStatCard('Overdue',overdue,'Needs action now')+
 taskStatCard('Customer work',customerTasks,'Linked to profiles')+
 taskStatCard('Owner work',ownerTasks,'Internal business tasks')+
 taskStatCard('Completed',stats.done||0,'Saved in history')+
-'</div></div><aside class="task-command-side"><div><strong>'+esc(overdue?'Overdue work is waiting':'Queue is under control')+'</strong><p>'+esc(next)+' Open the profile when the task depends on a customer conversation, reservation, or payment.</p></div><div class="task-filters"><select id="taskFilter"><option value="active" '+(state.taskFilter==='active'?'selected':'')+'>Active</option><option value="overdue" '+(state.taskFilter==='overdue'?'selected':'')+'>Overdue</option><option value="" '+(!state.taskFilter?'selected':'')+'>All</option><option value="done" '+(state.taskFilter==='done'?'selected':'')+'>Completed</option></select><button class="btn quiet" id="reloadTasks">Refresh</button></div></aside></section>';
+'</div></div><aside class="task-command-side"><div><strong>'+esc(overdue?'Overdue work is waiting':'Queue is under control')+'</strong><p>'+esc(next)+' Open the profile when the task depends on a customer conversation, reservation, or payment.</p></div><div class="task-filters"><select id="taskFilter"><option value="active" '+(state.taskFilter==='active'?'selected':'')+'>Active</option><option value="overdue" '+(state.taskFilter==='overdue'?'selected':'')+'>Overdue</option><option value="" '+(!state.taskFilter?'selected':'')+'>All history</option><option value="done" '+(state.taskFilter==='done'?'selected':'')+'>Completed</option><option value="archived" '+(state.taskFilter==='archived'?'selected':'')+'>Archived</option></select><button class="btn quiet" id="reloadTasks">Refresh</button></div></aside></section>';
 }
 
 function taskCard(task){
 var customerId=task.customer_id||task.customers&&task.customers.id;
 var customerName=task.customers&&task.customers.full_name||'Owner task';
-var overdue=task.due_at&&Date.parse(task.due_at)<Date.now()&&task.status!=='done';
+var inactive=['done','archived'].includes(task.status);
+var overdue=task.due_at&&Date.parse(task.due_at)<Date.now()&&!inactive;
 var hot=overdue||['urgent','high'].includes(task.priority);
 var waiting=task.status==='waiting';
 var context=[formatStatus(task.task_type||'task'),formatStatus(task.priority||'normal'),task.due_at?'Due '+date(task.due_at):'No due date'].join(' · ');
 var linked=customerId?customerLink(customerId,customerName):'<span class="muted">Owner-only task</span>';
 var details=[task.inquiries&&task.inquiries.inquiry_type,task.reservations&&task.reservations.status,task.description].filter(Boolean).join(' · ');
-var next=customerId?'Open the customer profile before replying, charging, or logging notes.':'Keep this as internal owner work unless it belongs to a customer.';
+var next=inactive?'This is out of active todos but preserved in history.':(customerId?'Open the customer profile before replying, charging, or logging notes.':'Keep this as internal owner work unless it belongs to a customer.');
 var openAttr=customerId?' data-open-task-customer="'+esc(customerId)+'"':'';
+var actions=inactive?openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="open">Reopen</button>':openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="archived">Archive</button>';
 return '<article class="task-card '+(hot?'hot ':'')+(waiting?'waiting':'')+'"'+openAttr+'>'+
 '<div class="task-card-main"><div class="task-card-title">'+dueStatus(task)+'<strong>'+esc(task.title||'Task')+'</strong></div>'+
 '<div class="task-card-meta"><span class="pill">'+esc(context)+'</span></div>'+
 '<p>'+linked+'</p>'+(details?'<p class="task-card-context">'+esc(details)+'</p>':'')+'</div>'+
-'<div class="task-card-actions"><div class="task-card-owner"><span>Next</span><strong>'+esc(customerId?'Open profile':'Owner work')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,'Profile')+'<button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="in_progress">Start</button><button class="btn small" data-task-status="'+esc(task.id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(task.id)+'" data-status="archived">Archive</button></div>'+
+'<div class="task-card-actions"><div class="task-card-owner"><span>Next</span><strong>'+esc(inactive?'History item':(customerId?'Open profile':'Owner work'))+'</strong>'+esc(next)+'</div>'+actions+'</div>'+
 '</article>';
 }
 
@@ -3757,8 +3809,8 @@ return '<section class="panel finals-safety"><div class="bar"><div><div class="s
 '<span class="pill">Notice wait <strong>'+esc(s.notice_hours||24)+'h</strong></span>'+
 '<span class="pill">Webhook secret <strong>'+esc(s.stripe_webhook_secret_configured?'set':'missing')+'</strong></span>'+
 '</div></div></div>'+
-(locked?'<p class="error">Live final-balance charges are locked. You can send notices and run dry runs, but live collection stays blocked until ALLOW_LIVE_FINAL_CHARGES=true.</p>':'<p class="muted">Live collection is enabled. Continue using notices, the wait period, and dry runs before charging.</p>')+
-'<p class="muted">Run one Stripe test-mode reservation end to end before enabling live final charges.</p>'+
+(locked?'<p class="error">Live final-balance charges are locked. You can send notices and run dry runs, but live collection stays blocked until ALLOW_LIVE_FINAL_CHARGES=true.</p>':'<p class="muted">Live collection is enabled in Vercel. The CRM still blocks unsafe records: no saved card, no future-charge permission, no notice, active wait period, or duplicate charge risk.</p>')+
+'<p class="muted">Run one Stripe test-mode reservation end to end before enabling live final charges. Before collecting from real customers, dry run the batch first.</p>'+
 '</section>';
 }
 function exportAccountingCsv(){
