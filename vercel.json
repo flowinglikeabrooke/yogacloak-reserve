@@ -29,7 +29,7 @@
       ]
     },
     {
-      "source": "/api/:path(batch-final-balance|charge-final-balance|send-final-balance-notice|manage-reservation|sms-optins-export|daily-ops-runner)",
+      "source": "/api/:path(auto-final-balance|batch-final-balance|charge-final-balance|send-final-balance-notice|manage-reservation|sms-optins-export|daily-ops-runner)",
       "headers": [
         { "key": "Cache-Control", "value": "no-store" },
         { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive, nosnippet" },

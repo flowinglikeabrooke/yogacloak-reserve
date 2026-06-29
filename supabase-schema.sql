@@ -13,6 +13,8 @@ create table if not exists customers (
   status text default 'lead',
   contact_status text default 'not_contacted',
   tags text[] default '{}'::text[],
+  birthday date,
+  birthday_discount_code text,
   last_contacted_at timestamptz,
   next_follow_up_at timestamptz,
   source text,
@@ -43,7 +45,12 @@ create index if not exists customers_next_follow_up_at_idx on customers (next_fo
 alter table if exists customers
   add column if not exists tags text[] default '{}'::text[];
 
+alter table if exists customers
+  add column if not exists birthday date,
+  add column if not exists birthday_discount_code text;
+
 create index if not exists customers_tags_idx on customers using gin (tags);
+create index if not exists customers_birthday_idx on customers (birthday);
 
 create table if not exists inquiries (
   id uuid primary key default gen_random_uuid(),

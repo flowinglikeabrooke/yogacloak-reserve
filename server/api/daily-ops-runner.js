@@ -8,6 +8,7 @@ import { requireAdmin, sendEmail } from '../../lib/yogacloak-ops.js';
 import cleanupPendingCheckouts from '../../lib/jobs/cleanup-pending-checkouts.js';
 import sendAbandonedReservations from '../../lib/jobs/send-abandoned-reservations.js';
 import reconcileStripeAirtable from '../../lib/jobs/reconcile-stripe-airtable.js';
+import chargeReadyFinalBalances from '../../lib/jobs/charge-ready-final-balances.js';
 import lowInventoryAlert from '../../lib/jobs/low-inventory-alert.js';
 import dailyOwnerDigest from '../../lib/jobs/daily-owner-digest.js';
 import seoHealthCheck from '../../lib/jobs/seo-health-check.js';
@@ -16,6 +17,7 @@ const TASKS = [
   ['cleanup-pending-checkouts', cleanupPendingCheckouts],
   ['send-abandoned-reservations', sendAbandonedReservations],
   ['reconcile-stripe-airtable', reconcileStripeAirtable],
+  ['charge-ready-final-balances', chargeReadyFinalBalances],
   ['low-inventory-alert', lowInventoryAlert],
   ['daily-owner-digest', dailyOwnerDigest],
   ['seo-health-check', seoHealthCheck]

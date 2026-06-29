@@ -32,6 +32,7 @@ import adminUpdateCustomerNote from '../server/api/admin-update-customer-note.js
 import adminUpdateAutomation from '../server/api/admin-update-automation.js';
 import adminUpdateInquiryStatus from '../server/api/admin-update-inquiry-status.js';
 import availability from '../server/api/availability.js';
+import autoFinalBalance from '../server/api/auto-final-balance.js';
 import batchFinalBalance from '../server/api/batch-final-balance.js';
 import chargeFinalBalance from '../server/api/charge-final-balance.js';
 import contact from '../server/api/contact.js';
@@ -88,6 +89,7 @@ const routes = {
   'admin-update-customer-note': adminUpdateCustomerNote,
   'admin-update-inquiry-status': adminUpdateInquiryStatus,
   availability,
+  'auto-final-balance': autoFinalBalance,
   'batch-final-balance': batchFinalBalance,
   'charge-final-balance': chargeFinalBalance,
   contact,

@@ -11,6 +11,11 @@ export default async function handler(req, res) {
   try {
     const task = await createOwnerTask({
       customer_id: req.body?.customer_id,
+      customer_first_name: req.body?.customer_first_name,
+      customer_last_name: req.body?.customer_last_name,
+      customer_name: req.body?.customer_name,
+      customer_email: req.body?.customer_email,
+      customer_phone: req.body?.customer_phone,
       inquiry_id: req.body?.inquiry_id,
       reservation_id: req.body?.reservation_id,
       task_type: req.body?.task_type,

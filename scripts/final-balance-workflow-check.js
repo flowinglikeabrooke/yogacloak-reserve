@@ -23,15 +23,20 @@ function functionBody(file, name) {
 
 const finalBalance = 'lib/final-balance.js';
 const batchEndpoint = 'server/api/batch-final-balance.js';
+const autoEndpoint = 'server/api/auto-final-balance.js';
 const noticeEndpoint = 'server/api/send-final-balance-notice.js';
 const adminReservations = 'server/api/admin-reservations.js';
 const adminHub = 'private/admin-hub.html';
 const reserve = 'server/api/reserve.js';
 const stripeWebhook = 'server/api/stripe-webhook.js';
 const apiDispatcher = 'api/[...path].js';
+const dailyOps = 'server/api/daily-ops-runner.js';
+const autoCharge = 'lib/final-balance-auto-charge.js';
 const noRawCardFiles = [
   finalBalance,
   batchEndpoint,
+  autoEndpoint,
+  autoCharge,
   noticeEndpoint,
   adminReservations,
   reserve,
@@ -89,6 +94,7 @@ includes(finalBalance, 'const amountText = escapeHtml(money(amount))', 'final-ba
 
 includes(batchEndpoint, 'chargeFinalBalanceReservation(reservationId, { dryRun })', 'batch endpoint reuses shared charge logic');
 includes(apiDispatcher, "'batch-final-balance': batchFinalBalance", 'API dispatcher preserves /api/batch-final-balance public route');
+includes(apiDispatcher, "'auto-final-balance': autoFinalBalance", 'API dispatcher preserves /api/auto-final-balance public route');
 includes(apiDispatcher, 'bodyParser: false', 'API dispatcher preserves raw-body support for Stripe webhooks');
 includes(apiDispatcher, "name === 'stripe-webhook'", 'API dispatcher does not pre-parse Stripe webhook raw body');
 notIncludes(batchEndpoint, "stripeRequest('payment_intents'", 'batch endpoint must not duplicate Stripe charge logic');
@@ -114,6 +120,15 @@ includes(batchEndpoint, 'sendOwnerSummary({ dryRun, results })', 'owner summary 
 includes(batchEndpoint, 'if (dryRun) return;', 'dry runs do not email owner summary or charge');
 includes(batchEndpoint, 'owner_summary_email: ownerSummaryEmail', 'batch response reports owner summary email status');
 includes(batchEndpoint, 'escapeHtml(summaryRows(results))', 'owner summary result rows are HTML escaped');
+includes(autoEndpoint, 'autoChargeReadyFinalBalances({ dryRun, limit })', 'auto final-balance endpoint uses shared auto-charge helper');
+includes(autoEndpoint, 'requireAdmin(req, res)', 'auto final-balance endpoint requires admin authorization');
+includes(autoEndpoint, 'checkRateLimit(req, res', 'auto final-balance endpoint is rate limited');
+includes(autoCharge, 'readiness.charge_eligible && !readiness.already_charged', 'auto final-balance only selects emailed-and-ready uncharged reservations');
+includes(autoCharge, 'chargeFinalBalanceReservation(item.id, { dryRun })', 'auto final-balance reuses shared Stripe charge logic');
+includes(autoCharge, 'sendOwnerSummary({ dryRun, results', 'auto final-balance sends owner summary after real run');
+includes(autoCharge, 'if (dryRun) return { skipped: true', 'auto final-balance dry run does not email or charge');
+includes(autoCharge, 'Live final-balance charges are disabled.', 'auto final-balance reports live charge lock as a skipped safety state');
+includes(dailyOps, "['charge-ready-final-balances', chargeReadyFinalBalances]", 'daily ops runner includes final-balance auto charge job');
 
 includes(noticeEndpoint, 'sendFinalBalanceNoticeForReservation(reservationId)', 'notice endpoint reuses shared notice logic');
 
@@ -155,6 +170,10 @@ includes(adminHub, "['Reservation','Status','Final balance','Reason']", 'admin n
 includes(adminHub, '/api/batch-final-balance', 'admin can run batch final-balance endpoint');
 includes(adminHub, 'Dry run', 'admin exposes dry run action');
 includes(adminHub, 'Charge ready batch', 'admin exposes real batch charge action');
+includes(adminHub, 'Charge emailed + ready', 'admin exposes automatic emailed-and-ready charge action');
+includes(adminHub, 'Check emailed + ready', 'admin exposes automatic emailed-and-ready dry-run action');
+includes(adminHub, '/api/auto-final-balance', 'admin can run auto final-balance endpoint');
+includes(adminHub, 'runAutoFinalBalance', 'admin uses auto final-balance workflow');
 includes(adminHub, 'Ready amount', 'admin final-balance summary shows ready-to-charge amount');
 includes(adminHub, 'reservationLoadNotice()', 'admin shows reservation load/cap status');
 includes(adminHub, 'Showing ', 'admin warns when more reservation records exist than are loaded');

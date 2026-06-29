@@ -130,10 +130,20 @@ tr:last-child td{border-bottom:0}
 .automation-card p{color:rgba(var(--cream),.5);font-size:12px;line-height:1.45;margin-top:6px}
 .automation-card label{margin-top:10px}
 .automation-card textarea{min-height:128px}
+.automation-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.automation-flow div{border:1px solid rgba(var(--cream),.1);border-radius:8px;padding:10px;background:rgba(var(--cream),.035)}
+.automation-flow span{display:block;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(var(--cream),.42);font-weight:800}
+.automation-flow strong{display:block;margin-top:6px;font-size:14px;line-height:1.18}
 .toggle-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0}
 .toggle-row input[type=checkbox]{width:auto;accent-color:#d8c7a2}
 .check-row{display:flex;flex-direction:row;align-items:center;gap:9px;margin-top:10px;font-size:11px;letter-spacing:0;text-transform:none;color:rgba(30,35,32,.66)}
 .check-row input[type=checkbox]{width:auto;accent-color:var(--sage)}
+.field-help{display:block;margin-top:6px;font-size:11px;letter-spacing:0;text-transform:none;color:rgba(30,35,32,.5);font-weight:400;line-height:1.35}
+.hub-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.hub-picker{display:flex;gap:8px;flex-wrap:wrap}
+.hub-picker label{flex-direction:row;align-items:center;gap:6px;border:1px solid rgba(var(--cream),.11);border-radius:999px;padding:7px 10px;background:rgba(var(--cream),.035);font-size:10px;letter-spacing:.08em;color:rgba(var(--cream),.62)}
+.hub-picker input{width:auto;accent-color:#d8c7a2}
+.hub-work-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
 .automation-card .meta{margin-top:12px}
 .automation-log-body{white-space:pre-wrap;max-width:420px}
 .id-line{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:rgba(30,35,32,.52);word-break:break-all;margin-top:4px}
@@ -328,6 +338,43 @@ var items=[
 return '<div class="grid">'+items.map(function(item){return '<div class="card"><span>'+esc(item[0])+'</span><strong>'+esc(item[1]===undefined?0:item[1])+'</strong></div>'}).join('')+'</div>';
 }
 
+function hubCardDefinitions(summary){
+return [
+{id:'customers',label:'Customers',value:summary.customers||0,note:'People in CRM'},
+{id:'new_inquiries',label:'New inquiries',value:summary.new_inquiries||0,note:'Fresh site activity'},
+{id:'tasks_overdue',label:'Overdue tasks',value:summary.tasks_overdue||0,note:'Needs action now'},
+{id:'tasks_active',label:'Active tasks',value:summary.tasks_active||0,note:'Open owner work'},
+{id:'needs_notice',label:'Needs notice',value:summary.needs_notice||0,note:'Final balance email not sent'},
+{id:'ready_to_charge',label:'Ready to charge',value:summary.ready_to_charge||0,note:'Run dry run first'},
+{id:'not_contacted',label:'Not contacted',value:summary.not_contacted||0,note:'Customers needing first touch'},
+{id:'follow_ups_due',label:'Follow-ups due',value:summary.follow_ups_due||0,note:'Reply queue'},
+{id:'failed_payments',label:'Failed payments',value:summary.failed_payments||0,note:'Payment cleanup'},
+{id:'raw_backup',label:'Raw backup',value:Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0),note:'Airtable-only records'}
+];
+}
+
+function hubPrefs(){
+try{
+var saved=JSON.parse(localStorage.getItem('yogacloak_hub_cards')||'[]');
+if(Array.isArray(saved)&&saved.length)return new Set(saved);
+}catch(err){}
+return new Set(['customers','new_inquiries','tasks_overdue','tasks_active','needs_notice','ready_to_charge','follow_ups_due','failed_payments']);
+}
+
+function saveHubPrefs(){
+var ids=Array.from(document.querySelectorAll('[data-hub-card-toggle]')).filter(function(input){return input.checked}).map(function(input){return input.dataset.hubCardToggle});
+localStorage.setItem('yogacloak_hub_cards',JSON.stringify(ids));
+renderToday();
+}
+
+function renderHubCards(summary){
+var prefs=hubPrefs();
+var cards=hubCardDefinitions(summary);
+var visible=cards.filter(function(card){return prefs.has(card.id)});
+if(!visible.length)visible=cards.slice(0,4);
+return '<section class="panel"><div class="hub-toolbar"><div><div class="section-title">Main hub</div><p class="muted">Choose the cards you want to see first. This stays private to your browser.</p></div><div class="hub-picker">'+cards.map(function(card){return '<label><input type="checkbox" data-hub-card-toggle="'+esc(card.id)+'" '+(prefs.has(card.id)?'checked':'')+'> '+esc(card.label)+'</label>'}).join('')+'</div></div><div class="grid">'+visible.map(function(card){return '<div class="card"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></div>'}).join('')+'</div></section>';
+}
+
 function renderToday(){
 var root=document.getElementById('today');
 var data=state.dashboard;
@@ -338,10 +385,11 @@ var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_ba
 var canSyncRaw=data.database_enabled!==false&&rawBackupCount>0;
 var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="syncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'';
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
-root.innerHTML=renderCards(summary)+syncStatusNotice()+databaseNotice+rawNotice+rawSyncReport()+
+root.innerHTML=renderHubCards(summary)+syncStatusNotice()+databaseNotice+rawNotice+rawSyncReport()+
 '<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Signal','What happened','Contact','Date','Action'],tasks.map(function(row){return [esc(formatStatus(row.type)),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at)),openProfileButton(row.customer_id,'Open profile')]}),true)+'</section>'+
 '<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Signal','Contact','Details','Date','Action'],(data.recent_events||[]).map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [esc(row.title||row.event_type),customerLink(customerId,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at)),openProfileButton(customerId,'Open timeline')]}),true)+'</section>';
 bindCustomerOpeners();
+document.querySelectorAll('[data-hub-card-toggle]').forEach(function(input){input.addEventListener('change',saveHubPrefs)});
 var syncBtn=document.getElementById('syncRawBackupBtn');
 if(syncBtn){syncBtn.addEventListener('click',syncRawAirtable)}
 }
@@ -391,7 +439,8 @@ root.innerHTML='<div class="grid">'+
 '<div class="card"><span>Done</span><strong>'+esc(stats.done||0)+'</strong></div>'+
 '</div>'+
 '<section class="panel"><div class="bar"><div><div class="section-title">Task Center</div><p class="muted">Track customer replies, inquiry follow-ups, accounting, payroll, inventory, and anything else that should not get lost.</p></div><div class="actions"><select id="taskFilter"><option value="active" '+(state.taskFilter==='active'?'selected':'')+'>Active</option><option value="overdue" '+(state.taskFilter==='overdue'?'selected':'')+'>Overdue</option><option value="" '+(!state.taskFilter?'selected':'')+'>All</option><option value="done" '+(state.taskFilter==='done'?'selected':'')+'>Done</option></select><button class="btn quiet" id="reloadTasks">Refresh</button></div></div>'+
-'<div class="record-grid"><label>Task<input id="newTaskTitle" placeholder="Example: reply to Brooke about Wrap sizing"></label><label>Customer ID optional<input id="newTaskCustomerId" placeholder="Paste customer ID if linked"></label><label>Type<select id="newTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="newTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due<input id="newTaskDue" type="datetime-local"></label><label>Notes<textarea id="newTaskDescription" placeholder="What needs to happen?"></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" id="createTaskBtn">Add task</button></div></section>'+
+'<div class="notice"><strong>Link to a customer without pasting an ID.</strong><br>Add first and last name plus either email or phone. Leave the customer fields blank for a task that is only for you.</div>'+
+'<div class="record-grid"><label>Task<input id="newTaskTitle" placeholder="Example: reply about Wrap sizing"></label><label>First name<input id="newTaskFirstName" placeholder="Brooke"></label><label>Last name<input id="newTaskLastName" placeholder="Bein"></label><label>Email<input id="newTaskEmail" type="email" placeholder="brooke@example.com"></label><label>Phone<input id="newTaskPhone" placeholder="555-555-5555"></label><label>Type<select id="newTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="newTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due date<input id="newTaskDue" type="date"><span class="field-help">Pick a date from the calendar. Use month/year controls to move around.</span></label><label>Notes<textarea id="newTaskDescription" placeholder="What needs to happen?"></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" id="createTaskBtn">Add task</button></div></section>'+
 '<section class="panel"><div class="section-title">Needs attention</div>'+table(['State','Task','Linked to','Type','Priority','Due','Action'],taskRows(tasks),true)+'</section>';
 document.getElementById('taskFilter').addEventListener('change',function(){state.taskFilter=document.getElementById('taskFilter').value;loadCurrent()});
 document.getElementById('reloadTasks').addEventListener('click',loadCurrent);
@@ -405,7 +454,7 @@ var title=document.getElementById('newTaskTitle').value.trim();
 if(!title){statusText.innerHTML='<span class="error">Add a task title first.</span>';return}
 setBusy('Creating task...');
 try{
-await post('/api/admin-create-task',{title:title,customer_id:document.getElementById('newTaskCustomerId').value.trim(),task_type:document.getElementById('newTaskType').value,priority:document.getElementById('newTaskPriority').value,due_at:document.getElementById('newTaskDue').value,description:document.getElementById('newTaskDescription').value});
+await post('/api/admin-create-task',{title:title,customer_first_name:document.getElementById('newTaskFirstName').value.trim(),customer_last_name:document.getElementById('newTaskLastName').value.trim(),customer_email:document.getElementById('newTaskEmail').value.trim(),customer_phone:document.getElementById('newTaskPhone').value.trim(),task_type:document.getElementById('newTaskType').value,priority:document.getElementById('newTaskPriority').value,due_at:taskDueValue('newTaskDue'),description:document.getElementById('newTaskDescription').value});
 state.tasks=await endpoint('/api/admin-tasks?status='+encodeURIComponent(state.taskFilter||'active'));
 renderTasks();
 statusText.innerHTML='<span class="ok">Task added.</span>';
@@ -425,6 +474,13 @@ if(activeTab==='tasks'){state.tasks=await endpoint('/api/admin-tasks?status='+en
 if(activeTab==='customers'&&state.customerDetail&&state.customerDetail.customer){state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(state.customerDetail.customer.id));renderCustomers()}
 statusText.innerHTML='<span class="ok">Task updated.</span>';
 }catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not update task.')+'</span>'}
+}
+
+function taskDueValue(inputId){
+var value=document.getElementById(inputId)&&document.getElementById(inputId).value;
+if(!value)return '';
+var dateValue=new Date(value+'T09:00:00');
+return Number.isNaN(dateValue.getTime())?'':dateValue.toISOString();
 }
 
 function renderCustomers(){
@@ -451,7 +507,7 @@ function bindCustomerProfileActions(detail){
 var syncCustomersBtn=document.getElementById('syncRawCustomersBtn');
 if(syncCustomersBtn){syncCustomersBtn.addEventListener('click',syncRawAirtable)}
 var saveProfile=document.getElementById('saveProfileBtn');
-if(saveProfile){saveProfile.addEventListener('click',async function(){var customerId=detail&&detail.customer&&detail.customer.id;if(!customerId)return;setBusy('Saving customer profile...');var tags=document.getElementById('profileTags').value.split(',').map(function(item){return item.trim()}).filter(Boolean);await post('/api/admin-update-customer-profile',{customer_id:customerId,full_name:document.getElementById('profileName').value,email:document.getElementById('profileEmail').value,phone:document.getElementById('profilePhone').value,status:document.getElementById('profileStatus').value,tags:tags});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(customerId));state.customers=(await endpoint('/api/admin-customers')).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Customer record saved.</span>'})}
+if(saveProfile){saveProfile.addEventListener('click',async function(){var customerId=detail&&detail.customer&&detail.customer.id;if(!customerId)return;setBusy('Saving customer profile...');var tags=document.getElementById('profileTags').value.split(',').map(function(item){return item.trim()}).filter(Boolean);await post('/api/admin-update-customer-profile',{customer_id:customerId,full_name:document.getElementById('profileName').value,email:document.getElementById('profileEmail').value,phone:document.getElementById('profilePhone').value,status:document.getElementById('profileStatus').value,tags:tags,birthday:document.getElementById('profileBirthday').value,birthday_discount_code:document.getElementById('profileBirthdayCode').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(customerId));state.customers=(await endpoint('/api/admin-customers')).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Customer record saved.</span>'})}
 var save=document.getElementById('saveNoteBtn');
 if(save){save.addEventListener('click',async function(){await post('/api/admin-update-customer-note',{customer_id:detail.customer.id,note:document.getElementById('ownerNote').value});state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(detail.customer.id));renderCustomers();statusText.innerHTML='<span class="ok">Note saved.</span>'})}
 var sendEmail=document.getElementById('sendEmailBtn');
@@ -666,7 +722,7 @@ var title=document.getElementById('profileTaskTitle')&&document.getElementById('
 if(!title){statusText.innerHTML='<span class="error">Add a task title first.</span>';return}
 setBusy('Adding customer task...');
 try{
-await post('/api/admin-create-task',{customer_id:c.id,title:title,task_type:document.getElementById('profileTaskType').value,priority:document.getElementById('profileTaskPriority').value,due_at:document.getElementById('profileTaskDue').value,description:document.getElementById('profileTaskDescription').value});
+await post('/api/admin-create-task',{customer_id:c.id,title:title,task_type:document.getElementById('profileTaskType').value,priority:document.getElementById('profileTaskPriority').value,due_at:taskDueValue('profileTaskDue'),description:document.getElementById('profileTaskDescription').value});
 state.customerDetail=await endpoint('/api/admin-customer-detail?id='+encodeURIComponent(c.id));
 renderCustomers();
 statusText.innerHTML='<span class="ok">Customer task added.</span>';
@@ -710,6 +766,8 @@ return '<div class="detail-block"><div class="section-title">Editable customer r
 '<label>Email<input id="profileEmail" type="email" value="'+esc(c.email||'')+'" placeholder="email@example.com"></label>'+
 '<label>Phone<input id="profilePhone" value="'+esc(c.phone||'')+'" placeholder="Phone number"></label>'+
 '<label>Lifecycle<select id="profileStatus">'+customerStatusOptions(c.status||'lead')+'</select></label>'+
+'<label>Birthday<input id="profileBirthday" type="date" value="'+esc(c.birthday||'')+'"><span class="field-help">Used later for birthday wishes and birthday discount automations.</span></label>'+
+'<label>Birthday code<input id="profileBirthdayCode" value="'+esc(c.birthday_discount_code||'')+'" placeholder="BIRTHDAY15"></label>'+
 '<label>Tags<input id="profileTags" value="'+esc(tagsValue(c.tags))+'" placeholder="vip, studio lead, cloak"></label>'+
 '</div><div class="record-actions"><span class="muted">Edit the customer once here; the timeline, notes, inquiries, reservations, and payment history stay attached.</span><button class="btn" id="saveProfileBtn">Save customer record</button></div></div>';
 }
@@ -787,12 +845,20 @@ return '<div class="notice warn"><strong>SMS opt-in needed before texting.</stro
 '<label class="check-row"><input id="smsConsentConfirmed" type="checkbox"> Customer gave SMS consent</label><button class="btn quiet" id="recordSmsOptinBtn" style="margin-top:10px">Record SMS opt-in</button>';
 }
 
+function renderMessagePortal(detail,emailHref,smsHref){
+var comms=(detail.communications||[]).slice(0,8);
+return '<div class="detail-block message-portal"><div class="bar"><div><div class="section-title">Messaging portal</div><p class="muted">Send and track customer email/SMS without leaving the profile. External buttons open your email or text app when you want the native app.</p></div><div class="actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email app</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text app</a>':'')+'</div></div>'+
+'<div class="profile-columns"><div><label>Email subject<input id="emailSubject" value="A note from yogacloak"></label><label style="margin-top:8px">Email message<textarea id="emailBody" placeholder="Write the customer email here."></textarea></label><button class="btn quiet" id="sendEmailBtn" style="margin-top:10px">Send email</button></div><div><label>SMS message<textarea id="smsBody" maxlength="1000" placeholder="Write a short text here. SMS requires opt-in."></textarea></label><button class="btn quiet" id="sendSmsBtn" style="margin-top:10px">Send SMS</button></div></div>'+
+renderSmsConsentBlock(detail)+
+'<div style="margin-top:12px">'+(comms.length?table(['Channel','Direction','Message','Date'],comms.map(function(row){return [row.channel,row.direction,row.subject||row.body,date(row.created_at)]})):'<div class="empty">No message history yet.</div>')+'</div></div>';
+}
+
 function renderCustomerTasks(detail){
 var tasks=detail.tasks||[];
 var active=tasks.filter(function(task){return !['done','archived'].includes(task.status)});
 var done=tasks.filter(function(task){return task.status==='done'}).length;
 return '<div class="detail-block"><div class="bar"><div><div class="section-title">Tasks for this customer</div><p class="muted">Create follow-ups, reply reminders, payment tasks, or owner-only notes tied to this profile.</p></div><span class="pill">Active <strong>'+esc(active.length)+'</strong></span><span class="pill">Done <strong>'+esc(done)+'</strong></span></div>'+
-'<div class="record-grid"><label>Task<input id="profileTaskTitle" placeholder="Example: text back about sizing"></label><label>Type<select id="profileTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="profileTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due<input id="profileTaskDue" type="datetime-local"></label><label>Notes<textarea id="profileTaskDescription" placeholder="What should future you remember?"></textarea></label></div><button class="btn" id="addCustomerTaskBtn" style="margin-top:10px">Add customer task</button>'+
+'<div class="record-grid"><label>Task<input id="profileTaskTitle" placeholder="Example: text back about sizing"></label><label>Type<select id="profileTaskType">'+taskTypeOptions('customer_reply')+'</select></label><label>Priority<select id="profileTaskPriority">'+taskPriorityOptions('normal')+'</select></label><label>Due date<input id="profileTaskDue" type="date"><span class="field-help">Pick a date from the calendar.</span></label><label>Notes<textarea id="profileTaskDescription" placeholder="What should future you remember?"></textarea></label></div><button class="btn" id="addCustomerTaskBtn" style="margin-top:10px">Add customer task</button>'+
 (tasks.length?'<div style="margin-top:14px">'+table(['State','Task','Linked to','Type','Priority','Due','Action'],taskRows(tasks.slice(0,12)),true)+'</div>':'<div class="empty" style="margin-top:14px">No tasks for this customer yet.</div>')+'</div>';
 }
 
@@ -830,17 +896,15 @@ renderEditableCustomerRecord(c)+
 renderCrmManagement(detail)+
 '<div class="profile-actions">'+(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'<button class="btn quiet" disabled>No email</button>')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'<button class="btn quiet" disabled>No phone</button>')+'</div>'+
 '<div class="profile-columns"><div class="detail-block"><div class="section-title">Contact tracking</div><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Status<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>'+
-'<div class="detail-block"><div class="section-title">Send from hub</div><label>Email subject<input id="emailSubject" value="A note from yogacloak"></label><label style="margin-top:8px">Email message<textarea id="emailBody"></textarea></label><button class="btn quiet" id="sendEmailBtn" style="margin-top:10px">Send email</button><label style="margin-top:14px">SMS message<textarea id="smsBody" maxlength="1000"></textarea></label><button class="btn quiet" id="sendSmsBtn" style="margin-top:10px">Send SMS</button></div></div>'+
-renderSmsConsentBlock(detail)+
+'<div class="detail-block"><div class="section-title">Relationship notes</div><p class="muted">Use notes, tasks, and message history to keep the relationship moving without losing context.</p><label style="margin-top:8px">Private customer note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div></div>'+
+renderMessagePortal(detail,emailHref,smsHref)+
 renderCustomerTasks(detail)+
 '<div class="detail-block"><div class="section-title">Relationship timeline</div>'+renderTimeline(detail)+'</div>'+
 '<div class="detail-block"><div class="section-title">Internal notes</div><label>Note type<select id="noteType"><option value="general">General</option><option value="call">Call</option><option value="email">Email</option><option value="sms">SMS</option><option value="payment">Payment</option><option value="follow_up">Follow-up</option></select></label><label style="margin-top:8px">New note<textarea id="internalNoteBody" placeholder="Example: replied by text, wants The Wrap, follow up tomorrow."></textarea></label><button class="btn" id="addInternalNoteBtn" style="margin-top:10px">Add internal note</button>'+table(['Type','Status','Note','Follow-up','Date'],(detail.internal_notes||[]).slice(0,10).map(function(row){return [row.note_type,row.contact_status,row.body,date(row.next_follow_up_at),date(row.created_at)]}))+'</div>'+
-'<div class="detail-block"><div class="section-title">Owner note</div><label>Private customer note<textarea id="ownerNote">'+esc(c.owner_note||'')+'</textarea></label><button class="btn" id="saveNoteBtn" style="margin-top:10px">Save note</button></div>'+
 '<div class="detail-block"><div class="section-title">Reservations + final balance</div>'+renderProfileReservations(detail.reservations||[])+'</div>'+
 '<div class="detail-block"><div class="section-title">Payments</div>'+renderProfilePayments(detail.payments||[])+'</div>'+
 '<div class="detail-block"><div class="section-title">Saved payment methods</div>'+renderPaymentMethods(detail.payment_methods||[])+'</div>'+
-'<div class="detail-block"><div class="section-title">Inquiries</div>'+renderProfileInquiries(detail.inquiries||[])+'</div>'+
-'<div class="detail-block"><div class="section-title">Messages</div>'+table(['Channel','Direction','Message','Date'],(detail.communications||[]).slice(0,10).map(function(row){return [row.channel,row.direction,row.subject||row.body,date(row.created_at)]}))+'</div>';
+'<div class="detail-block"><div class="section-title">Inquiries</div>'+renderProfileInquiries(detail.inquiries||[])+'</div>';
 }
 
 function renderProfileOverview(detail){
@@ -852,6 +916,7 @@ return '<div class="profile-stat"><span>Contact status</span><strong>'+esc(forma
 '<div class="profile-stat"><span>Next follow-up</span><strong>'+esc(c.next_follow_up_at?date(c.next_follow_up_at):'None set')+'</strong></div>'+
 '<div class="profile-stat"><span>Product thread</span><strong>'+esc(products.length?products.slice(0,2).join(' + '):'No product yet')+'</strong></div>'+
 '<div class="profile-stat"><span>Tags</span><strong>'+esc(tagsValue(c.tags)||'None')+'</strong></div>'+
+'<div class="profile-stat"><span>Birthday</span><strong>'+esc(c.birthday?date(c.birthday):'Not set')+'</strong><p class="muted">'+esc(c.birthday_discount_code?'Code '+c.birthday_discount_code:'No birthday code yet')+'</p></div>'+
 '<div class="profile-stat"><span>Outstanding</span><strong>'+money(outstanding)+'</strong></div>'+
 (last?'<div class="profile-stat"><span>Last activity</span><strong>'+esc(last.type)+'</strong><p class="muted">'+esc(date(last.at))+'</p></div>':'<div class="profile-stat"><span>Last activity</span><strong>None yet</strong></div>')+
 '<div class="profile-stat"><span>Saved card</span><strong>'+esc((detail.payment_methods||[]).some(function(row){return row.stripe_payment_method_id})?'On file':'Not saved')+'</strong></div>';
@@ -1120,10 +1185,18 @@ return 'automation_'+String(key||'').replace(/[^a-zA-Z0-9_]/g,'_')+'_'+field;
 }
 
 function triggerName(value){
-return ({inquiry_created:'New inquiry',sms_opt_in_created:'SMS opt-in',reservation_created:'New reservation',payment_failed:'Failed payment',final_balance_ready:'Final balance ready'}[value]||formatStatus(value));
+return ({inquiry_created:'New inquiry',sms_opt_in_created:'SMS opt-in',reservation_created:'New reservation',payment_failed:'Failed payment',final_balance_ready:'Final balance ready',birthday_today:'Customer birthday'}[value]||formatStatus(value));
 }
 
-function modeName(value){
+function actionName(rule){
+if(rule.channel==='task')return 'Create task';
+if(rule.channel==='sms')return 'Send SMS';
+if(rule.channel==='email')return 'Send email';
+return formatStatus(rule.channel||'Action');
+}
+
+function modeName(value,rule){
+if(rule&&rule.channel==='task')return value==='auto_send'?'Auto-create':'Draft task';
 return value==='auto_send'?'Auto-send':'Draft only';
 }
 
@@ -1134,15 +1207,15 @@ var modeId=automationId(key,'mode');
 var subjectId=automationId(key,'subject');
 var bodyId=automationId(key,'body');
 var counts=rule.counts||{};
-var autoWarning=rule.channel==='sms'&&rule.target_type==='customer'?'Customer SMS only sends when phone + SMS opt-in exist.':'Auto-send should only be enabled after you approve the exact wording.';
+var autoWarning=rule.channel==='task'?'Auto-create will add a CRM task every time the trigger happens, with duplicate protection.':(rule.channel==='sms'&&rule.target_type==='customer'?'Customer SMS only sends when phone + SMS opt-in exist.':'Auto-send should only be enabled after you approve the exact wording.');
 return '<article class="automation-card">'+
 '<header><div><h3>'+esc(rule.name||'Automation')+'</h3><p>'+esc(rule.description||'')+'</p></div><span class="health '+(rule.enabled?'good':'bad')+'">'+esc(rule.enabled?'On':'Off')+'</span></header>'+
-'<div class="meta"><span class="pill">Trigger <strong>'+esc(triggerName(rule.trigger_type))+'</strong></span><span class="pill">Target <strong>'+esc(formatStatus(rule.target_type))+'</strong></span><span class="pill">Channel <strong>'+esc(String(rule.channel||'').toUpperCase())+'</strong></span></div>'+
-'<div class="toggle-row"><label style="flex-direction:row;align-items:center;margin:0"><input id="'+esc(enabledId)+'" type="checkbox" '+(rule.enabled?'checked':'')+'> Enabled</label><label style="min-width:180px;margin:0">Mode<select id="'+esc(modeId)+'"><option value="draft" '+(rule.mode!=='auto_send'?'selected':'')+'>Draft only</option><option value="auto_send" '+(rule.mode==='auto_send'?'selected':'')+'>Auto-send</option></select></label></div>'+
-'<div class="notice '+(rule.mode==='auto_send'?'warn':'')+'"><strong>'+esc(modeName(rule.mode))+'</strong><br>'+esc(rule.mode==='auto_send'?autoWarning:'Draft mode logs the message for review before anything is sent.')+'</div>'+
-'<label>Subject<input id="'+esc(subjectId)+'" value="'+esc(rule.subject_template||'')+'" placeholder="Only used for email"></label>'+
-'<label>Message template<textarea id="'+esc(bodyId)+'">'+esc(rule.body_template||'')+'</textarea></label>'+
-'<div class="meta"><span class="pill">Drafted <strong>'+esc(counts.drafted||0)+'</strong></span><span class="pill">Sent <strong>'+esc(counts.sent||0)+'</strong></span><span class="pill">Skipped <strong>'+esc(counts.skipped||0)+'</strong></span><span class="pill">Failed <strong>'+esc(counts.failed||0)+'</strong></span></div>'+
+'<div class="automation-flow"><div><span>When</span><strong>'+esc(triggerName(rule.trigger_type))+'</strong></div><div><span>Then</span><strong>'+esc(actionName(rule))+'</strong></div><div><span>For</span><strong>'+esc(formatStatus(rule.target_type))+'</strong></div></div>'+
+'<div class="toggle-row"><label style="flex-direction:row;align-items:center;margin:0"><input id="'+esc(enabledId)+'" type="checkbox" '+(rule.enabled?'checked':'')+'> Enabled</label><label style="min-width:180px;margin:0">Mode<select id="'+esc(modeId)+'"><option value="draft" '+(rule.mode!=='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Draft task':'Draft only')+'</option><option value="auto_send" '+(rule.mode==='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Auto-create':'Auto-send')+'</option></select></label></div>'+
+'<div class="notice '+(rule.mode==='auto_send'?'warn':'')+'"><strong>'+esc(modeName(rule.mode,rule))+'</strong><br>'+esc(rule.mode==='auto_send'?autoWarning:(rule.channel==='task'?'Draft mode logs the task idea without creating it.':'Draft mode logs the message for review before anything is sent.'))+'</div>'+
+'<label>'+esc(rule.channel==='task'?'Task title':'Subject')+'<input id="'+esc(subjectId)+'" value="'+esc(rule.subject_template||'')+'" placeholder="'+esc(rule.channel==='task'?'Task title template':'Only used for email')+'"></label>'+
+'<label>'+esc(rule.channel==='task'?'Task notes':'Message template')+'<textarea id="'+esc(bodyId)+'">'+esc(rule.body_template||'')+'</textarea></label>'+
+'<div class="meta"><span class="pill">Drafted <strong>'+esc(counts.drafted||0)+'</strong></span><span class="pill">Created <strong>'+esc(counts.created||0)+'</strong></span><span class="pill">Sent <strong>'+esc(counts.sent||0)+'</strong></span><span class="pill">Skipped <strong>'+esc(counts.skipped||0)+'</strong></span><span class="pill">Failed <strong>'+esc(counts.failed||0)+'</strong></span></div>'+
 '<div class="actions" style="margin-top:12px"><button class="btn" data-save-automation="'+esc(key)+'" data-automation-id="'+esc(rule.id||'')+'">Save automation</button></div>'+
 '</article>';
 }
@@ -1206,13 +1279,15 @@ var groupRows=rows.filter(function(row){return row.readiness_group===group});
 return '<section class="panel"><div class="bar"><div class="section-title">'+esc(group)+'</div><span class="pill">'+groupRows.length+' record(s)</span></div>'+reservationTable(groupRows,true)+'</section>';
 }).join('');
 var disabled=state.batchBusy?' disabled':'';
-document.getElementById('finals').innerHTML='<div class="bar"><div><div class="section-title">Final balances</div><div class="meta">'+summary+'<span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div><div class="actions"><button class="btn quiet" id="selectNeedsNotice">Select needs notice</button><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run</button><button class="btn" id="chargeBatch"'+disabled+'>Charge ready batch</button></div></div>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+grouped;
+document.getElementById('finals').innerHTML='<div class="bar"><div><div class="section-title">Final balances</div><div class="meta">'+summary+'<span class="pill">Selected <strong>'+state.selected.size+'</strong></span></div></div><div class="actions"><button class="btn quiet" id="selectNeedsNotice">Select needs notice</button><button class="btn quiet" id="selectReady">Select ready</button><button class="btn quiet" id="sendNotices">Send notices</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run</button><button class="btn" id="chargeBatch"'+disabled+'>Charge ready batch</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Check emailed + ready</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge emailed + ready</button></div></div>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+grouped;
 document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
 document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('selectReady').addEventListener('click',function(){rows.filter(function(row){return row.charge_eligible&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
 document.getElementById('sendNotices').addEventListener('click',sendNotices);
 document.getElementById('dryRun').addEventListener('click',function(){runBatch(true)});
 document.getElementById('chargeBatch').addEventListener('click',function(){runBatch(false)});
+document.getElementById('autoDryRun').addEventListener('click',function(){runAutoFinalBalance(true)});
+document.getElementById('autoChargeReady').addEventListener('click',function(){runAutoFinalBalance(false)});
 bindCustomerOpeners();
 }
 
@@ -1334,6 +1409,32 @@ var s=data.summary||{};
 statusText.innerHTML='<span class="'+(s.failed?'error':'ok')+'">'+(dryRun?'Dry run':'Batch')+': charged '+(s.charged||0)+', skipped '+(s.skipped||0)+', already '+(s.already_charged||0)+', failed '+(s.failed||0)+'.</span>';
 }catch(err){
 statusText.innerHTML='<span class="error">'+esc(err.message||'Batch request failed.')+'</span>';
+}finally{
+state.batchBusy=false;
+renderFinals();
+}
+}
+async function runAutoFinalBalance(dryRun){
+if(state.batchBusy){statusText.innerHTML='<span class="muted">Final-balance automation is already running.</span>';return}
+var readyRows=state.reservations.filter(function(row){return row.charge_eligible&&!row.already_charged});
+var readyAmount=readyRows.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
+if(!dryRun){
+if(!readyRows.length){statusText.innerHTML='<span class="error">No emailed final-balance records are ready to charge yet.</span>';return}
+var safety=state.finalBalanceSafety||{};
+var message='Charge every emailed-and-ready final balance now?\\n\\nReady reservations: '+readyRows.length+'\\nEstimated total: '+money(readyAmount)+'\\nStripe mode: '+(safety.stripe_mode||'unknown')+'\\nNotice wait: '+(safety.notice_hours||24)+'h\\n\\nUnsafe records will still be skipped by the backend.';
+if(!window.confirm(message)){statusText.innerHTML='<span class="muted">Automatic charge cancelled.</span>';return}
+}
+state.batchBusy=true;
+renderFinals();
+setBusy(dryRun?'Checking emailed-and-ready final balances...':'Charging emailed-and-ready final balances...');
+try{
+var data=await post('/api/auto-final-balance',{dry_run:dryRun,limit:100});
+state.batchResults=data;
+await loadCurrent();
+var s=data.summary||{};
+statusText.innerHTML='<span class="'+(s.failed?'error':'ok')+'">'+(dryRun?'Check':'Auto batch')+': charged '+(s.charged||0)+', skipped '+(s.skipped||0)+', already '+(s.already_charged||0)+', failed '+(s.failed||0)+'.</span>';
+}catch(err){
+statusText.innerHTML='<span class="error">'+esc(err.message||'Automatic final-balance batch failed.')+'</span>';
 }finally{
 state.batchBusy=false;
 renderFinals();
