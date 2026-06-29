@@ -184,6 +184,18 @@ tr:last-child td{border-bottom:0}
 .hub-card-grid .card strong{font-size:38px;letter-spacing:0}
 .hub-card-grid .card small{color:rgba(var(--cream),.48);font-size:12px;line-height:1.35}
 .hub-card-grid .card.is-hot{border-color:rgba(212,148,141,.28);background:linear-gradient(145deg,rgba(212,148,141,.12),rgba(var(--cream),.03))}
+.today-workspace{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(380px,.9fr);gap:14px;align-items:start}
+.work-panel{background:#151618;border:1px solid rgba(var(--cream),.09);border-radius:8px;padding:18px;min-height:320px;box-shadow:var(--shadow)}
+.work-panel.hero-panel{min-height:390px}
+.work-panel header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.work-panel h2{font-size:26px;font-weight:500;letter-spacing:-.025em}
+.work-list{display:grid;gap:9px}
+.work-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid rgba(var(--cream),.075);border-radius:8px;background:rgba(var(--cream),.026);padding:12px}
+.work-row strong{display:block;font-size:14px;color:var(--bone);line-height:1.25}
+.work-row span{display:block;font-size:12px;color:rgba(var(--cream),.5);line-height:1.35;margin-top:4px}
+.message-row{border-left:2px solid rgba(154,170,136,.7)}
+.message-row.inbound{border-left-color:rgba(215,184,114,.75);background:rgba(215,184,114,.055)}
+.today-side{display:grid;gap:14px}
 .hub-work-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
 .automation-card .meta{margin-top:12px}
 .automation-log-body{white-space:pre-wrap;max-width:420px}
@@ -237,7 +249,7 @@ tr:last-child td{border-bottom:0}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
 .section-title{font-size:22px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
 @media(max-width:980px){.shell{padding:20px}.top,.login,.split{display:block;margin-top:64px}.login>*{margin-bottom:10px}.grid,.setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail{position:static;max-height:none;overflow:visible}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1}.utility-btn{width:auto}.corner-actions{right:14px;top:12px}.corner-status{display:none}.ops-panel{margin-top:12px}.tabs{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}}
-@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}}
+@media(max-width:620px){.shell{padding:16px}.grid,.quick-actions,.profile-overview,.profile-hubs,.profile-columns,.record-grid,.automation-board,.automation-studio,.automation-builder-grid,.automation-settings-layout,.hub-card-grid,.today-workspace{grid-template-columns:1fr}.record-grid label:first-child,.record-grid label:last-child{grid-column:auto}h1{font-size:38px}.tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}}
 </style>
 </head>
 <body>
@@ -446,8 +458,7 @@ return [
 {id:'ready_to_charge',label:'Ready to charge',value:summary.ready_to_charge||0,note:'Run dry run first'},
 {id:'not_contacted',label:'Not contacted',value:summary.not_contacted||0,note:'Customers needing first touch'},
 {id:'follow_ups_due',label:'Follow-ups due',value:summary.follow_ups_due||0,note:'Reply queue'},
-{id:'failed_payments',label:'Failed payments',value:summary.failed_payments||0,note:'Payment cleanup'},
-{id:'raw_backup',label:'Raw backup',value:Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0),note:'Airtable-only records'}
+{id:'failed_payments',label:'Failed payments',value:summary.failed_payments||0,note:'Payment cleanup'}
 ];
 }
 
@@ -459,9 +470,9 @@ return ['focus','sales','ops','founder'].includes(saved)?saved:'focus';
 function hubPrefsForLens(lens){
 var prefs={
 focus:['new_inquiries','tasks_overdue','tasks_active','follow_ups_due','not_contacted','failed_payments'],
-sales:['customers','new_inquiries','needs_notice','ready_to_charge','failed_payments','raw_backup'],
-ops:['tasks_overdue','tasks_active','follow_ups_due','not_contacted','raw_backup','customers'],
-founder:['customers','ready_to_charge','failed_payments','needs_notice','raw_backup','new_inquiries']
+sales:['customers','new_inquiries','needs_notice','ready_to_charge','failed_payments','not_contacted'],
+ops:['tasks_overdue','tasks_active','follow_ups_due','not_contacted','new_inquiries','customers'],
+founder:['customers','ready_to_charge','failed_payments','needs_notice','new_inquiries','tasks_overdue']
 };
 return new Set(prefs[lens]||prefs.focus);
 }
@@ -481,23 +492,39 @@ var lenses=[['focus','Focus','What needs your attention now'],['sales','Sales','
 return '<section class="panel"><div class="hub-toolbar"><div><div class="section-title">Command hub</div><p class="muted">Personalized for '+esc(adminUser.name||'you')+'. Pick the lens for how you want to work right now.</p></div><div class="hub-lenses">'+lenses.map(function(item){return '<button class="lens-btn '+(lens===item[0]?'active':'')+'" data-hub-lens="'+esc(item[0])+'" title="'+esc(item[2])+'">'+esc(item[1])+'</button>'}).join('')+'</div></div><div class="hub-card-grid">'+visible.map(function(card){var hot=Number(card.value||0)>0&&['tasks_overdue','failed_payments','ready_to_charge','new_inquiries'].includes(card.id);return '<div class="card '+(hot?'is-hot':'')+'"><span>'+esc(card.label)+'</span><strong>'+esc(card.value||0)+'</strong><small>'+esc(card.note)+'</small></div>'}).join('')+'</div></section>';
 }
 
+function renderTodayTasks(tasks){
+var rows=(tasks||[]).filter(function(row){return row.type!=='raw_backup'}).slice(0,10);
+if(!rows.length)return '<div class="empty">No open work right now.</div>';
+return '<div class="work-list">'+rows.map(function(row){return '<div class="work-row"><div><strong>'+esc(row.title||formatStatus(row.type))+'</strong><span>'+customerLink(row.customer_id,row.detail||'Open customer')+' · '+esc(date(row.created_at))+'</span></div>'+openProfileButton(row.customer_id,'Open')+'</div>'}).join('')+'</div>';
+}
+
+function renderTodayMessages(messages){
+var rows=(messages||[]).slice(0,8);
+if(!rows.length)return '<div class="empty">No inbound texts or emails yet.</div>';
+return '<div class="work-list">'+rows.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;var inbound=String(row.direction||'').toLowerCase()==='inbound';return '<div class="work-row message-row '+(inbound?'inbound':'')+'"><div><strong>'+esc((inbound?'New ':'')+String(row.channel||'message').toUpperCase()+' · '+(row.customers&&row.customers.full_name||'Customer'))+'</strong><span>'+esc(row.subject||row.body||row.status||'Message')+' · '+esc(date(row.created_at))+'</span></div>'+openProfileButton(customerId,'Open')+'</div>'}).join('')+'</div>';
+}
+
+function renderTodayQuickQueue(summary){
+var items=[
+['New inquiries',summary.new_inquiries||0,'Open Inquiries','inquiries'],
+['Follow-ups due',summary.follow_ups_due||0,'Open Tasks','tasks'],
+['Ready to charge',summary.ready_to_charge||0,'Open Final Balances','finals']
+];
+return '<div class="work-list">'+items.map(function(item){return '<div class="work-row"><div><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+' waiting</span></div><button class="btn quiet small" data-jump-tab="'+esc(item[3])+'">'+esc(item[2])+'</button></div>'}).join('')+'</div>';
+}
+
 function renderToday(){
 var root=document.getElementById('today');
 var data=state.dashboard;
 if(!data){root.innerHTML='<div class="empty">Load the hub to see today\'s action list.</div>';return}
 var tasks=data.tasks||[];
 var summary=data.summary||{};
-var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
-var canSyncRaw=isFounder()&&data.database_enabled!==false&&rawBackupCount>0;
-var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="syncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'';
 var databaseNotice=data.database_error?'<div class="notice warn"><strong>Private CRM database needs setup.</strong><br>'+esc(data.database_error)+'</div>':'';
-root.innerHTML=renderHubCards(summary)+syncStatusNotice()+databaseNotice+rawNotice+rawSyncReport()+
-'<section class="panel"><div class="section-title">Today\'s action list</div>'+table(['Signal','What happened','Contact','Date','Action'],tasks.map(function(row){return [esc(formatStatus(row.type)),esc(row.title),customerLink(row.customer_id,row.detail),esc(date(row.created_at)),openProfileButton(row.customer_id,'Open profile')]}),true)+'</section>'+
-'<section class="panel"><div class="section-title">Recent customer timeline</div>'+table(['Signal','Contact','Details','Date','Action'],(data.recent_events||[]).map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [esc(row.title||row.event_type),customerLink(customerId,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at)),openProfileButton(customerId,'Open timeline')]}),true)+'</section>';
+root.innerHTML=renderHubCards(summary)+databaseNotice+
+'<div class="today-workspace"><section class="work-panel hero-panel"><header><div><h2>Task space</h2><p class="muted">Customer replies, follow-ups, deposits, and owner work that should not get lost.</p></div><button class="btn quiet small" data-jump-tab="tasks">Open Tasks</button></header>'+renderTodayTasks(tasks)+'</section><div class="today-side"><section class="work-panel"><header><div><h2>Messaging center</h2><p class="muted">Newest inbound texts and email replies.</p></div><button class="btn quiet small" data-jump-tab="communications">Open Comms</button></header>'+renderTodayMessages(data.message_preview||[])+'</section><section class="work-panel"><header><div><h2>Quick queue</h2><p class="muted">Jump into the work areas that usually matter first.</p></div></header>'+renderTodayQuickQueue(summary)+'</section></div></div>';
 bindCustomerOpeners();
 document.querySelectorAll('[data-hub-lens]').forEach(function(btn){btn.addEventListener('click',function(){setHubLens(btn.dataset.hubLens)})});
-var syncBtn=document.getElementById('syncRawBackupBtn');
-if(syncBtn){syncBtn.addEventListener('click',syncRawAirtable)}
+document.querySelectorAll('[data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.jumpTab)})});
 }
 
 function taskStatusOptions(value){
@@ -1556,6 +1583,11 @@ document.getElementById('mergeBtn').addEventListener('click',async function(){aw
 function renderSettings(){
 var s=(state.dashboard&&state.dashboard.security_status)||{};
 var sync=(state.dashboard&&state.dashboard.sync_status)||{};
+var summary=(state.dashboard&&state.dashboard.summary)||{};
+var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
+var canSyncRaw=isFounder()&&state.dashboard&&state.dashboard.database_enabled!==false&&rawBackupCount>0;
+var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="settingsSyncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'<div class="notice good"><strong>Private CRM is ready for raw backup sync.</strong><br>No Airtable reconciliation sync has been recorded yet.</div>';
+var recentEvents=(state.dashboard&&state.dashboard.recent_events)||[];
 function yes(value){return value?'<span class="ok">On</span>':'<span class="error">Missing</span>'}
 function bool(value){return value?'<span class="ok">Yes</span>':'<span class="muted">No</span>'}
 document.getElementById('settings').innerHTML=commandCenterSettingsPanel()+'<section class="panel"><div class="section-title">Security status</div><table><tbody>'+
@@ -1588,7 +1620,11 @@ row('Twilio URL','Set TWILIO_WEBHOOK_URL to the exact Twilio webhook URL if sign
 row('Email webhook','Set EMAIL_WEBHOOK_SECRET or RESEND_WEBHOOK_SECRET before turning on inbound email replies.')+
 row('Pre-deploy check','Run npm run security:check before launch or after security changes.')+
 row('Privacy','This page is noindex,nofollow, no-store, and is not linked from the public site.')+
-'</tbody></table></section>';
+'</tbody></table></section>'+
+'<section class="panel"><div class="bar"><div><div class="section-title">Raw activity + backup</div><p class="muted">This is the system/data layer. Keep it here so Today stays focused on work.</p></div></div>'+syncStatusNotice()+rawNotice+rawSyncReport()+table(['Signal','Contact','Details','Date','Action'],recentEvents.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [esc(row.title||row.event_type),customerLink(customerId,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at)),openProfileButton(customerId,'Open timeline')]}),true)+'</section>';
+var settingsSyncBtn=document.getElementById('settingsSyncRawBackupBtn');
+if(settingsSyncBtn){settingsSyncBtn.addEventListener('click',syncRawAirtable)}
+bindCustomerOpeners();
 }
 
 function table(headers, rows, allowHtml){
