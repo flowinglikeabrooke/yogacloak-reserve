@@ -223,13 +223,18 @@ If you upgrade to Vercel Pro, these can be moved back to hourly for faster hold 
 
 Vercel Hobby cron jobs are daily and approximate within the hour, so the 9:00 AM Arizona time run may happen any time between about 9:00 and 9:59 AM.
 
-Recommended owner email setting:
+Recommended admin profile and notification settings:
 
 ```text
-OWNER_EMAIL=your@email.com
+FOUNDER_EMAIL=Brookebein@gmail.com
+CHRISTIAN_EMAIL=christian@example.com
+ADMIN_USERS_JSON=[
+  {"name":"Brooke","email":"Brookebein@gmail.com","role":"founder","token":"paste-brooke-login-code"},
+  {"name":"Christian","email":"christian@example.com","role":"owner","token":"paste-christian-login-code"}
+]
 ```
 
-If `OWNER_EMAIL` is missing, owner alerts fall back to `ADMIN_EMAIL`, then `EMAIL_TO`, then `hello@yogacloak.com`.
+If `FOUNDER_EMAIL` is missing, founder alerts fall back to `Brookebein@gmail.com`. Owner/operator updates go to the founder plus `CHRISTIAN_EMAIL`, `OWNER_NOTIFICATION_EMAILS`, or any `ADMIN_USERS_JSON` users with `founder`/`owner` roles.
 
 Set `CRON_SECRET` in Vercel so scheduled calls can authenticate. You can also call those endpoints manually with:
 
