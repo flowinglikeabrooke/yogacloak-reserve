@@ -46,8 +46,9 @@ label{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
 input{width:100%;box-sizing:border-box;background:rgba(251,248,240,.055);border:1px solid rgba(251,248,240,.14);color:#fbf8f0;border-radius:8px;padding:13px;margin-top:8px}
 button{width:100%;border:0;border-radius:999px;background:#fbf8f0;color:#1e2320;font-weight:700;padding:13px;margin-top:14px;cursor:pointer}
 .google-box{margin-top:18px;padding:14px;border:1px solid rgba(251,248,240,.12);border-radius:8px;background:rgba(251,248,240,.04)}
-.divider{display:flex;gap:10px;align-items:center;margin:18px 0 0;color:rgba(251,248,240,.42);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-.divider:before,.divider:after{content:"";height:1px;background:rgba(251,248,240,.12);flex:1}
+.setup{margin-top:18px;padding:14px;border:1px solid rgba(212,148,141,.35);border-radius:8px;background:rgba(212,148,141,.08);color:#d4948d}
+details{margin-top:16px;border-top:1px solid rgba(251,248,240,.12);padding-top:14px}
+summary{cursor:pointer;color:rgba(251,248,240,.56);font-size:13px}
 .fine{font-size:12px;color:rgba(251,248,240,.45);margin:10px 0 0}
 .error{color:#d4948d;font-size:13px;margin-top:12px}
 </style>
@@ -65,9 +66,12 @@ ${googleEnabled ? `<div class="google-box">
   data-auto_prompt="false"></div>
 <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black" data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
 <p class="fine">Only approved yogacloak team emails can open the admin hub.</p>
-</div><div class="divider">backup code</div>` : ''}
-<label>Profile access code<input id="token" type="password" autocomplete="off" autofocus></label>
-<button id="login">Open admin hub</button>
+</div>` : `<div class="setup"><strong>Google login is not configured yet.</strong><br>Set GOOGLE_ADMIN_CLIENT_ID in Vercel, redeploy Production, then come back here.</div>`}
+<details>
+<summary>Google not working? Use backup code</summary>
+<label>Backup access code<input id="token" type="password" autocomplete="off"></label>
+<button id="login">Open admin hub with backup code</button>
+</details>
 <div id="msg" class="error"></div>
 </main>
 <script nonce="${safeAttr(nonce)}">
@@ -79,7 +83,7 @@ msg.textContent='';
 var res=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:document.getElementById('token').value.trim()})});
 if(res.ok){location.reload();return}
 var data=await res.json().catch(function(){return {}});
-msg.textContent=(data.error||'Could not log in.')+' If you just changed profile codes in Vercel, redeploy Production and refresh this page.';
+msg.textContent=(data.error||'Could not log in with backup code.')+' If you just changed the code in Vercel, redeploy Production and refresh this page.';
 }
 async function handleGoogleLogin(response){
 var msg=document.getElementById('msg');
