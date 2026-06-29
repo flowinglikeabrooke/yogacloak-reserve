@@ -964,7 +964,7 @@ return String(tags||'');
 }
 
 function customerStatusOptions(value){
-var options=[['lead','Lead'],['prospect','Prospect'],['reserved','Reserved'],['customer','Customer'],['vip','VIP'],['closed','Closed'],['merged','Merged']];
+var options=[['lead','Lead'],['prospect','Prospect'],['reserved','Reserved'],['customer','Customer'],['vip','VIP'],['closed','No follow-up'],['merged','Merged duplicate']];
 var current=String(value||'lead');
 var known=options.some(function(option){return option[0]===current});
 if(!known&&current)options.unshift([current,formatStatus(current)]);
@@ -974,7 +974,7 @@ return options.map(function(option){return '<option value="'+esc(option[0])+'" '
 function renderEditableCustomerRecord(c){
 if(!isOwner())return '<div class="detail-block"><div class="section-title">Customer record</div><div class="notice"><strong>Staff workspace.</strong><br>You can add notes, tasks, contact status, and messages. Owner profiles can edit core customer fields.</div></div>';
 return '<div class="detail-block"><div class="section-title">Editable customer record</div><div class="record-grid">'+
-'<label>Name<input id="profileName" value="'+esc(c.full_name||'')+'" placeholder="Customer name"></label>'+
+'<label>Full name<input id="profileName" value="'+esc(c.full_name||'')+'" placeholder="Customer full name"></label>'+
 '<label>Email<input id="profileEmail" type="email" value="'+esc(c.email||'')+'" placeholder="email@example.com"></label>'+
 '<label>Phone<input id="profilePhone" value="'+esc(c.phone||'')+'" placeholder="Phone number"></label>'+
 '<label>Lifecycle<select id="profileStatus">'+customerStatusOptions(c.status||'lead')+'</select></label>'+
@@ -1287,7 +1287,7 @@ return sum+Number(row.final_balance_total||row.final_balance_amount||0);
 }
 
 function contactOptions(value){
-var options=[['not_contacted','Not contacted'],['needs_reply','Needs reply'],['emailed','Emailed'],['texted','Texted'],['spoke_to_customer','Spoke to customer'],['waiting_on_customer','Waiting on customer'],['closed','Closed']];
+var options=[['not_contacted','Needs first touch'],['needs_reply','Needs reply'],['emailed','Emailed'],['texted','Texted'],['spoke_to_customer','Contacted'],['waiting_on_customer','Waiting on customer'],['closed','No follow-up']];
 return options.map(function(option){return '<option value="'+esc(option[0])+'" '+(option[0]===value?'selected':'')+'>'+esc(option[1])+'</option>'}).join('');
 }
 function datetimeLocal(value){
@@ -1426,8 +1426,45 @@ bindCustomerOpeners();
 }
 
 function renderPayments(){
-document.getElementById('payments').innerHTML='<div class="bar"><div class="section-title">Payments</div></div>'+table(['Customer','Type','Amount','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
+document.getElementById('payments').innerHTML='<div class="bar"><div class="section-title">Payments</div></div>'+stripeRecoveryPanel()+table(['Customer','Type','Amount','Status','Stripe ID','Date'],state.payments.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [customerLink(customerId,row.customers&&row.customers.full_name||row.stripe_customer_id||'Customer'),esc(row.payment_type),money(row.amount),esc(row.status),esc(row.stripe_payment_intent_id),esc(date(row.occurred_at))]}),true);
+var syncStripeBtn=document.getElementById('syncStripePaymentBtn');
+if(syncStripeBtn){syncStripeBtn.addEventListener('click',syncStripePayment)}
 bindCustomerOpeners();
+}
+
+function stripeRecoveryPanel(){
+if(!isOwner())return '';
+var result=state.stripeRecoveryResult;
+var report='';
+if(result){
+var customer=result.customer||{};
+var reservation=result.reservation||{};
+var reasons=result.blocked_reasons||[];
+report='<div class="notice '+(result.can_charge_remaining_later?'good':'warn')+'"><strong>'+esc(result.can_charge_remaining_later?'Stripe payment recovered. Remaining balance can be prepared.':'Stripe payment recovered, but remaining balance is not ready yet.')+'</strong><br>'+
+'Customer: '+esc(customer.full_name||customer.email||customer.phone||'Customer')+
+(reservation.id?' · Reservation connected':'')+
+(reasons.length?'<ul class="mini-list">'+reasons.map(function(reason){return '<li>'+esc(reason)+'</li>'}).join('')+'</ul>':'<p class="muted">Send the final-balance notice first. The charge stays locked until the notice wait has passed.</p>')+
+'</div>';
+}
+return '<section class="panel"><div class="bar"><div><div class="section-title">Recover missing Stripe payment</div><p class="muted">Use this when Stripe shows a payment but the CRM does not. It imports the payment/customer/reservation links; it does not charge anyone.</p></div></div>'+
+'<div class="login"><label>Stripe payment intent<input id="stripePaymentIntentInput" placeholder="pi_..." value="pi_3TmR97KcKQy9WmP60XIIPd0d"></label><label>Payment type<select id="stripePaymentType"><option value="deposit">Deposit</option><option value="final_balance">Final balance</option></select></label><button class="btn" id="syncStripePaymentBtn">Recover payment</button></div>'+report+'</section>';
+}
+
+async function syncStripePayment(){
+var input=document.getElementById('stripePaymentIntentInput');
+var type=document.getElementById('stripePaymentType');
+var paymentIntentId=input&&input.value.trim();
+if(!paymentIntentId){statusText.innerHTML='<span class="error">Paste the Stripe payment intent ID from Stripe.</span>';return}
+setBusy('Recovering Stripe payment...');
+try{
+var result=await post('/api/admin-sync-stripe-payment',{stripe_payment_intent_id:paymentIntentId,payment_type:type&&type.value||'deposit'});
+state.stripeRecoveryResult=result;
+state.payments=(await endpoint('/api/admin-payments')).payments||[];
+renderPayments();
+statusText.innerHTML='<span class="ok">Stripe payment recovered into the CRM.</span>';
+}catch(err){
+statusText.innerHTML='<span class="error">'+esc(err.message||'Could not recover Stripe payment.')+'</span>';
+}
 }
 
 function renderCommunications(){
