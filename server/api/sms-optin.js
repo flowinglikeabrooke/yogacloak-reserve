@@ -97,7 +97,7 @@ export default async function handler(req, res) {
         fullName,
         phone,
         status: 'lead',
-        source: 'SMS Opt-In',
+        source: 'Website',
         reason: 'Customer joined SMS launch updates.'
       });
       if (identity.customer?.id) {

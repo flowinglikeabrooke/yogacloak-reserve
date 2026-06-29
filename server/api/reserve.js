@@ -412,7 +412,7 @@ export default async function handler(req, res) {
         lastName,
         email,
         status: 'lead',
-        source: 'Reservation Checkout',
+        source: 'Website',
         reason: 'Customer started a reservation checkout.'
       });
       databaseCustomerId = identity.customer?.id || '';

@@ -706,11 +706,11 @@ bindCustomerProfileActions(detail);
 return;
 }
 root.innerHTML='<div class="bar"><div class="section-title">Customers</div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'<select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search name, email, phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div></div>'+rawSyncReport()+
-'<div>'+table(['Customer','Email','Phone','Source','Contact','Last seen'],state.customers.map(function(row){var source=row.raw_backup_only?'Raw backup only':(row.fallback_source==='airtable_forms'||String(row.id||'').indexOf('airtable:')===0?'Airtable raw':'Private CRM');return [customerLink(row.id,row.full_name||row.email||row.phone||'Customer'),esc(row.email),esc(row.phone),esc(source),esc(row.contact_status||'not_contacted'),esc(date(row.last_seen_at))]}),true)+'</div>';
+'<div>'+table(['Customer','Email','Phone','Source','Next step','Last seen'],state.customers.map(function(row){return [customerLink(row.id,row.full_name||row.email||row.phone||'Customer'),esc(row.email),esc(row.phone),esc(customerSourceLabel(row)),esc(customerContactLabel(row.contact_status,row.status)),esc(date(row.last_seen_at))]}),true)+'</div>';
 var syncCustomersBtn=document.getElementById('syncRawCustomersBtn');
 if(syncCustomersBtn){syncCustomersBtn.addEventListener('click',syncRawAirtable)}
 document.getElementById('searchCustomers').addEventListener('click',async function(){var q=document.getElementById('customerSearch').value.trim();var status=document.getElementById('customerContactFilter').value;setBusy('Searching customers...');state.customers=(await endpoint('/api/admin-customers?search='+encodeURIComponent(q)+'&contact_status='+encodeURIComponent(status))).customers||[];renderCustomers();statusText.innerHTML='<span class="ok">Loaded customers.</span>'});
-document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','source','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){var source=row.raw_backup_only?'raw_backup_only':(String(row.id||'').indexOf('airtable:')===0?'airtable_raw':'private_crm');return [row.full_name,row.email,row.phone,source,row.contact_status,row.next_follow_up_at,row.last_seen_at]}))});
+document.getElementById('exportCustomers').addEventListener('click',function(){exportCsv('yogacloak-customers.csv',['name','email','phone','source','contact_status','next_follow_up','last_seen'],state.customers.map(function(row){return [row.full_name,row.email,row.phone,customerSourceLabel(row),customerContactLabel(row.contact_status,row.status),row.next_follow_up_at,row.last_seen_at]}))});
 bindCustomerOpeners();
 }
 
@@ -1229,6 +1229,34 @@ return (Date.now()-noticeMs)/(1000*60*60)>=hours;
 
 function formatStatus(value){
 return String(value||'').replace(/_/g,' ').replace(/\b\w/g,function(ch){return ch.toUpperCase()});
+}
+
+function customerContactLabel(contactStatus,status){
+var lifecycle=String(status||'').toLowerCase();
+var value=String(contactStatus||'not_contacted').toLowerCase();
+if(['archived','deleted','merged'].includes(lifecycle))return lifecycle==='merged'?'Merged duplicate':'Archived';
+return ({
+not_contacted:'Needs first touch',
+needs_reply:'Needs reply',
+emailed:'Emailed',
+texted:'Texted',
+spoke_to_customer:'Contacted',
+waiting_on_customer:'Waiting on customer',
+closed:'No follow-up'
+}[value]||formatStatus(value));
+}
+
+function customerSourceLabel(row){
+var source=String(row&&row.source||'').toLowerCase();
+var fallback=String(row&&row.fallback_source||'').toLowerCase();
+var id=String(row&&row.id||'');
+if(row&&row.raw_backup_only)return 'Airtable backup';
+if(fallback==='airtable_forms'||id.indexOf('airtable:')===0)return 'Airtable backup';
+if(source.includes('sms'))return 'Website SMS opt-in';
+if(source.includes('contact'))return 'Website contact form';
+if(source.includes('reservation')||source.includes('stripe')||source.includes('deposit'))return 'Website deposit';
+if(source.includes('website')||source.includes('homepage')||source.includes('reserve')||source.includes('faq'))return 'Website';
+return 'Website';
 }
 
 function productValues(value){

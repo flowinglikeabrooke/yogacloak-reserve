@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         email,
         phone: cleanPhone,
         status: 'lead',
-        source: 'Website Contact',
+        source: 'Website',
         reason: 'Customer submitted the contact form.'
       });
       if (identity.customer?.id) {
