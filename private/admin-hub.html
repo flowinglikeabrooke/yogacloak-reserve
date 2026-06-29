@@ -1258,6 +1258,20 @@ body{background:linear-gradient(180deg,#1c231f 0%,#18201c 42%,#202820 100%)}
 .final-decision-copy,.final-decision-money,.final-next-box{background:rgba(var(--cream),.018)}
 .final-decision-actions{align-content:start;padding-top:2px}
 .finals-reference-lanes .finals-lane:not([open]){min-height:96px}
+/* Calm CRM header: compact brand, centered work surface, less poster energy. */
+.top{max-width:var(--read-max);margin:clamp(26px,3.2vw,48px) auto var(--space-4)}
+.hero{display:block;max-width:var(--read-max);padding-bottom:0}
+.wordmark{font-size:clamp(28px,2vw,36px)}
+.eyebrow{margin-top:10px}
+.command-title{margin:clamp(26px,3vw,44px) 0 0;font-size:clamp(42px,4.4vw,68px);line-height:1;letter-spacing:-.048em}
+.sub{margin-top:12px;max-width:640px;font-size:14px;line-height:1.5;color:rgba(var(--cream),.58)}
+.tabs{margin:var(--space-4) auto var(--space-5)}
+.today-start,.work-panel,.panel,.finals-command-card,.customer-command-panel,.customer-card-row{box-shadow:0 24px 70px -54px rgba(0,0,0,.86)}
+.today-start{min-height:210px}
+.today-start h2{font-size:clamp(30px,3vw,48px)}
+.today-start p,.muted,.card small,.brief-card small{color:rgba(var(--cream),.5)}
+.brief-card{display:grid;align-content:center}
+.brief-card strong{font-size:clamp(24px,2vw,32px)}
 .hide{display:none!important}
 .select-cell{width:42px}.select-cell input{width:auto}
 .empty{padding:28px;color:rgba(var(--cream),.48);text-align:center}
@@ -2524,12 +2538,12 @@ var raw=isRawProfile(c);
 var inquiries=detail.inquiries||[];
 var privateInquiryCount=crmInquiryRows(inquiries).length;
 return '<div class="detail-block"><div class="section-title">CRM cleanup</div>'+
-'<div class="notice"><strong>Use this to keep one true customer record.</strong><br>Archive removes a record from your active workspace. Merge and move keep the timeline connected to the right person.</div>'+
+'<div class="notice"><strong>Customer record cleanup.</strong><br>Archive, merge, or move records while keeping history attached to the kept profile.</div>'+
 '<div class="crm-tools">'+
 '<div class="crm-tool danger"><strong>Archive/delete contact</strong><p>Hide this person from active CRM lists while preserving payment, opt-in, and timeline history.</p><span class="id-line">'+esc(c.id||'No customer ID')+'</span><button class="btn danger small" id="archiveCustomerBtn" style="margin-top:10px">Archive contact</button></div>'+
 '<div class="crm-tool"><strong>Merge this contact</strong><p>Search the customer profile to keep. This profile will be archived into that one.</p><label class="customer-picker">Customer to keep<input id="mergeTargetCustomerSearch" autocomplete="off" placeholder="Type name, email, or phone" '+(raw?'disabled':'')+'><input id="mergeTargetCustomer" type="hidden"><div id="mergeTargetCustomerSelected" class="selected-customer hide"></div><div id="mergeTargetCustomerResults" class="typeahead-results hide"></div></label><button class="btn quiet small" id="mergeThisCustomerBtn" '+(raw?'disabled':'')+' style="margin-top:10px">Merge into selected contact</button>'+(raw?'<p class="muted">Import raw profile first to merge.</p>':'')+'</div>'+
 '<div class="crm-tool"><strong>Merge duplicate lead messages</strong><p>Combine two lead records on this profile when they are the same conversation.</p><label>Source lead<select id="mergeInquirySource" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label style="margin-top:8px">Keep lead<select id="mergeInquiryTarget" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><button class="btn quiet small" id="mergeInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Merge leads</button></div>'+
-'<div class="crm-tool"><strong>Move lead to another contact</strong><p>Use this when a lead landed on the wrong customer.</p><label>Lead<select id="moveInquiryId" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label class="customer-picker" style="margin-top:8px">Move to customer<input id="moveInquiryCustomerSearch" autocomplete="off" placeholder="Type name, email, or phone" '+(!privateInquiryCount?'disabled':'')+'><input id="moveInquiryCustomerId" type="hidden"><div id="moveInquiryCustomerSelected" class="selected-customer hide"></div><div id="moveInquiryCustomerResults" class="typeahead-results hide"></div></label><button class="btn quiet small" id="moveInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Move lead</button></div>'+
+'<div class="crm-tool"><strong>Move lead to another contact</strong><p>For a message attached to the wrong profile.</p><label>Lead<select id="moveInquiryId" '+(!privateInquiryCount?'disabled':'')+'>'+inquiryOptions(inquiries)+'</select></label><label class="customer-picker" style="margin-top:8px">Move to customer<input id="moveInquiryCustomerSearch" autocomplete="off" placeholder="Type name, email, or phone" '+(!privateInquiryCount?'disabled':'')+'><input id="moveInquiryCustomerId" type="hidden"><div id="moveInquiryCustomerSelected" class="selected-customer hide"></div><div id="moveInquiryCustomerResults" class="typeahead-results hide"></div></label><button class="btn quiet small" id="moveInquiryBtn" '+(!privateInquiryCount?'disabled':'')+' style="margin-top:10px">Move lead</button></div>'+
 '</div></div>';
 }
 
@@ -2658,7 +2672,7 @@ return '<div class="customer-task-card '+(hot?'urgent':'')+'"><div><strong>'+esc
 
 function renderContactTrackingBlock(detail){
 var c=detail.customer||{};
-return '<div class="detail-block"><div class="section-title">Contact tracking</div><p class="muted">Use this to keep the relationship status clear everywhere in the CRM.</p><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Next step<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>';
+return '<div class="detail-block"><div class="section-title">Contact tracking</div><p class="muted">Relationship status used across this profile.</p><div class="quick-actions"><button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button><button class="btn quiet" data-quick-status="needs_reply">Needs reply</button><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div><label style="margin-top:12px">Next step<select id="contactStatus">'+contactOptions(c.contact_status||'not_contacted')+'</select></label><label style="margin-top:8px">Next follow-up<input id="nextFollowUp" type="datetime-local" value="'+datetimeLocal(c.next_follow_up_at)+'"></label><button class="btn quiet" id="saveContactStatusBtn" style="margin-top:10px">Save contact status</button></div>';
 }
 
 function renderOwnerNoteBlock(detail){
@@ -2837,12 +2851,12 @@ var failed=payments.find(function(row){return ['failed','requires_payment_method
 if(failed)return {label:'Payment issue',value:money(failed.amount||0),note:formatStatus(failed.status),pane:'sales',hot:true};
 var risk=customerFinalBalanceRisk(detail);
 if(risk&&risk.level==='blocked')return {label:'Needs payment link',value:money(risk.amount),note:'Send a secure Stripe invoice or link',pane:'sales',hot:true};
-if(risk&&risk.level==='needs')return {label:'Needs notice',value:money(risk.amount),note:'Email before collecting',pane:'sales',hot:true};
+if(risk&&risk.level==='needs')return {label:'Balance pending',value:money(risk.amount),note:'Collect closer to shipment',pane:'sales',hot:false};
 if(risk&&risk.level==='ready')return {label:'Ready balance',value:money(risk.amount),note:'Dry run before charge',pane:'sales',hot:true};
 var ready=reservations.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
 if(ready)return {label:'Ready balance',value:money(ready.final_balance_total||ready.final_balance_amount||0),note:'Dry run before charge',pane:'sales',hot:true};
 var notice=reservations.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at&&!row.final_balance_payment_intent_id});
-if(notice)return {label:'Needs notice',value:money(notice.final_balance_total||notice.final_balance_amount||0),note:'Email before collecting',pane:'sales',hot:false};
+if(notice)return {label:'Balance pending',value:money(notice.final_balance_total||notice.final_balance_amount||0),note:'Collect closer to shipment',pane:'sales',hot:false};
 var outstanding=profileOutstanding(detail);
 if(outstanding>0)return {label:'Pending balance',value:money(outstanding),note:'Review reservation status',pane:'sales',hot:false};
 return {label:'Money',value:money(sumPayments(payments)),note:'Collected so far',pane:'sales',hot:false};
@@ -3030,44 +3044,44 @@ var waiting=reservations.find(function(row){return row.final_balance_notice_sent
 var hasActivity=timelineItems(detail).length>0;
 var actions='';
 if(moneyRisk&&moneyRisk.level==='blocked'){
-return '<span>Next best move</span><strong>Send a secure payment link</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open customer money</button><button class="btn quiet" data-jump-tab="finals" '+(reservationChargeId(moneyRisk.reservation||{})?'data-focus-reservation="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'"':'')+'>Open balance plan</button>'+stripePaymentsLink('Open Stripe')+'</div>';
+return '<span>Payment</span><strong>Payment link needed</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open money</button>'+stripePaymentsLink('Open Stripe')+'</div>';
 }
 if(failedPayment){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email customer</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Text customer</a>':'');
-return '<span>Next best move</span><strong>Payment needs attention</strong><p>A Stripe payment is marked '+esc(formatStatus(failedPayment.status))+'. Reach out before trying any new charge.</p><div class="actions">'+actions+'</div>';
+return '<span>Payment</span><strong>Payment issue</strong><p>'+esc(formatStatus(failedPayment.status))+'</p><div class="actions">'+actions+'</div>';
 }
 if(moneyRisk&&moneyRisk.level==='needs'&&reservationChargeId(moneyRisk.reservation||{})){
 return '<span>Money</span><strong>Balance pending</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open money</button></div>';
 }
 if(moneyRisk&&moneyRisk.level==='ready'&&reservationChargeId(moneyRisk.reservation||{})){
-return '<span>Next best move</span><strong>Final balance check</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Charge</button></div>';
+return '<span>Payment</span><strong>Ready for dry run</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'">Charge</button></div>';
 }
 if(c.contact_status==='needs_reply'){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Reply by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Reply by text</a>':'');
-return '<span>Next best move</span><strong>Reply needed</strong><p>This contact is marked as needing a response.</p><div class="actions">'+actions+'</div>';
+return '<span>Messaging</span><strong>Reply needed</strong><p>Marked as needing a response.</p><div class="actions">'+actions+'</div>';
 }
 if(followUpDue){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Follow up by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Follow up by text</a>':'')+'<button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Move to tomorrow</button>';
-return '<span>Next best move</span><strong>Follow-up is due</strong><p>This customer has a follow-up date set for '+esc(date(c.next_follow_up_at))+'.</p><div class="actions">'+actions+'</div>';
+return '<span>To-Do</span><strong>Follow-up due</strong><p>'+esc(date(c.next_follow_up_at))+'</p><div class="actions">'+actions+'</div>';
 }
 if(readyToCharge){
-return '<span>Next best move</span><strong>Ready for final-balance check</strong><p>The notice wait appears complete. Run a dry run first, then charge only if the customer passes every safety check.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Charge</button></div>';
+return '<span>Payment</span><strong>Ready for dry run</strong><p>Check once before collecting.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Dry run</button><button class="btn" data-final-action="charge" data-reservation-id="'+esc(reservationChargeId(readyToCharge))+'">Charge</button></div>';
 }
 if(needsNotice){
 return '<span>Money</span><strong>Balance pending</strong><p>This customer still owes the remaining balance. Send the balance email when you are ready to collect closer to shipment.</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open money</button></div>';
 }
 if(waiting){
-return '<span>Next best move</span><strong>Balance email is active</strong><p>The balance email was sent. Check readiness after the 24-hour wait before collecting the remaining balance.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(waiting))+'">Check readiness</button></div>';
+return '<span>Payment</span><strong>Waiting period</strong><p>Balance email sent. Check after 24 hours.</p><div class="actions"><button class="btn quiet" data-final-action="dry_run" data-reservation-id="'+esc(reservationChargeId(waiting))+'">Check readiness</button></div>';
 }
 if(!hasActivity){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Start email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Start text</a>':'');
-return '<span>Next best move</span><strong>Start the relationship</strong><p>No timeline activity is linked yet.</p><div class="actions">'+actions+'</div>';
+return '<span>Profile</span><strong>New profile</strong><p>No timeline activity yet.</p><div class="actions">'+actions+'</div>';
 }
 if(c.contact_status==='not_contacted'){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Text</a>':'')+'<button class="btn quiet" data-quick-status="spoke_to_customer">Mark contacted</button>';
-return '<span>Next best move</span><strong>First follow-up needed</strong><p>This customer has activity but has not been marked contacted.</p><div class="actions">'+actions+'</div>';
+return '<span>To-Do</span><strong>First follow-up</strong><p>Activity exists; not marked contacted.</p><div class="actions">'+actions+'</div>';
 }
-return '<span>Next best move</span><strong>Keep relationship warm</strong><p>Use follow-up status, notes, or messages to keep this customer moving cleanly.</p><div class="actions"><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div>';
+return '<span>Status</span><strong>Steady</strong><p>No urgent customer work.</p><div class="actions"><button class="btn quiet" data-quick-status="waiting_on_customer" data-follow-up-days="1">Follow up tomorrow</button></div>';
 }
 
 function renderRawNextAction(detail,emailHref,smsHref,canImportRaw){
@@ -3075,13 +3089,13 @@ var c=detail.customer||{};
 var actions='';
 if(c.contact_status==='needs_reply'){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Reply by email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Reply by text</a>':'');
-return '<span>Next best move</span><strong>Reply needed</strong><p>This raw-backup customer is marked as needing a response.</p><div class="actions">'+actions+'</div>';
+return '<span>Messaging</span><strong>Reply needed</strong><p>Raw-backup profile.</p><div class="actions">'+actions+'</div>';
 }
 if(canImportRaw){
-return '<span>Next best move</span><strong>Organize into CRM</strong><p>Airtable caught the raw activity. Import this person so notes, follow-ups, messages, orders, and payments live on one customer workspace.</p><div class="actions"><button class="btn" id="importRawCustomerBtn">Organize into CRM</button></div>';
+return '<span>Cleanup</span><strong>Import to CRM</strong><p>Move raw activity into one customer workspace.</p><div class="actions"><button class="btn" id="importRawCustomerBtn">Import to CRM</button></div>';
 }
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Open email</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Open text</a>':'');
-return '<span>Next best move</span><strong>Raw activity captured</strong><p>The private CRM database is not connected yet, so this profile is editable in Airtable backup metadata for now.</p><div class="actions">'+actions+'</div>';
+return '<span>Raw backup</span><strong>Activity captured</strong><p>Editable after CRM import.</p><div class="actions">'+actions+'</div>';
 }
 
 function finalBalanceReady(row){
