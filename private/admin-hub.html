@@ -2168,7 +2168,7 @@ await refreshCustomerProfile(customerId,'Lead moved to another customer.');
 async function runCustomerFinalAction(action,reservationId){
 if(!reservationId){statusText.innerHTML='<span class="error">This order is missing its balance record ID.</span>';return}
 var customerId=state.customerDetail&&state.customerDetail.customer&&state.customerDetail.customer.id;
-if(action==='charge'&&!window.confirm('Charge this customer only if their balance email was sent and the 24-hour wait has passed. Anything missing card permission or notice history will be skipped and shown in the results.'))return;
+if(action==='charge'&&!window.confirm('Charge this customer only if their balance email was sent and the 24-hour wait has passed. Anything missing saved-card approval or notice history will be skipped and shown in the results.'))return;
 setBusy(action==='notice'?'Sending balance email...':(action==='dry_run'?'Running balance dry run...':'Collecting final balance...'));
 try{
 if(action==='notice'){
@@ -2321,7 +2321,7 @@ if(inquiries.some(function(row){return row.inquiry_type==='sms_opt_in'}))return 
 if(inquiries.some(function(row){return contactMessageInquiry(row)}))return 'Contact form';
 if(c.source)return c.source;
 if(c.fallback_source==='airtable_forms')return 'Raw Airtable';
-return 'Manual profile';
+return 'Owner-added profile';
 }
 
 function customerOriginDetail(detail){
@@ -3825,7 +3825,7 @@ var pickable=row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:'
 var manual=!pickable||row.blocked_reason;
 var checkbox=pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for action</label>':'<span class="status blocked">Payment link only</span>';
 var card=row.stripe_payment_method_saved?'Saved card on file':'No saved card';
-var auth=row.future_charge_authorized?'Customer approved later charge':'Customer has not approved card-on-file charge';
+var auth=row.future_charge_authorized?'Customer approved the later charge':'Customer has not approved the later charge';
 var notice=row.final_balance_notice_sent_at?'Notice sent '+date(row.final_balance_notice_sent_at):'Notice not sent';
 var next=row.charge_eligible?'Dry run, then charge if still ready':(row.blocked_reason?'Send payment link or invoice':(row.notice_required?'Send final-balance notice':'No action right now'));
 var nextHelp=row.charge_eligible?'This is the saved-card workflow. Dry run checks notice age, saved card, customer permission, and duplicate protection before money moves.':(row.blocked_reason?'This customer still owes money, but this order does not have a saved-card path yet. Contact them, then send a secure Stripe invoice or payment link.':(row.notice_required?'Email the final-balance notice first. After the wait window, this can move to the charge review queue if saved-card permission exists.':'Keep this record for reference.'));
@@ -4113,7 +4113,7 @@ var attempt=row.final_balance_last_attempt_at?'<br><span class="muted">Last atte
 var attemptError=row.final_balance_last_error?'<br><span class="error">'+esc(row.final_balance_last_error)+'</span>':'';
 var finalStatus=row.final_balance_status?'<br><span class="muted">Final status</span> '+esc(row.final_balance_status):'';
 var pickable=row.admin_selectable!==false&&!String(row.id||'').startsWith('crm:');
-return '<tr>'+(selectable?'<td class="select-cell">'+(pickable?'<input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'>':'<span class="muted">Manual</span>')+'</td>':'')+
+return '<tr>'+(selectable?'<td class="select-cell">'+(pickable?'<input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'>':'<span class="muted">Payment link</span>')+'</td>':'')+
 '<td><span class="status '+readyClass(row.readiness_group)+'">'+esc(row.readiness_group||row.status)+'</span><br><span class="muted">'+esc(row.notice_status||'')+'</span>'+eligible+wait+finalStatus+attempt+block+attemptError+'</td>'+
 '<td>'+customerLink(row.customer_id,row.customer_name||row.email||'Customer')+'<br><span class="muted">'+esc(row.email)+'</span></td>'+
 '<td>'+esc(row.product)+'<br><span class="muted">'+esc(row.size)+'</span></td>'+
