@@ -332,7 +332,7 @@ function canOpenTab(tab){if(isFounder())return true;if(founderOnlyTabs.has(tab))
 function applyRoleUi(){
 var label=(adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff');
 document.getElementById('sessionUserLabel').textContent=label;
-document.getElementById('heroRoleLabel').textContent='Command center';
+document.getElementById('heroRoleLabel').textContent='command';
 document.getElementById('profileMenuLabel').textContent=adminUser.name||'Profile';
 document.getElementById('profileMenuName').textContent=adminUser.name||'Team';
 document.getElementById('profileMenuRole').textContent=formatStatus(adminUser.role||'staff');
