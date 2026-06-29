@@ -30,6 +30,17 @@ button:disabled{cursor:not-allowed;opacity:.45}
 .utility-btn:hover{color:var(--bone);border-color:rgba(var(--cream),.28);background:rgba(var(--cream),.04)}
 .corner-actions{position:fixed;right:22px;top:18px;z-index:20;display:flex;align-items:center;gap:8px;background:rgba(21,22,24,.72);border:1px solid rgba(var(--cream),.09);border-radius:999px;padding:7px;backdrop-filter:blur(18px);box-shadow:0 20px 50px -34px rgba(0,0,0,.8)}
 .corner-status{max-width:220px;color:rgba(var(--cream),.5);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 7px}
+.profile-menu-wrap{position:relative}
+.profile-trigger{display:inline-flex;align-items:center;gap:9px;background:var(--bone);color:var(--ink);border-radius:999px;padding:9px 12px 9px 10px;font-weight:800;font-size:12px;box-shadow:0 12px 34px -24px rgba(251,248,240,.9)}
+.avatar-dot{width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:var(--bone);font-size:11px;font-weight:800}
+.profile-caret{font-size:11px;opacity:.7}
+.profile-menu{position:absolute;right:0;top:calc(100% + 10px);width:240px;background:#151618;border:1px solid rgba(var(--cream),.12);border-radius:8px;box-shadow:0 28px 70px -36px rgba(0,0,0,.92);padding:8px}
+.profile-menu-header{padding:10px 11px 12px;border-bottom:1px solid rgba(var(--cream),.08);margin-bottom:6px}
+.profile-menu-header strong{display:block;font-size:14px;color:var(--bone)}
+.profile-menu-header span{display:block;margin-top:3px;font-size:11px;color:rgba(var(--cream),.5)}
+.profile-menu button{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;background:transparent;color:rgba(var(--cream),.74);border-radius:7px;padding:10px 11px;font-size:12px;font-weight:700;box-shadow:none}
+.profile-menu button:hover{background:rgba(var(--cream),.055);color:var(--bone);transform:none}
+.profile-menu button.danger{color:#d4948d}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .hub-state{border-top:1px solid rgba(var(--cream),.07);margin-top:14px;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:rgba(var(--cream),.48);line-height:1.45}
 .wordmark{font-size:28px;letter-spacing:-.02em;text-decoration:none;display:inline-flex;align-items:center;gap:0}.wordmark strong{font-weight:700}.wordmark span{font-weight:400}
@@ -232,8 +243,16 @@ tr:last-child td{border-bottom:0}
 <body>
 <div class="corner-actions" aria-label="Admin controls">
 <span id="statusText" class="corner-status">Ready.</span>
-<button class="utility-btn" id="loadBtn">Refresh live</button>
-<button class="utility-btn" id="logoutBtn">Log out</button>
+<div class="profile-menu-wrap">
+<button class="profile-trigger" id="profileMenuBtn" aria-haspopup="true" aria-expanded="false"><span class="avatar-dot" id="profileInitial">B</span><span id="profileMenuLabel">Profile</span><span class="profile-caret">v</span></button>
+<div class="profile-menu hide" id="profileMenu" role="menu">
+<div class="profile-menu-header"><strong id="profileMenuName">Brooke</strong><span id="profileMenuRole">Founder</span></div>
+<button id="profileRefresh" role="menuitem">Refresh live <span>Now</span></button>
+<button id="profileSettings" role="menuitem">Settings <span>Hub</span></button>
+<button id="profileChange" role="menuitem">Change profile <span>Switch</span></button>
+<button class="danger" id="profileLogout" role="menuitem">Log out <span>Exit</span></button>
+</div>
+</div>
 </div>
 <span id="storageText" class="sr-only"></span>
 <span id="currentTabLabel" class="sr-only">Today</span>
@@ -280,7 +299,6 @@ tr:last-child td{border-bottom:0}
 <script>
 var statusText=document.getElementById('statusText');
 var storageText=document.getElementById('storageText');
-var heroStatus=document.getElementById('heroStatus');
 var currentTabLabel=document.getElementById('currentTabLabel');
 var csrfToken='__ADMIN_CSRF_TOKEN__';
 var adminUserRaw='__ADMIN_USER_JSON__';
@@ -296,16 +314,40 @@ function isFounder(){return adminUser&&adminUser.role==='founder'}
 function isOwner(){return adminUser&&['founder','owner'].includes(adminUser.role)}
 function canOpenTab(tab){if(isFounder())return true;if(founderOnlyTabs.has(tab))return false;return isOwner()||!ownerOnlyTabs.has(tab)}
 function applyRoleUi(){
-document.getElementById('sessionUserLabel').textContent=(adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff');
+var label=(adminUser.name||'Team')+' · '+formatStatus(adminUser.role||'staff');
+document.getElementById('sessionUserLabel').textContent=label;
 document.getElementById('heroRoleLabel').textContent=isFounder()?'Founder':(isOwner()?'Owner':'Team');
+document.getElementById('profileMenuLabel').textContent=adminUser.name||'Profile';
+document.getElementById('profileMenuName').textContent=adminUser.name||'Team';
+document.getElementById('profileMenuRole').textContent=formatStatus(adminUser.role||'staff');
+document.getElementById('profileInitial').textContent=String(adminUser.name||'Y').trim().slice(0,1).toUpperCase()||'Y';
+document.getElementById('profileSettings').classList.toggle('hide',!canOpenTab('settings'));
 document.querySelectorAll('.tab').forEach(function(btn){
 var locked=!canOpenTab(btn.dataset.tab);
 btn.classList.toggle('hide',locked);
 btn.setAttribute('aria-hidden',locked?'true':'false');
 });
 }
-document.getElementById('loadBtn').addEventListener('click',loadCurrent);
-document.getElementById('logoutBtn').addEventListener('click',async function(){await fetch('/api/admin-logout',{method:'POST'});location.reload()});
+function closeProfileMenu(){
+document.getElementById('profileMenu').classList.add('hide');
+document.getElementById('profileMenuBtn').setAttribute('aria-expanded','false');
+}
+function toggleProfileMenu(){
+var menu=document.getElementById('profileMenu');
+var open=menu.classList.contains('hide');
+menu.classList.toggle('hide',!open);
+document.getElementById('profileMenuBtn').setAttribute('aria-expanded',open?'true':'false');
+}
+async function endAdminSession(){
+await fetch('/api/admin-logout',{method:'POST'});
+location.reload();
+}
+document.getElementById('profileMenuBtn').addEventListener('click',function(event){event.stopPropagation();toggleProfileMenu()});
+document.getElementById('profileRefresh').addEventListener('click',function(){closeProfileMenu();loadCurrent()});
+document.getElementById('profileSettings').addEventListener('click',function(){closeProfileMenu();setTab('settings')});
+document.getElementById('profileChange').addEventListener('click',endAdminSession);
+document.getElementById('profileLogout').addEventListener('click',endAdminSession);
+document.addEventListener('click',function(event){if(!event.target.closest('.profile-menu-wrap'))closeProfileMenu()});
 document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.tab)})});
 
 function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]})}
@@ -319,8 +361,6 @@ function tabLabel(tab){return ({today:'Today',tasks:'Tasks',customers:'Customers
 function health(value){return value?'<span class="health good">On</span>':'<span class="health bad">Missing</span>'}
 function ownerOnlyNotice(tab){return '<section class="panel"><div class="notice warn"><strong>'+esc(founderOnlyTabs.has(tab)?'Founder-only area.':'Owner-only area.')+'</strong><br>'+esc(tabLabel(tab))+' includes '+esc(founderOnlyTabs.has(tab)?'security, automation, duplicate cleanup, or destructive controls.':'money or final-balance controls.')+' Staff profiles can work customers, inquiries, tasks, notes, and messages.</div></section>'}
 function renderHeroStatus(){
-heroStatus.className='notice';
-heroStatus.innerHTML='<strong>Command center</strong><br>Use Update to refresh this workspace. Setup warnings and security status now live in Settings.';
 currentTabLabel.textContent=tabLabel(activeTab);
 }
 
@@ -383,8 +423,6 @@ document.querySelectorAll('.tab').forEach(function(btn){btn.classList.toggle('ac
 document.querySelectorAll('.view').forEach(function(view){view.classList.toggle('hide',view.id!=='today')});
 statusText.innerHTML='<span class="error">This is the raw local file preview, not the live CRM.</span>';
 storageText.textContent='Open the deployed private admin page so the hub can use its secure session and live APIs.';
-heroStatus.className='notice warn';
-heroStatus.innerHTML='<strong>Disconnected preview.</strong><br>This page was opened from your computer files, so it cannot load customers, Airtable sync, Stripe readiness, CSRF security, or admin session data.';
 document.getElementById('today').innerHTML='<section class="panel"><div class="section-title">Open the real admin hub</div><div class="notice warn"><strong>This local file will always look incomplete.</strong><br>The CRM only works through the protected server page. Use the deployed private admin URL when you want live customers, inquiries, payments, and final-balance tools.</div><div class="meta"><span class="pill">Admin session <strong>not connected</strong></span><span class="pill">CRM APIs <strong>not connected</strong></span><span class="pill">Stripe tools <strong>not connected</strong></span><span class="pill">Airtable sync <strong>not connected</strong></span></div><div class="actions" style="margin-top:16px"><a class="btn" href="https://www.yogacloak.com/yogacloak-admin.html">Open live admin hub</a><a class="btn quiet" href="https://www.yogacloak.com/api/admin-page">Open protected admin route</a></div></section>';
 }
 
