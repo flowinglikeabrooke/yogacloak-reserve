@@ -1187,6 +1187,7 @@ if(!adminUser||typeof adminUser!=='object'||Array.isArray(adminUser)){adminUser=
 var directFilePreview=location.protocol==='file:'||csrfToken==='__ADMIN_CSRF_TOKEN__';
 var activeTab='today';
 var state={dashboard:null,tasks:null,taskFilter:'active',customers:[],customerDetail:null,customerProfilePane:'work',customerQueueFilter:'all',inquiryQueueFilter:'all',inquiries:[],reservations:[],payments:[],paymentFilter:'all',communications:null,automations:null,activeAutomationKey:null,accounting:null,duplicates:[],selected:new Set(),batchResults:null,noticeResults:null,rawSyncResults:null,finalBalanceSafety:null,finalBalanceSummary:null,finalBalanceMeta:null,batchBusy:false,focusReservation:''};
+var STRIPE_PAYMENTS_URL='https://dashboard.stripe.com/acct_1ThK1eKcKQy9WmP6/payments';
 var taskCustomerSearchTimer=null;
 var ownerOnlyTabs=new Set(['reservations','payments','finals','accounting']);
 var founderOnlyTabs=new Set(['automations','duplicates','settings']);
@@ -1238,6 +1239,7 @@ document.querySelectorAll('.tab').forEach(function(btn){btn.addEventListener('cl
 function esc(value){return String(value||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]})}
 function money(value){var n=Number(value||0);return '$'+(Math.abs(n-Math.round(n))>.004?n.toFixed(2):n.toFixed(0))}
 function stripeFeeEstimate(value){var n=Number(value||0);return n>0?Math.round((n*.029+.30)*100)/100:0}
+function stripePaymentsLink(label,className){return '<a class="'+esc(className||'btn quiet small')+'" href="'+esc(STRIPE_PAYMENTS_URL)+'" target="_blank" rel="noopener">'+esc(label||'Open Stripe')+'</a>'}
 function date(value){return value?String(value).slice(0,10):''}
 function endpoint(path){return fetch(path,{credentials:'same-origin'}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok)throw new Error(data.error||'Could not load');return data})}
 function post(path,body){return fetch(path,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)}).then(async function(res){var data=await res.json().catch(function(){return {}});if(res.status===401){location.reload();throw new Error('Admin session expired.')}if(!res.ok&&res.status!==207){var err=new Error(data.error||'Request failed');err.step=data.step||'';err.details=data.details||'';throw err}return data})}
@@ -1406,6 +1408,7 @@ return {kind:kind,title:title,detail:detail,tab:tab,hot:hot,customer_id:row&&row
 
 function priorityButton(item,label,style){
 var className=style||'btn small';
+if(item.reservation_id&&(item.tab==='finals'||item.kind==='Balances'||item.kind==='Money'))return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open balance')+'</button>';
 if(item.customer_id)return '<button class="'+esc(className)+'" data-open-customer="'+esc(item.customer_id)+'" data-open-customer-pane="'+esc(item.profile_pane||'work')+'">'+esc(label||'Open profile')+'</button>';
 if(item.reservation_id)return '<button class="'+esc(className)+'" data-jump-tab="finals" data-focus-reservation="'+esc(item.reservation_id)+'">'+esc(label||'Open balance')+'</button>';
 return '<button class="'+esc(className)+'" data-jump-tab="'+esc(item.tab||'today')+'">'+esc(label||'Open')+'</button>';
@@ -1471,6 +1474,7 @@ return 'work';
 }
 
 function todayRowAttrs(row,tab){
+if(row.charge_id&&['notice','charge','payment','final_balance'].includes(String(row.type||'').toLowerCase()))return 'data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'"';
 if(row.customer_id)return 'data-open-customer="'+esc(row.customer_id)+'" data-open-customer-pane="'+esc(todayTaskPane(row))+'"';
 if(row.charge_id)return 'data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'"';
 return 'data-jump-tab="'+esc(tab)+'"';
@@ -1513,6 +1517,11 @@ return '<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+
 }
 
 function renderTodayTaskButtons(row){
+var type=String(row.type||'').toLowerCase();
+if(!row.owner_task_id&&row.charge_id&&['notice','charge','payment','final_balance'].includes(type)){
+var profile=row.customer_id?openProfileButton(row.customer_id,'Profile','sales'):'';
+return profile+'<button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(row.charge_id)+'">Open balance</button>';
+}
 if(!row.owner_task_id)return renderTodayAction(row)+'<button class="btn quiet small" data-jump-tab="'+esc(todayTaskTab(row))+'">'+esc(tabLabel(todayTaskTab(row)))+'</button>';
 var profile=row.customer_id?openProfileButton(row.customer_id,'Profile',todayTaskPane(row)):'<button class="btn quiet small" data-jump-tab="tasks">Task center</button>';
 return profile+'<button class="btn small" data-task-status="'+esc(row.owner_task_id)+'" data-status="done">Complete</button><button class="btn quiet small" data-task-status="'+esc(row.owner_task_id)+'" data-status="archived">Archive</button>';
@@ -2421,7 +2430,7 @@ var waiting=reservations.find(function(row){return row.final_balance_notice_sent
 var hasActivity=timelineItems(detail).length>0;
 if(raw&&c.contact_status==='needs_reply')return {title:'Reply needed',note:'Raw backup profile, but this customer still needs a response.',pane:'messages',hot:true};
 if(raw)return {title:'Organize into CRM',note:'Import this raw Airtable profile so notes, tasks, messages, and money stay together.',pane:'profile',hot:true};
-if(moneyRisk&&moneyRisk.level==='blocked')return {title:'Manual balance issue',note:moneyRisk.note,pane:'sales',hot:true};
+if(moneyRisk&&moneyRisk.level==='blocked')return {title:'Needs payment link or card update',note:moneyRisk.note,pane:'sales',hot:true};
 if(failedPayment)return {title:'Payment needs attention',note:'Reach out before trying another charge.',pane:'sales',hot:true};
 if(moneyRisk&&moneyRisk.level==='needs')return {title:'Send balance notice',note:moneyRisk.note,pane:'sales',hot:true};
 if(moneyRisk&&moneyRisk.level==='ready')return {title:'Final balance check',note:moneyRisk.note,pane:'sales',hot:true};
@@ -2442,7 +2451,7 @@ var reservations=detail.reservations||[];
 var open=reservations.filter(function(row){return !row.final_balance_payment_intent_id&&Number(row.final_balance_total||row.final_balance_amount||0)>0});
 if(!open.length)return null;
 var manual=open.find(function(row){return row.blocked_reason||!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized});
-if(manual)return {level:'blocked',title:'Manual final-balance path',amount:Number(manual.final_balance_total||manual.final_balance_amount||0),pane:'sales',reservation:manual,note:manual.blocked_reason||'This customer still owes a balance, but this profile does not have the saved-card permission/payment-method path needed for batch charging. Use a Stripe invoice or payment link unless the original reservation checkout is reconnected.'};
+if(manual)return {level:'blocked',title:'Needs payment link or card update',amount:Number(manual.final_balance_total||manual.final_balance_amount||0),pane:'sales',reservation:manual,note:manual.blocked_reason||'This customer still owes the remaining balance, but the CRM cannot safely charge a saved card for this record. Contact the customer and send a Stripe invoice or payment link, or have them complete a checkout that saves permission for the later charge.'};
 var needsNotice=open.find(function(row){return ['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at});
 if(needsNotice)return {level:'needs',title:'Final-balance notice needed',amount:Number(needsNotice.final_balance_total||needsNotice.final_balance_amount||0),pane:'sales',reservation:needsNotice,note:'Send the required balance email before any remaining-balance collection.'};
 var ready=open.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
@@ -2456,8 +2465,8 @@ function renderCustomerMoneyAlert(detail){
 var risk=customerFinalBalanceRisk(detail);
 if(!risk)return '';
 var chargeId=reservationChargeId(risk.reservation||{});
-var action='<button class="btn quiet small" data-profile-pane="sales">Open sales issue</button>';
-if(risk.level==='blocked')action+='<button class="btn quiet small" data-jump-tab="finals" '+(chargeId?'data-focus-reservation="'+esc(chargeId)+'"':'')+'>Final balance workflow</button>';
+var action='<button class="btn quiet small" data-profile-pane="sales">Open sales</button>';
+if(risk.level==='blocked')action+='<button class="btn quiet small" data-jump-tab="finals" '+(chargeId?'data-focus-reservation="'+esc(chargeId)+'"':'')+'>Open balance</button>'+stripePaymentsLink('Open Stripe');
 else if(risk.level==='needs'&&chargeId)action+='<button class="btn small" data-final-action="notice" data-reservation-id="'+esc(chargeId)+'">Send notice</button>';
 else if(chargeId)action+='<button class="btn quiet small" data-final-action="dry_run" data-reservation-id="'+esc(chargeId)+'">Check readiness</button>';
 return '<section class="customer-money-alert '+esc(risk.level||'')+'"><div><strong>'+esc(risk.title)+' · '+money(risk.amount)+'</strong><span>'+esc(risk.note)+'</span></div><div class="actions">'+action+'</div></section>';
@@ -2537,7 +2546,7 @@ var payments=detail.payments||[];
 var failed=payments.find(function(row){return ['failed','requires_payment_method','requires_action'].includes(String(row.status||''))});
 if(failed)return {label:'Payment issue',value:money(failed.amount||0),note:formatStatus(failed.status),pane:'sales',hot:true};
 var risk=customerFinalBalanceRisk(detail);
-if(risk&&risk.level==='blocked')return {label:'Manual balance issue',value:money(risk.amount),note:'Invoice/payment link needed',pane:'sales',hot:true};
+if(risk&&risk.level==='blocked')return {label:'Needs payment link',value:money(risk.amount),note:'Card-on-file charge is not ready',pane:'sales',hot:true};
 if(risk&&risk.level==='needs')return {label:'Needs notice',value:money(risk.amount),note:'Email before collecting',pane:'sales',hot:true};
 if(risk&&risk.level==='ready')return {label:'Ready balance',value:money(risk.amount),note:'Dry run before charge',pane:'sales',hot:true};
 var ready=reservations.find(function(row){return finalBalanceReady(row)&&reservationChargeId(row)});
@@ -2697,7 +2706,7 @@ var rawNotice=raw?'<div class="notice warn"><strong>Raw backup caught this.</str
 return '<div class="customer-workspace-head"><div class="customer-identity"><span>'+esc(raw?'Raw profile':'Customer profile')+'</span><h2>'+esc(c.full_name||c.email||c.phone||'Customer')+'</h2><div class="customer-contact-line"><span>Email <strong>'+esc(c.email||'Missing')+'</strong></span><span>Phone <strong>'+esc(c.phone||'Missing')+'</strong></span></div></div><div class="customer-status-stack">'+badge+moneyBadge+'<span class="pill">Origin <strong>'+esc(customerOriginLabel(detail))+'</strong></span><span class="pill">Status <strong>'+esc(customerContactLabel(c.contact_status,c.status))+'</strong></span></div></div>'+
 rawNotice+
 renderCustomerMoneyAlert(detail)+
-renderCustomerBrain(detail,raw,emailHref,smsHref)+
+renderCustomerWorkStrip(detail,emailHref,smsHref)+
 renderCustomerPaneTabs(detail,raw)+
 renderCustomerPane(detail,raw,emailHref,smsHref);
 }
@@ -2730,7 +2739,7 @@ var waiting=reservations.find(function(row){return row.final_balance_notice_sent
 var hasActivity=timelineItems(detail).length>0;
 var actions='';
 if(moneyRisk&&moneyRisk.level==='blocked'){
-return '<span>Next best move</span><strong>Manual balance issue</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open sales issue</button><button class="btn quiet" data-jump-tab="finals" '+(reservationChargeId(moneyRisk.reservation||{})?'data-focus-reservation="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'"':'')+'>Final balance workflow</button></div>';
+return '<span>Next best move</span><strong>Send payment link or collect card permission</strong><p>'+esc(moneyRisk.note)+'</p><div class="actions"><button class="btn quiet" data-profile-pane="sales">Open sales</button><button class="btn quiet" data-jump-tab="finals" '+(reservationChargeId(moneyRisk.reservation||{})?'data-focus-reservation="'+esc(reservationChargeId(moneyRisk.reservation||{}))+'"':'')+'>Open balance</button>'+stripePaymentsLink('Open Stripe')+'</div>';
 }
 if(failedPayment){
 actions=(emailHref?'<a class="btn quiet" href="'+esc(emailHref)+'">Email customer</a>':'')+(smsHref?'<a class="btn quiet" href="'+esc(smsHref)+'">Text customer</a>':'');
@@ -3025,7 +3034,7 @@ var amount=Number(row.final_balance_total||row.final_balance_amount||0);
 if(row.final_balance_payment_intent_id)return {className:'charged',label:'Final paid',note:'Remaining balance collected.'};
 if(amount<=0)return {className:'ready',label:'No balance due',note:'No remaining balance is recorded.'};
 if(row.blocked_reason)return {className:'blocked',label:'Manual review',note:row.blocked_reason};
-if(!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized)return {className:'blocked',label:'Manual balance path',note:'No saved-card batch-charge path is connected. Use Stripe invoice/payment link unless this reservation is reconnected.'};
+if(!reservationChargeId(row)||!row.stripe_customer_id||!row.stripe_payment_method_id||!row.future_charge_authorized)return {className:'blocked',label:'Needs payment link',note:'Card-on-file charging is not ready for this reservation. Contact the customer and send a Stripe invoice or payment link.'};
 if(['Reserved','Confirmed'].includes(row.status)&&!row.final_balance_notice_sent_at)return {className:'needs',label:'Needs notice',note:'Send the balance email before collecting.'};
 if(finalBalanceReady(row))return {className:'ready',label:'Ready for dry run',note:'Run dry run before charging.'};
 if(row.final_balance_notice_sent_at)return {className:'waiting',label:'Waiting period',note:'Notice sent. Wait period must pass before charging.'};
@@ -3249,8 +3258,8 @@ document.getElementById('refreshReservations').addEventListener('click',loadCurr
 var miniRefresh=document.getElementById('refreshReservationsMini');
 if(miniRefresh)miniRefresh.addEventListener('click',loadCurrent);
 bindCustomerOpeners();
-document.querySelectorAll('[data-open-reservation-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary,details'))return;openCustomer(card.dataset.openReservationCustomer)})});
-document.querySelectorAll('#reservations [data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(){setTab(btn.dataset.jumpTab)})});
+document.querySelectorAll('[data-open-reservation-customer]').forEach(function(card){card.addEventListener('click',function(event){if(event.target.closest('button,a,select,input,label,textarea,summary,details'))return;openCustomer(card.dataset.openReservationCustomer,'sales')})});
+document.querySelectorAll('#reservations [data-jump-tab]').forEach(function(btn){btn.addEventListener('click',function(){if(btn.dataset.focusReservation)state.focusReservation=btn.dataset.focusReservation;setTab(btn.dataset.jumpTab)})});
 }
 
 function renderReservationSummary(rows){
@@ -3282,9 +3291,10 @@ var className=group==='Ready to Charge'?'ready':(group==='Needs Notice'?'needs':
 var customer=row.customer_name||row.email||'Customer';
 var product=esc(row.product||'Reservation')+(row.size?' · '+esc(row.size):'');
 var card=row.stripe_payment_method_saved?'Saved card':'No saved card';
-var next=row.charge_eligible?'Run dry run before charging':(row.notice_required?'Send final-balance notice':(row.blocked_reason?'Manual review needed':(row.final_balance_notice_sent_at?'Waiting / already notified':'No urgent action')));
-var nextHelp=row.charge_eligible?'Ready only means safe to check. Dry run before collecting.':(row.notice_required?'This customer must receive the balance email before any charge attempt.':(row.blocked_reason?'Use the customer profile and Stripe context before taking action.':'Keep connected to the customer profile for fulfillment.'));
-var actions='<div class="reservation-actions">'+openProfileButton(row.customer_id,'Open profile')+'<button class="btn quiet small" data-jump-tab="finals">Final balance</button></div>';
+var needsPaymentLink=!!row.blocked_reason||(!row.stripe_payment_method_saved&&!row.charge_eligible&&Number(row.final_balance_total||0)>0);
+var next=row.charge_eligible?'Run dry run before charging':(row.notice_required?'Send final-balance notice':(needsPaymentLink?'Get card or send payment link':(row.final_balance_notice_sent_at?'Waiting / already notified':'No urgent action')));
+var nextHelp=row.charge_eligible?'Ready only means safe to check. Dry run before collecting.':(row.notice_required?'This customer must receive the balance email before any charge attempt.':(needsPaymentLink?'Contact the customer, then send a Stripe invoice/payment link or have them check out again with card permission saved.':'Keep connected to the customer profile for fulfillment.'));
+var actions='<div class="reservation-actions">'+openProfileButton(row.customer_id,'Open sales','sales')+'<button class="btn quiet small" data-jump-tab="finals" '+(row.id?'data-focus-reservation="'+esc(row.id)+'"':'')+'>Open balance</button>'+(needsPaymentLink?stripePaymentsLink('Open Stripe'):'')+'</div>';
 var openAttr=row.customer_id?' data-open-reservation-customer="'+esc(row.customer_id)+'"':'';
 return '<article class="reservation-card '+className+'"'+openAttr+'>'+
 '<div class="reservation-person"><span class="status '+readyClass(group)+'">'+esc(group)+'</span><strong>'+customerLink(row.customer_id,customer)+'</strong><span>'+esc(row.email||'No email')+'</span><span>'+esc(row.status||'Reservation')+'</span></div>'+
