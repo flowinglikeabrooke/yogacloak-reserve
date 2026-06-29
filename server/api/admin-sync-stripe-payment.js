@@ -338,10 +338,10 @@ export default async function handler(req, res) {
     }));
     const canChargeRemainingLater = Boolean(metadata.reservation_record_id && stripeCustomerId && paymentMethodId && futureAuthorized && finalBalanceTotal > 0);
     const blockedReasons = [];
-    if (!metadata.reservation_record_id) blockedReasons.push('No yogacloak reservation ID found on the Stripe payment.');
-    if (!paymentMethodId) blockedReasons.push('No saved Stripe payment method found.');
-    if (!futureAuthorized) blockedReasons.push('Future-charge authorization was not found on the Stripe payment.');
-    if (!finalBalanceTotal) blockedReasons.push('No final-balance amount found on the Stripe payment.');
+    if (!metadata.reservation_record_id) blockedReasons.push('Tracked in the CRM, but this Stripe payment is not linked to the original yogacloak reservation/Airtable record used by the batch-charge workflow.');
+    if (!paymentMethodId) blockedReasons.push('No saved Stripe payment method was found on this payment.');
+    if (!futureAuthorized) blockedReasons.push('Stripe does not show permission to charge this card later. Do not auto-charge this payment; send a new invoice/payment link for the remaining balance.');
+    if (!finalBalanceTotal) blockedReasons.push('No final-balance amount was saved on the Stripe payment. Enter the remaining balance when recovering, or update the customer reservation.');
 
     await step('audit_admin_action', () => auditAdminAction(req, {
       actionType: 'sync_stripe_payment',

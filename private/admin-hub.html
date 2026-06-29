@@ -1499,10 +1499,12 @@ report='<div class="notice warn"><strong>Stripe recovery did not finish.</strong
 var customer=result.customer||{};
 var reservation=result.reservation||{};
 var reasons=result.blocked_reasons||[];
-report='<div class="notice '+(result.can_charge_remaining_later?'good':'warn')+'"><strong>'+esc(result.can_charge_remaining_later?'Stripe payment recovered. Remaining balance can be prepared.':'Stripe payment recovered, but remaining balance is not ready yet.')+'</strong><br>'+
+var recoveredTitle=result.can_charge_remaining_later?'Stripe payment recovered. Remaining balance can be prepared.':'Stripe payment recovered into the CRM. Auto-charge is blocked for this payment.';
+var nextStep=result.can_charge_remaining_later?'Send the final-balance notice first. The charge stays locked until the notice wait has passed.':'For this recovered payment, use a Stripe invoice/payment link for any remaining balance unless the customer makes a new reservation checkout that saves future-charge permission.';
+report='<div class="notice '+(result.can_charge_remaining_later?'good':'warn')+'"><strong>'+esc(recoveredTitle)+'</strong><br>'+
 'Customer: '+esc(customer.full_name||customer.email||customer.phone||'Customer')+
 (reservation.id?' · Reservation connected':'')+
-(reasons.length?'<ul class="mini-list">'+reasons.map(function(reason){return '<li>'+esc(reason)+'</li>'}).join('')+'</ul>':'<p class="muted">Send the final-balance notice first. The charge stays locked until the notice wait has passed.</p>')+
+(reasons.length?'<ul class="mini-list">'+reasons.map(function(reason){return '<li>'+esc(reason)+'</li>'}).join('')+'</ul><p class="muted">'+esc(nextStep)+'</p>':'<p class="muted">'+esc(nextStep)+'</p>')+
 '</div>';
 }
 }
