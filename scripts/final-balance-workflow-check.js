@@ -166,7 +166,7 @@ includes(adminHub, 'selectNeedsNotice', 'admin can select notice-needed reservat
 includes(adminHub, 'Select needs notice', 'admin exposes select needs notice action');
 includes(adminHub, 'noticeResultReport()', 'admin renders per-reservation notice results');
 includes(adminHub, 'Notice send results', 'admin labels notice result report');
-includes(adminHub, "['Reservation','Status','Final balance','Reason']", 'admin notice result table shows reservation status, balance, and reason');
+includes(adminHub, "['Order','Status','Final balance','Reason']", 'admin notice result table shows order status, balance, and reason');
 includes(adminHub, '/api/batch-final-balance', 'admin can run batch final-balance endpoint');
 includes(adminHub, 'Dry run', 'admin exposes dry run action');
 includes(adminHub, 'Charge ready batch', 'admin exposes real batch charge action');
@@ -181,8 +181,8 @@ includes(adminHub, 'window.confirm(message)', 'admin asks for confirmation befor
 includes(adminHub, 'readyAmount', 'admin calculates selected ready-to-charge total before confirmation');
 includes(adminHub, "totaling '+money(readyAmount)+'", 'admin confirmation shows the batch charge total');
 includes(adminHub, 'Batch charge cancelled.', 'admin reports cancelled real batch charge');
-includes(adminHub, 'No selected reservations are ready to charge.', 'admin blocks real batch when no selected reservation is ready');
-includes(adminHub, 'Batch limit is 100 reservations. Select fewer records and try again.', 'admin blocks oversized final-balance batch requests before sending');
+includes(adminHub, 'None of the picked balances are ready to charge.', 'admin blocks real batch when no selected balance is ready');
+includes(adminHub, 'Batch limit is 100 balances. Pick fewer records and try again.', 'admin blocks oversized final-balance batch requests before sending');
 includes(adminHub, 'batchBusy', 'admin tracks in-progress batch requests');
 includes(adminHub, 'Batch request already running.', 'admin blocks duplicate in-progress batch requests');
 includes(adminHub, 'Charge eligible', 'admin rows show eligibility');
@@ -196,11 +196,11 @@ includes(adminHub, 'Batch charge results', 'admin labels real batch result repor
 includes(adminHub, 'Dry run results', 'admin labels dry-run result report');
 includes(adminHub, 'Owner email', 'admin batch report shows owner summary email status');
 includes(adminHub, 'Owner summary email failed:', 'admin batch report shows owner summary email failure');
-includes(adminHub, "['Reservation','Status','Code','Amount','Stripe status','Payment intent','Reason']", 'admin result table shows reservation status, reason code, Stripe status, payment intent, and reason');
+includes(adminHub, "['Order','Status','Code','Amount','Stripe status','Payment intent','Reason']", 'admin result table shows order status, reason code, Stripe status, payment intent, and reason');
 includes(adminHub, 'finalBalanceSafetyPanel()', 'admin renders charging safety panel');
-includes(adminHub, 'Charging safety', 'admin labels charging safety panel');
+includes(adminHub, 'Charging safety lock', 'admin labels charging safety panel');
 includes(adminHub, 'Live final charges', 'admin shows live final charge lock state');
 includes(adminHub, 'Notice wait', 'admin shows configured notice wait');
-includes(adminHub, 'Run one Stripe test-mode reservation end to end before enabling live final charges.', 'admin reminds owner to test before live use');
+includes(adminHub, 'Run one Stripe test-mode order end to end before enabling live final charges.', 'admin reminds owner to test before live use');
 
 console.log('Final-balance workflow check passed.');
