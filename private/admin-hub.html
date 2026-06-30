@@ -2176,7 +2176,7 @@ if(back){back.addEventListener('click',function(){state.customerDetail=null;rend
 bindCustomerProfileActions(detail);
 return;
 }
-root.innerHTML='<div class="bar"><div><div class="section-title">Customers</div><p class="muted">One real person, one profile. Open a contact to see messages, To-Do items, orders, payments, notes, and timeline.</p></div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'</div></div>'+rawSyncReport()+
+root.innerHTML='<div class="bar"><div><div class="section-title">Customers</div><p class="muted">Open a profile for messages, To-Do, orders, payments, notes, and timeline.</p></div><div class="actions">'+(canSync?'<button class="btn quiet" id="syncRawCustomersBtn">Sync raw backup</button>':'')+'</div></div>'+rawSyncReport()+
 renderCustomerCommandPanel(state.customers)+
 '<div class="customer-filter-panel"><select id="customerContactFilter"><option value="">All contact statuses</option>'+contactOptions('')+'</select><input id="customerSearch" placeholder="Search full name, email, or phone"><button class="btn quiet" id="searchCustomers">Search</button><button class="btn quiet" id="exportCustomers">Export CSV</button></div>'+
 renderCustomerQueue(filteredCustomerRows(state.customers))+
@@ -2922,7 +2922,7 @@ return '<div class="customer-pane"><div class="customer-command-grid"><div class
 '<section class="customer-command-hero"><div class="customer-next-panel">'+next+'</div>'+renderCustomerFastPanel(detail,emailHref,smsHref)+'</section>'+
 renderCustomerOperatingBoard(detail,emailHref,smsHref)+
 renderCustomerTaskPreview(detail)+
-'<details class="profile-drawer"><summary>Open full task workspace</summary><div class="profile-drawer-body">'+renderCustomerTasks(detail)+'</div></details>'+
+'<details class="profile-drawer"><summary>Open all tasks</summary><div class="profile-drawer-body">'+renderCustomerTasks(detail)+'</div></details>'+
 '</div><aside class="customer-command-side">'+
 renderRelationshipSnapshot(detail)+
 '<details class="profile-drawer"><summary>Contact status + follow-up</summary><div class="profile-drawer-body">'+renderContactTrackingBlock(detail)+'</div></details>'+
@@ -3163,7 +3163,7 @@ var inbound=Number(row&&row.inbound_message_count||0);
 var outstanding=Number(row&&row.outstanding_balance||0);
 var label=raw?'Organize raw record':(overdue?'Clear overdue task':(String(row&&row.contact_status||'').toLowerCase()==='needs_reply'||inbound?'Reply now':(outstanding?'Review balance':(row&&row.next_follow_up_at?'Follow up':'Review profile'))));
 var note=raw?'Sync into private CRM before heavy editing.':(source+' · '+follow);
-return '<div class="next-read"><span>Next action</span><strong>'+esc(label)+'</strong><small>'+esc(status+' · '+note)+'</small></div>';
+return '<div class="next-read"><span>Action</span><strong>'+esc(label)+'</strong><small>'+esc(status+' · '+note)+'</small></div>';
 }
 
 function customerSignalPills(row){
@@ -3504,7 +3504,7 @@ if(relationship.kind==='review')return {title:'Match contact',detail:'Attach to 
 if(status==='needs_reply'||status==='new')return {title:'Reply',detail:'Open the profile message pane.'};
 if(status==='waiting_on_customer')return {title:'Waiting',detail:'Add a follow-up date if needed.'};
 if(status==='closed')return {title:'Closed',detail:'Saved to timeline.'};
-if(customerId)return {title:'Review profile',detail:'Open the customer workspace.'};
+if(customerId)return {title:'Review profile',detail:'Open profile.'};
 return {title:'Review',detail:'Decide next step.'};
 }
 
@@ -3556,16 +3556,16 @@ var linked=(contactRows||[]).filter(function(row){return row.customer_id||row.cu
 var needsReview=(contactRows||[]).filter(function(row){return inquiryMatchClass(row)==='needs-review'}).length;
 var newMessages=(contactRows||[]).filter(function(row){return ['new','needs_reply',''].includes(String(row.status||'new').toLowerCase())}).length;
 var signals=(otherRows||[]).length;
-return '<div class="inquiry-command"><section class="inquiry-command-main"><h2>Lead intake</h2><p>Website and grassroots leads that need customer work.</p><div class="inquiry-stats">'+
+return '<div class="inquiry-command"><section class="inquiry-command-main"><h2>Leads</h2><div class="inquiry-stats">'+
 '<div class="inquiry-stat"><span>Messages</span><strong>'+esc((contactRows||[]).length)+'</strong></div>'+
 '<div class="inquiry-stat"><span>Need reply</span><strong>'+esc(newMessages)+'</strong></div>'+
 '<div class="inquiry-stat"><span>Linked</span><strong>'+esc(linked)+'</strong></div>'+
 '<div class="inquiry-stat"><span>Review</span><strong>'+esc(needsReview)+'</strong></div>'+
-'</div></section><aside class="inquiry-guidance"><div class="inquiry-origin-row"><span class="pill">Website <strong>leads</strong></span><span class="pill">Grassroots <strong>leads</strong></span><span class="pill">Other signals <strong>'+esc(signals)+'</strong></span></div></aside></div>';
+'</div></section><aside class="inquiry-guidance"><div class="inquiry-origin-row"><span class="pill">Website <strong>leads</strong></span><span class="pill">Grassroots <strong>leads</strong></span><span class="pill">Other <strong>'+esc(signals)+'</strong></span></div></aside></div>';
 }
 
 function renderGrassrootsLeadForm(){
-return '<details class="panel lead-add-panel"><summary><div><div class="section-title">Add grassroots lead</div><p class="muted">Add someone you met offline. The CRM matches by full name, email, or phone.</p></div><span class="pill">New lead</span></summary><div class="record-grid"><label>Full name<input id="leadFullName" placeholder="First and last name"></label><label>Email<input id="leadEmail" type="email" placeholder="email@example.com"></label><label>Phone<input id="leadPhone" placeholder="Phone number"></label><label>Lead source<input id="leadSource" value="Grassroots" placeholder="Coffee shop, studio, friend referral"></label><label>Product interest<input id="leadProductInterest" placeholder="Wrap, Cloak, both, not sure"></label><label>Notes<textarea id="leadMessage" placeholder="What did they ask about? What should you remember?"></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" id="createLeadBtn">Add lead</button></div></details>';
+return '<details class="panel lead-add-panel"><summary><div><div class="section-title">Add grassroots lead</div><p class="muted">Add someone you met offline.</p></div><span class="pill">New lead</span></summary><div class="record-grid"><label>Full name<input id="leadFullName" placeholder="First and last name"></label><label>Email<input id="leadEmail" type="email" placeholder="email@example.com"></label><label>Phone<input id="leadPhone" placeholder="Phone number"></label><label>Lead source<input id="leadSource" value="Grassroots" placeholder="Coffee shop, studio, friend referral"></label><label>Product interest<input id="leadProductInterest" placeholder="Wrap, Cloak, both, not sure"></label><label>Notes<textarea id="leadMessage" placeholder="What did they ask about? What should you remember?"></textarea></label></div><div class="actions" style="margin-top:12px"><button class="btn" id="createLeadBtn">Add lead</button></div></details>';
 }
 
 function inquiryCard(row){
@@ -3721,8 +3721,8 @@ var pending=rows.filter(function(row){return ['pending','processing','requires_c
 var deposits=paid.filter(function(row){return String(row.payment_type||'').toLowerCase().indexOf('deposit')!==-1});
 var finals=paid.filter(function(row){return String(row.payment_type||'').toLowerCase().indexOf('final')!==-1});
 var guidance=failed.length?'Payment cleanup needed':(pending.length?'Some payments are still processing':(rows.length?'Stripe ledger is connected':'No CRM payments yet'));
-var body=failed.length?'Open the failed payment or the customer Sales pane before fulfillment. Stripe remains the source of truth.':(pending.length?'Wait for Stripe settlement before treating the cash as collected.':(rows.length?'Gross, Stripe fees, net, and linked customers.':'New deposits and recovered Stripe payments will appear here once written into the CRM.'));
-return '<section class="payment-command"><div class="payment-command-main"><h2>Payment operations</h2><p>Gross, Stripe fees, net, deposits, final balances, and payment cleanup in one place.</p>'+renderPaymentSummary(rows)+'</div>'+
+var body=failed.length?'Open the customer money tab before fulfillment.':(pending.length?'Wait for Stripe settlement before counting the cash.':(rows.length?'Gross, Stripe fees, net, and linked customers.':'New deposits appear here after checkout.'));
+return '<section class="payment-command"><div class="payment-command-main"><h2>Payments</h2>'+renderPaymentSummary(rows)+'</div>'+
 '<aside class="payment-command-side"><div><strong>'+esc(guidance)+'</strong><p>'+esc(body)+'</p></div><div class="meta"><span class="pill">Deposits <strong>'+esc(deposits.length)+'</strong></span><span class="pill">Finals <strong>'+esc(finals.length)+'</strong></span><span class="pill">Pending <strong>'+esc(pending.length)+'</strong></span></div><div class="actions"><button class="btn quiet small" data-jump-tab="accounting">Open accounting</button><button class="btn quiet small" data-jump-tab="finals">Final balances</button>'+stripePaymentsLink('Open Stripe')+'</div></aside></section>';
 }
 
@@ -3758,7 +3758,7 @@ return '<div class="inquiry-filter-bar" aria-label="Payment filters">'+chips.map
 function renderPaymentLedger(rows,allRows){
 if(!allRows.length)return '<section class="panel"><div class="empty">No payment records yet.</div></section>';
 if(!rows.length)return '<section class="panel"><div class="bar"><div><div class="section-title">Payment ledger</div><p class="muted">No records match this payment filter.</p></div></div><div class="empty">Choose another filter to see more payment activity.</div></section>';
-return '<section class="panel"><div class="bar"><div><div class="section-title">Payment ledger</div><p class="muted">Newest payment records first. Open Sales to see orders, notes, messages, and remaining-balance work.</p></div></div><div class="payment-ledger">'+rows.map(paymentCard).join('')+'</div></section>';
+return '<section class="panel"><div class="bar"><div><div class="section-title">Payment ledger</div></div></div><div class="payment-ledger">'+rows.map(paymentCard).join('')+'</div></section>';
 }
 
 function paymentCard(row){
@@ -3793,7 +3793,7 @@ var reservation=result.reservation||{};
 var reasons=result.blocked_reasons||[];
 var feeLine=result.stripe_fee_amount!==undefined?'<p class="muted">Stripe fee: '+money(result.stripe_fee_amount)+' · Net: '+money(result.stripe_net_amount||0)+'</p>':'';
 var recoveredTitle=result.can_charge_remaining_later?'Stripe payment recovered. Remaining balance can be prepared.':'Stripe payment recovered into the CRM. Auto-charge is blocked for this payment.';
-var nextStep=result.can_charge_remaining_later?'Send the final-balance notice first. The charge stays locked until the notice wait has passed.':'For this recovered payment, use a Stripe invoice/payment link for any remaining balance unless the customer makes a new reservation checkout that saves future-charge permission.';
+var nextStep=result.can_charge_remaining_later?'Send the balance notice first. The 24-hour wait protects the charge.':'Use a Stripe payment link for any remaining balance on this order.';
 report='<div class="notice '+(result.can_charge_remaining_later?'good':'warn')+'"><strong>'+esc(recoveredTitle)+'</strong><br>'+
 'Customer: '+esc(customer.full_name||customer.email||customer.phone||'Customer')+
 (reservation.id?' · Reservation connected':'')+
@@ -3833,7 +3833,7 @@ var optins=data.sms_optins||[];
 var comms=data.communications||[];
 var inbound=comms.filter(function(row){return String(row.direction||'').toLowerCase()==='inbound'});
 document.getElementById('communications').innerHTML=renderCommsCommand(data,comms,optins,inbound)+
-'<div class="comms-layout"><section class="panel"><div class="bar"><div><div class="section-title">Reply inbox</div><p class="muted">Inbound texts and emails first. Open Messages so replies, notes, and To-Do stay attached to the customer.</p></div><button class="btn quiet" id="exportMessages">Export CSV</button></div>'+renderMessageInbox(comms)+'</section>'+
+'<div class="comms-layout"><section class="panel"><div class="bar"><div><div class="section-title">Reply inbox</div></div><button class="btn quiet" id="exportMessages">Export CSV</button></div>'+renderMessageInbox(comms)+'</section>'+
 '<aside><section class="panel"><div class="bar"><div><div class="section-title">Text-ready customers</div><p class="muted">'+esc(data.sms_optins_total&&data.sms_optins_total!==optins.length?optins.length+' unique · '+data.sms_optins_total+' raw':'Customers who can receive texts')+'</p></div><button class="btn quiet" id="exportSmsOptins">Export CSV</button></div>'+renderSmsOptinCards(optins.slice(0,8))+'</section>'+
 '<details class="crm-drawer"><summary>Receiving setup</summary><table><tbody>'+
 row('Inbound SMS URL','https://www.yogacloak.com/api/twilio-sms-webhook')+
@@ -3850,14 +3850,14 @@ document.querySelectorAll('[data-open-message-customer]').forEach(function(card)
 function renderCommsCommand(data,comms,optins,inbound){
 var smsReady=data.sms_enabled?'On':'Setup';
 var newest=(inbound.length?inbound:comms).slice().sort(function(a,b){return String(b.created_at||'').localeCompare(String(a.created_at||''))})[0]||null;
-var nextCopy=inbound.length?'Open the newest customer Messages pane and reply there.':(optins.length?'Review new SMS opt-ins and send a welcome text task.':'No customer replies are waiting.');
+var nextCopy=inbound.length?'Reply from the customer profile.':(optins.length?'Text-ready customers are saved.':'No customer replies.');
 var nextAction=newest&&newest.customer_id?openProfileButton(newest.customer_id,'Open newest reply','messages'):'<button class="btn quiet small" data-jump-tab="customers">Open customers</button>';
-return '<section class="comms-command"><div class="comms-command-main"><h2>Messaging</h2><p>Customer replies, text opt-ins, email/SMS history, and message follow-ups in one connected inbox.</p><div class="comms-stats">'+
-commsStat('Reply queue',inbound.length,'Inbound messages first')+
-commsStat('Text opt-ins',optins.length,'Customers who can get SMS')+
-commsStat('Logged messages',comms.length,'Email and text history')+
+return '<section class="comms-command"><div class="comms-command-main"><h2>Messaging</h2><div class="comms-stats">'+
+commsStat('Replies',inbound.length,'Needs response')+
+commsStat('SMS opt-ins',optins.length,'Can receive texts')+
+commsStat('Messages',comms.length,'Email and text history')+
 commsStat('SMS sending',smsReady,data.sms_enabled?'Twilio ready':'Set up Twilio')+
-'</div></div><aside class="comms-guidance"><div><strong>'+esc(inbound.length?'Customer reply needs attention':'No unread reply pressure')+'</strong><p>'+esc(nextCopy)+'</p></div><div class="actions">'+nextAction+'<button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></div></aside></section>';
+'</div></div><aside class="comms-guidance"><div><strong>'+esc(inbound.length?'Customer reply needs attention':'No replies waiting')+'</strong><p>'+esc(nextCopy)+'</p></div><div class="actions">'+nextAction+'<button class="btn quiet small" data-jump-tab="tasks">Open To-Do</button></div></aside></section>';
 }
 
 function commsStat(label,value,note){
@@ -3883,9 +3883,9 @@ var channel=String(row.channel||'message').toUpperCase();
 var body=row.subject||row.body||row.status||'Message logged';
 var label=direction==='inbound'?'Customer replied':'Sent from hub';
 var contact=[row.customers&&row.customers.email,row.customers&&row.customers.phone].filter(Boolean).join(' · ')||'Open Messages for contact details';
-var next=direction==='inbound'?'Reply, add a note, or create a follow-up task.':'Logged for relationship history.';
+var next=direction==='inbound'?'Reply, add note, or create task.':'Saved to profile.';
 var openAttr=customerId?' data-open-message-customer="'+esc(customerId)+'"':'';
-return '<article class="message-card '+esc(direction)+'"'+openAttr+'><div class="message-head"><span class="status '+(direction==='inbound'?'needs':'ready')+'">'+esc(label)+'</span><strong>'+customerLink(customerId,customer)+'</strong><span class="message-subhead">'+esc(contact)+'</span></div><div><div class="message-body">'+esc(body)+'</div><div class="message-meta"><span class="pill">'+esc(channel)+'</span><span class="pill">'+esc(formatStatus(row.status||direction))+'</span><span class="pill">'+esc(date(row.created_at))+'</span></div></div><div class="message-actions"><div class="message-next"><strong>'+esc(direction==='inbound'?'Next best action':'Saved context')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,direction==='inbound'?'Reply':'Open messages','messages')+'</div></article>';
+return '<article class="message-card '+esc(direction)+'"'+openAttr+'><div class="message-head"><span class="status '+(direction==='inbound'?'needs':'ready')+'">'+esc(label)+'</span><strong>'+customerLink(customerId,customer)+'</strong><span class="message-subhead">'+esc(contact)+'</span></div><div><div class="message-body">'+esc(body)+'</div><div class="message-meta"><span class="pill">'+esc(channel)+'</span><span class="pill">'+esc(formatStatus(row.status||direction))+'</span><span class="pill">'+esc(date(row.created_at))+'</span></div></div><div class="message-actions"><div class="message-next"><strong>'+esc(direction==='inbound'?'Action':'History')+'</strong>'+esc(next)+'</div>'+openProfileButton(customerId,direction==='inbound'?'Reply':'Open messages','messages')+'</div></article>';
 }
 
 function renderSmsOptinCards(optins){
@@ -3915,18 +3915,18 @@ return value==='auto_send'?'Auto-send':'Draft only';
 
 function automationStudio(){
 var triggers=[
-['inquiry_created','New lead','Contact form or grassroots lead creates or updates a customer profile'],
-['sms_opt_in_created','SMS opt-in','Customer gives permission to text'],
-['reservation_created','Deposit made','Order and payment activity starts'],
-['final_balance_ready','Final balance ready','Email notice is sent and the wait period has passed'],
-['birthday_today','Customer birthday','Draft a birthday note or discount code']
+['inquiry_created','New lead','Website or grassroots lead'],
+['sms_opt_in_created','SMS opt-in','Customer can receive texts'],
+['reservation_created','Deposit made','Order started'],
+['final_balance_ready','Balance ready','Email sent and wait period passed'],
+['birthday_today','Birthday','Draft birthday note']
 ];
 var actions=[
 ['task','Create task','Assign a follow-up to Brooke or Christian'],
-['email','Send email','Notify an owner or prepare a customer reply'],
+['email','Send email','Owner alert or customer reply'],
 ['sms','Send text','Only when the customer has opted into SMS'],
-['note','Add timeline note','Save context on the customer profile'],
-['charge','Queue balance charge','Founder-controlled final-balance step']
+['note','Add note','Save to profile'],
+['charge','Queue balance','Founder approval required']
 ];
 var presets=[
 ['New lead follow-up','Create To-Do, alert owner, draft reply'],
@@ -3935,7 +3935,7 @@ var presets=[
 ['Final balance ready','Notify owner before batch charge'],
 ['Birthday message','Draft birthday wish and discount code']
 ];
-return '<section class="panel"><div class="bar"><div><div class="section-title">Automation studio</div><p class="muted">Choose what starts a workflow, then add the owner To-Do, emails, texts, notes, or balance steps that should happen next.</p></div><button class="btn" id="newAutomationIdea">+ New automation</button></div><div class="automation-studio"><aside class="automation-rail"><h3>Quick recipes</h3><p>Start with a workflow yogacloak will use often.</p>'+presets.map(function(item){return '<button class="automation-preset" data-automation-idea="'+esc(item[0])+'"><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+'</span></button>'}).join('')+'</aside><div class="automation-builder"><h3>Flow builder</h3><p>Click plus to sketch the workflow. Saved live rules stay below in Automation settings.</p><div class="automation-builder-grid"><div><div class="tiny-label">Triggers</div><div class="automation-palette">'+triggers.map(function(item){return '<div class="automation-choice"><div class="automation-choice-copy"><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="trigger:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div><div><div class="tiny-label">Actions</div><div class="automation-palette">'+actions.map(function(item){return '<div class="automation-choice"><div class="automation-choice-copy"><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="action:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div></div><div class="notice" id="automationSketch" style="margin-top:14px"><strong>Sketch an automation.</strong><br>Example: new lead -> create To-Do -> send owner email -> draft customer reply.</div></div></div></section>';
+return '<section class="panel"><div class="bar"><div><div class="section-title">Automations</div></div><button class="btn" id="newAutomationIdea">+ New automation</button></div><div class="automation-studio"><aside class="automation-rail"><h3>Recipes</h3>'+presets.map(function(item){return '<button class="automation-preset" data-automation-idea="'+esc(item[0])+'"><strong>'+esc(item[0])+'</strong><span>'+esc(item[1])+'</span></button>'}).join('')+'</aside><div class="automation-builder"><h3>Builder</h3><div class="automation-builder-grid"><div><div class="tiny-label">Triggers</div><div class="automation-palette">'+triggers.map(function(item){return '<div class="automation-choice"><div class="automation-choice-copy"><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="trigger:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div><div><div class="tiny-label">Actions</div><div class="automation-palette">'+actions.map(function(item){return '<div class="automation-choice"><div class="automation-choice-copy"><strong>'+esc(item[1])+'</strong><span>'+esc(item[2])+'</span></div><button class="btn quiet automation-plus" data-builder-piece="action:'+esc(item[0])+'">+</button></div>'}).join('')+'</div></div></div><div class="notice" id="automationSketch" style="margin-top:14px"><strong>Build rule</strong><br>Pick a trigger and action.</div></div></div></section>';
 }
 
 function renderAutomationCard(rule){
@@ -3946,12 +3946,12 @@ var modeId=automationId(key,'mode');
 var subjectId=automationId(key,'subject');
 var bodyId=automationId(key,'body');
 var counts=rule.counts||{};
-var autoWarning=rule.channel==='task'?'Auto-create will add a CRM task every time the trigger happens, with duplicate protection.':(rule.channel==='sms'&&rule.target_type==='customer'?'Customer SMS only sends when phone + SMS opt-in exist.':'Auto-send should only be enabled after you approve the exact wording.');
+var autoWarning=rule.channel==='task'?'Creates a task when this happens.':(rule.channel==='sms'&&rule.target_type==='customer'?'Sends only with phone and SMS opt-in.':'Review wording before auto-send.');
 return '<article class="automation-card">'+
 '<header><div><h3>'+esc(rule.name||'Automation')+'</h3><p>'+esc(rule.description||'')+'</p></div><span class="health '+(rule.enabled?'good':'bad')+'">'+esc(rule.enabled?'On':'Off')+'</span></header>'+
 '<div class="automation-flow"><div><span>When</span><strong>'+esc(triggerName(rule.trigger_type))+'</strong></div><div><span>Then</span><strong>'+esc(actionName(rule))+'</strong></div><div><span>For</span><strong>'+esc(formatStatus(rule.target_type))+'</strong></div></div>'+
 '<div class="record-grid"><label>Status<select id="'+esc(enabledId)+'"><option value="enabled" '+(rule.enabled?'selected':'')+'>Listening</option><option value="paused" '+(!rule.enabled?'selected':'')+'>Paused</option></select></label><label>Mode<select id="'+esc(modeId)+'"><option value="draft" '+(rule.mode!=='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Draft task':'Draft only')+'</option><option value="auto_send" '+(rule.mode==='auto_send'?'selected':'')+'>'+esc(rule.channel==='task'?'Auto-create':'Auto-send')+'</option></select></label></div>'+
-'<div class="notice '+(rule.mode==='auto_send'?'warn':'')+'"><strong>'+esc(modeName(rule.mode,rule))+'</strong><br>'+esc(rule.mode==='auto_send'?autoWarning:(rule.channel==='task'?'Draft mode logs the task idea without creating it.':'Draft mode logs the message for review before anything is sent.'))+'</div>'+
+'<div class="notice '+(rule.mode==='auto_send'?'warn':'')+'"><strong>'+esc(modeName(rule.mode,rule))+'</strong><br>'+esc(rule.mode==='auto_send'?autoWarning:(rule.channel==='task'?'Draft task only.':'Draft message only.'))+'</div>'+
 '<label>'+esc(rule.channel==='task'?'Task title':'Subject')+'<input id="'+esc(subjectId)+'" value="'+esc(rule.subject_template||'')+'" placeholder="'+esc(rule.channel==='task'?'Task title template':'Only used for email')+'"></label>'+
 '<label>'+esc(rule.channel==='task'?'Task notes':'Message template')+'<textarea id="'+esc(bodyId)+'">'+esc(rule.body_template||'')+'</textarea></label>'+
 '<div class="meta"><span class="pill">Drafted <strong>'+esc(counts.drafted||0)+'</strong></span><span class="pill">Created <strong>'+esc(counts.created||0)+'</strong></span><span class="pill">Sent <strong>'+esc(counts.sent||0)+'</strong></span><span class="pill">Skipped <strong>'+esc(counts.skipped||0)+'</strong></span><span class="pill">Failed <strong>'+esc(counts.failed||0)+'</strong></span></div>'+
@@ -3971,7 +3971,7 @@ return '<div class="grid">'+items.map(function(item){return '<div class="card"><
 function renderAutomations(){
 var root=document.getElementById('automations');
 var data=state.automations;
-if(!data){root.innerHTML='<div class="empty">Load automations to see CRM workflows.</div>';return}
+if(!data){root.innerHTML='<div class="empty">Load automations.</div>';return}
 var rules=data.automations||[];
 var runs=data.runs||[];
 if(rules.length&&!state.activeAutomationKey)state.activeAutomationKey=rules[0].key||rules[0].id;
@@ -3982,24 +3982,24 @@ var drafted=runs.filter(function(run){return run.status==='drafted'}).length;
 var sent=runs.filter(function(run){return run.status==='sent'}).length;
 var failed=runs.filter(function(run){return run.status==='failed'}).length;
 var setup=data.setup_required?'<div class="notice warn"><strong>Automation storage needs setup.</strong><br>'+esc(data.setup_message||'Run the latest private CRM database schema to save automation rules and logs.')+'</div>':'';
-var safety='<div class="notice"><strong>Automation safety.</strong><br>Customer SMS is blocked unless the profile has a phone number and SMS opt-in. Draft mode records the message without sending. Auto-send should only be used after Twilio/email setup is tested.</div>';
+var safety='<details class="crm-drawer"><summary>Safety rules</summary><div class="notice">SMS requires opt-in. Draft mode does not send. Test Twilio/email before auto-send.</div></details>';
 root.innerHTML=automationMetricCards([
-['Automation rules',rules.length,'Editable CRM workflows'],
-['Enabled',enabled,'Rules currently listening'],
-['Drafts',drafted,'Created for review'],
-['Sent',sent,'Auto-sent successfully'],
+['Rules',rules.length,'Editable'],
+['On',enabled,'Listening'],
+['Drafts',drafted,'For review'],
+['Sent',sent,'Completed'],
 ['Failed',failed,'Needs attention'],
-['SMS sending',data.sms_enabled?'On':'Setup','Twilio outbound status'],
-['Owner SMS',data.owner_sms_configured?'On':'Setup','Optional internal alerts'],
-['Database',data.setup_required?'Setup':'Ready','Rule storage status']
+['SMS',data.sms_enabled?'On':'Setup','Twilio'],
+['Owner SMS',data.owner_sms_configured?'On':'Setup','Internal alerts'],
+['Database',data.setup_required?'Setup':'Ready','Rules saved']
 ])+
 setup+safety+automationStudio()+
-'<section class="panel"><div class="bar"><div><div class="section-title">Automation settings</div><p class="muted">Click an automation, edit its status, mode, and wording, then save. Live recipes stay tucked inside their own settings.</p></div><button class="btn quiet" id="reloadAutomations">Refresh</button></div><div class="automation-settings-layout"><div>'+automationSettingsList(rules,activeKey)+'</div><div>'+renderAutomationCard(activeRule)+'</div></div></section>'+
+'<section class="panel"><div class="bar"><div><div class="section-title">Rules</div></div><button class="btn quiet" id="reloadAutomations">Refresh</button></div><div class="automation-settings-layout"><div>'+automationSettingsList(rules,activeKey)+'</div><div>'+renderAutomationCard(activeRule)+'</div></div></section>'+
 '<section class="panel"><div class="section-title">Recent automation log</div>'+table(['Rule','Customer','Trigger','Status','Channel','Message','Date'],runs.map(function(run){var customerId=run.customer_id||run.customers&&run.customers.id;var ruleName=run.automation_rules&&run.automation_rules.name||run.trigger_type||'Automation';return [esc(ruleName),customerLink(customerId,run.customers&&run.customers.full_name||run.customer_id||'Customer'),esc(triggerName(run.trigger_type)),esc(formatStatus(run.status)),esc(String(run.channel||'').toUpperCase()),'<div class="automation-log-body">'+esc(run.reason||run.subject||run.body||'')+'</div>',esc(date(run.created_at))]}),true)+'</section>';
 document.getElementById('reloadAutomations').addEventListener('click',loadCurrent);
-document.getElementById('newAutomationIdea').addEventListener('click',function(){var sketch=document.getElementById('automationSketch');sketch.className='notice good';sketch.innerHTML='<strong>New automation sketch started.</strong><br>Choose a trigger and one or more actions. Saving custom multi-step rules will use the same safety checks as the live recipes below.'});
-document.querySelectorAll('[data-automation-idea]').forEach(function(btn){btn.addEventListener('click',function(){var sketch=document.getElementById('automationSketch');sketch.className='notice good';sketch.innerHTML='<strong>'+esc(btn.dataset.automationIdea)+'</strong><br>Pick the closest live recipe below and adjust its draft/auto mode, wording, and channel.'})});
-document.querySelectorAll('[data-builder-piece]').forEach(function(btn){btn.addEventListener('click',function(){var sketch=document.getElementById('automationSketch');var piece=btn.dataset.builderPiece.split(':');sketch.className='notice good';sketch.innerHTML='<strong>Added '+esc(piece[0])+'.</strong><br>'+esc(formatStatus(piece[1]))+' is part of this sketch. Use the live recipe cards below to activate the matching safe workflow.'})});
+document.getElementById('newAutomationIdea').addEventListener('click',function(){var sketch=document.getElementById('automationSketch');sketch.className='notice good';sketch.innerHTML='<strong>New rule</strong><br>Pick what starts it and what happens next.'});
+document.querySelectorAll('[data-automation-idea]').forEach(function(btn){btn.addEventListener('click',function(){var sketch=document.getElementById('automationSketch');sketch.className='notice good';sketch.innerHTML='<strong>'+esc(btn.dataset.automationIdea)+'</strong><br>Choose a saved rule below and edit it.'})});
+document.querySelectorAll('[data-builder-piece]').forEach(function(btn){btn.addEventListener('click',function(){var sketch=document.getElementById('automationSketch');var piece=btn.dataset.builderPiece.split(':');sketch.className='notice good';sketch.innerHTML='<strong>Added '+esc(piece[0])+'</strong><br>'+esc(formatStatus(piece[1]))})});
 document.querySelectorAll('[data-open-automation]').forEach(function(btn){btn.addEventListener('click',function(){state.activeAutomationKey=btn.dataset.openAutomation;renderAutomations()})});
 document.querySelectorAll('[data-save-automation]').forEach(function(btn){btn.addEventListener('click',async function(){await saveAutomation(btn.dataset.saveAutomation,btn.dataset.automationId)})});
 bindCustomerOpeners();
@@ -4060,7 +4060,7 @@ var toolbar='<div class="finals-toolbar"><span class="sr-only">Select needs noti
 '<div class="finals-action-step"><div><span>2. Check</span><strong>Dry run</strong></div><div class="actions"><button class="btn quiet" id="selectReady">Pick ready</button><button class="btn quiet" id="dryRun"'+disabled+'>Dry run picked</button><button class="btn quiet" id="autoDryRun"'+disabled+'>Dry run ready</button></div></div>'+
 '<div class="finals-action-step"><div><span>3. Collect</span><strong>'+esc(selectedCount)+' picked</strong></div><div class="actions"><button class="btn" id="chargeBatch"'+disabled+'>Charge picked</button><button class="btn warn" id="autoChargeReady"'+disabled+'>Charge ready</button></div></div>'+
 '</div>';
-var command='<div class="finals-command-grid"><div class="finals-command-card primary"><div><div class="finals-command-title">Final balance <span>workspace</span></div><p><strong>'+esc(nextHeadline)+'</strong> '+esc(nextCopy)+'</p></div></div><div class="finals-command-card money-card"><div><h3>Cash after Stripe</h3></div><div class="finals-money-row"><div><span>Customers owe</span><strong>'+money(pendingAmount)+'</strong></div><div><span>Stripe fees est.</span><strong>'+money(pendingFee)+'</strong></div><div><span>You keep est.</span><strong>'+money(pendingNet)+'</strong></div></div><div class="finals-route-panel"><div class="finals-route batch"><span>Saved card</span><strong>'+esc(batchRouteCount)+' record(s)</strong></div><div class="finals-route manual"><span>Payment link</span><strong>'+money(manualAmount)+'</strong></div></div><div class="actions" style="margin-top:12px">'+stripePaymentsLink('Open Stripe payments')+'</div><div class="finals-money-note"><strong>'+money(readyAmount)+' ready for review.</strong> Net est. '+money(readyNet)+' after '+money(readyFee)+' fees.</div></div></div>';
+var command='<div class="finals-command-grid"><div class="finals-command-card primary"><div><div class="finals-command-title">Final balances</div><p><strong>'+esc(nextHeadline)+'</strong> '+esc(nextCopy)+'</p></div></div><div class="finals-command-card money-card"><div><h3>Cash after Stripe</h3></div><div class="finals-money-row"><div><span>Customers owe</span><strong>'+money(pendingAmount)+'</strong></div><div><span>Stripe fees est.</span><strong>'+money(pendingFee)+'</strong></div><div><span>You keep est.</span><strong>'+money(pendingNet)+'</strong></div></div><div class="finals-route-panel"><div class="finals-route batch"><span>Saved card</span><strong>'+esc(batchRouteCount)+' record(s)</strong></div><div class="finals-route manual"><span>Payment link</span><strong>'+money(manualAmount)+'</strong></div></div><div class="actions" style="margin-top:12px">'+stripePaymentsLink('Open Stripe payments')+'</div><div class="finals-money-note"><strong>'+money(readyAmount)+' ready for review.</strong> Net est. '+money(readyNet)+' after '+money(readyFee)+' fees.</div></div></div>';
 document.getElementById('finals').innerHTML='<div class="finals-page"><section class="panel finals-hero"><div class="finals-command-head"><div></div><span class="pill">Stripe-safe</span></div>'+command+'<div class="finals-summary">'+stats+'</div>'+toolbar+'</section>'+reservationLoadNotice()+finalBalanceSafetyPanel()+noticeResultReport()+batchResultReport()+'<div class="finals-workflow"><div class="finals-primary-lanes">'+primaryLanes+'</div><div class="finals-reference-lanes">'+referenceLanes+'</div></div></div>';
 document.querySelectorAll('[data-pick]').forEach(function(input){input.addEventListener('change',function(){if(input.checked)state.selected.add(input.dataset.pick);else state.selected.delete(input.dataset.pick);renderFinals()})});
 document.getElementById('selectNeedsNotice').addEventListener('click',function(){rows.filter(function(row){return finalBatchSelectable(row)&&row.notice_required&&!row.already_charged}).forEach(function(row){state.selected.add(row.id)});renderFinals()});
@@ -4085,14 +4085,14 @@ var lane=card.closest('details');
 if(lane)lane.open=true;
 card.classList.add('is-focused');
 card.scrollIntoView({behavior:'smooth',block:'center'});
-statusText.innerHTML='<span class="ok">Opened the connected balance plan.</span>';
+statusText.innerHTML='<span class="ok">Opened balance.</span>';
 state.focusReservation='';
 }
 
 function renderFinalsNextList(groups,readyAmount,pendingAmount){
 var items=[
 ['1','Pending email',groups['Needs Notice'].length+' customer(s)','Collect later.'],
-['2','Review open balances',money(pendingAmount),'All unpaid final balances still open.'],
+['2','Open balances',money(pendingAmount),'Unpaid balances.'],
 ['3','Batch-ready',money(readyAmount),'Dry run, then charge only clean records.']
 ];
 return '<div class="finals-next-list">'+items.map(function(item){return '<div class="finals-next-item"><span class="finals-next-number">'+esc(item[0])+'</span><div><strong>'+esc(item[1])+'</strong><span>'+esc(item[3])+'</span></div><small>'+esc(item[2])+'</small></div>'}).join('')+'</div>';
@@ -4150,11 +4150,11 @@ function finalBalanceCard(row){
 var pickable=finalBatchSelectable(row);
 var manual=!pickable;
 var checkbox=!manual&&pickable?'<label class="check-row"><input type="checkbox" data-pick="'+esc(row.id)+'" '+(state.selected.has(row.id)?'checked':'')+'> Select for batch</label>':'<span class="status blocked">Needs payment link</span>';
-var card=row.stripe_payment_method_saved?'Card saved for later charge':'No card saved for later charge';
-var auth=row.future_charge_authorized?'Customer approved the later charge':'Customer has not approved the later charge';
+var card=row.stripe_payment_method_saved?'Saved card':'No saved card';
+var auth=row.future_charge_authorized?'Approved for later collection':'Needs payment link';
 var notice=row.final_balance_notice_sent_at?'Balance email sent '+date(row.final_balance_notice_sent_at):'Balance email not sent';
-var next=row.charge_eligible?'Dry run, then charge if still ready':(manual?'Send a secure payment link':(row.notice_required?'Balance email later':'No action right now'));
-var nextHelp=row.charge_eligible?'Ready for the saved-card route. Dry run before money moves.':(manual?'Still owed, but not approved for automatic collection. Use Stripe invoice or payment link.':(row.notice_required?'Still owed. Send the balance email when collection is actually starting.':'Keep for reference.'));
+var next=row.charge_eligible?'Dry run, then collect':(manual?'Send payment link':(row.notice_required?'Balance email later':'No action'));
+var nextHelp=row.charge_eligible?'Dry run before money moves.':(manual?'Use a Stripe invoice or payment link.':(row.notice_required?'Send when collection is actually starting.':'Reference only.'));
 var details=[notice,card,auth].filter(Boolean).join(' · ');
 var actionButtons=[];
 if(!manual&&pickable&&row.notice_required)actionButtons.push('<button class="btn quiet small" data-final-action="notice" data-reservation-id="'+esc(row.id)+'">Send notice</button>');
@@ -4176,7 +4176,7 @@ var feeNote=finalAmount>0?'Estimated net after Stripe fee: '+money(netAmount)+' 
 return '<article class="final-card '+(manual?'manual':'')+'" data-final-card="'+esc(row.id)+'" data-final-charge-id="'+esc(row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||row.id)+'">'+
 '<div class="final-card-headline"><div class="final-card-title"><span class="status '+readyClass(row.readiness_group)+'">'+esc(finalStatusLabel(row.readiness_group||row.status))+'</span><strong>'+customerLink(row.customer_id,person)+'</strong><div class="final-card-statusline"><span>'+esc(contactLine)+'</span><span>'+esc(route)+'</span></div></div>'+selection+'</div>'+
 '<div class="final-record-tags"><span class="pill">'+product+'</span><span class="pill">Deposit paid '+money(row.deposit_amount||0)+'</span><span class="pill">'+esc(notice)+'</span></div>'+
-'<div class="finals-decision"><div class="final-decision-money"><span>Still owed</span><strong>'+money(finalAmount)+'</strong><small>'+esc(feeNote)+'</small></div><div class="final-decision-copy"><span>'+esc(routeLabel)+'</span><strong>'+esc(next)+'</strong><span>'+esc(nextHelp)+'</span>'+(manual?'<span class="final-warning">Not batch-chargeable yet. Use a Stripe payment link or invoice, or have the customer reserve again with later-charge permission.</span>':'')+'</div><div class="final-decision-actions">'+actionButtons.join('')+'</div></div>'+
+'<div class="finals-decision"><div class="final-decision-money"><span>Still owed</span><strong>'+money(finalAmount)+'</strong><small>'+esc(feeNote)+'</small></div><div class="final-decision-copy"><span>'+esc(routeLabel)+'</span><strong>'+esc(next)+'</strong><span>'+esc(nextHelp)+'</span>'+(manual?'<span class="final-warning">Needs a Stripe payment link before collection.</span>':'')+'</div><div class="final-decision-actions">'+actionButtons.join('')+'</div></div>'+
 '<div class="final-card-foot"><details class="final-card-more"><summary>Safety details</summary><div class="final-card-body"><div class="final-context"><strong>Collection safety</strong><span>'+esc(card)+'</span><span>'+esc(auth)+'</span><span>'+esc(notice)+'</span></div><div class="final-context"><strong>Timeline</strong>'+timeline+'</div></div><span>'+esc(details)+'</span></details></div></article>';
 }
 
@@ -4186,9 +4186,9 @@ if(!data){document.getElementById('accounting').innerHTML='<div class="empty">Lo
 var t=data.totals||{};
 var payments=data.payments||[];
 document.getElementById('accounting').innerHTML=
-'<section class="panel accounting-command"><div><div class="bar"><div><div class="section-title">Accounting command</div><p class="muted">Founder cash view: collected, pending, Stripe fees, net, and what needs attention.</p></div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+renderAccountingFocus(t)+'</div>'+renderAccountingSide(t)+'</section>'+
-'<section class="panel"><div class="bar"><div><div class="section-title">Money workspace</div><p class="muted">Payments, final balances, Stripe fees, and outstanding customer money live in Accounting. Open a section when you need the deeper workflow.</p></div><div class="actions"><button class="btn quiet small" data-jump-tab="payments">Payments section</button><button class="btn quiet small" data-jump-tab="finals">Final balances section</button>'+stripePaymentsLink('Open Stripe')+'</div></div>'+renderAccountingFinalBalancePreview(state.reservations||[])+'</section>'+
-'<section class="panel"><div class="bar"><div><div class="section-title">Payment ledger</div><p class="muted">Each payment shows gross, Stripe fee, and estimated net so the cash picture matches Stripe.</p></div><span class="pill">'+esc(payments.length)+' payment(s)</span></div>'+renderAccountingLedger(payments)+'</section>'+
+'<section class="panel accounting-command"><div><div class="bar"><div><div class="section-title">Accounting</div></div><button class="btn quiet" id="exportCsv">Export CSV</button></div>'+renderAccountingFocus(t)+'</div>'+renderAccountingSide(t)+'</section>'+
+'<section class="panel"><div class="bar"><div><div class="section-title">Money</div></div><div class="actions"><button class="btn quiet small" data-jump-tab="payments">Payments</button><button class="btn quiet small" data-jump-tab="finals">Final balances</button>'+stripePaymentsLink('Open Stripe')+'</div></div>'+renderAccountingFinalBalancePreview(state.reservations||[])+'</section>'+
+'<section class="panel"><div class="bar"><div><div class="section-title">Payment ledger</div></div><span class="pill">'+esc(payments.length)+' payment(s)</span></div>'+renderAccountingLedger(payments)+'</section>'+
 '<details class="accounting-drawer"><summary>Open accounting export details</summary><div class="accounting-drawer-body">'+table(['Metric','Value'],[['Deposits collected',money(t.deposits_collected)],['Final balances collected',money(t.final_balances_collected)],['Gross collected',money(t.gross_collected)],['Refunds',money(t.refunds)],['Stripe fees actual + estimated',money(t.estimated_stripe_fees)],['Estimated net collected',money(t.estimated_net_collected)],['Pending balances',money(t.pending_balances||t.outstanding_balances)],['Failed payments',t.failed_payments||0],['Unpaid orders',t.unpaid_reservations||0],['Unfulfilled orders',t.unfulfilled||0],['Converted / fulfilled',t.fulfilled_or_converted||0]])+'</div></details>';
 document.getElementById('exportCsv').addEventListener('click',exportAccountingCsv);
 bindCustomerOpeners();
@@ -4205,7 +4205,7 @@ var pending=open.reduce(function(sum,row){return sum+Number(row.final_balance_to
 var fee=stripeFeeEstimate(pending);
 var samples=open.slice(0,4);
 return '<div class="finals-summary compact"><div class="finals-stat"><span>Pending emails</span><strong>'+esc(needs.length)+'</strong><small>Collect later</small></div><div class="finals-stat"><span>Ready</span><strong>'+esc(ready.length)+'</strong><small>Dry run first</small></div><div class="finals-stat"><span>Needs payment link</span><strong>'+esc(blocked.length)+'</strong><small>Stripe link or invoice</small></div><div class="finals-stat"><span>Pending net est.</span><strong>'+money(Math.max(0,pending-fee))+'</strong><small>'+money(fee)+' Stripe fee est.</small></div></div>'+
-(samples.length?'<div class="work-list">'+samples.map(function(row){var id=row.id||row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||'';var customer=row.customer_name||row.email||'Customer';var status=finalStatusLabel(row.readiness_group||'Review');return '<div class="work-row"><div><strong>'+esc(customer)+' · '+money(row.final_balance_total||0)+'</strong><span>'+esc(status)+' · '+esc(row.blocked_reason?'Needs secure payment link':'Connected final balance')+'</span></div><button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(id)+'">Open balance plan</button></div>'}).join('')+'</div>':'<div class="empty">No open final balances right now.</div>');
+(samples.length?'<div class="work-list">'+samples.map(function(row){var id=row.id||row.airtable_reservation_id||row.airtable_record_id||row.reservation_record_id||'';var customer=row.customer_name||row.email||'Customer';var status=finalStatusLabel(row.readiness_group||'Review');return '<div class="work-row"><div><strong>'+esc(customer)+' · '+money(row.final_balance_total||0)+'</strong><span>'+esc(status)+' · '+esc(row.blocked_reason?'Needs payment link':'Connected')+'</span></div><button class="btn quiet small" data-jump-tab="finals" data-focus-reservation="'+esc(id)+'">Open balance</button></div>'}).join('')+'</div>':'<div class="empty">No open final balances right now.</div>');
 }
 
 function renderAccountingFocus(t){
@@ -4217,14 +4217,14 @@ var pendingFees=Number(t.pending_stripe_fees_estimated||stripeFeeEstimate(pendin
 var pendingNet=Number(t.pending_net_after_fees_estimated||Math.max(0,pending-pendingFees));
 var failed=Number(t.failed_payments||0);
 return '<div class="accounting-focus">'+
-accountingFocusCard('Collected gross',money(gross),'Deposits plus final balances already recorded before refunds and Stripe fees.','highlight')+
-accountingFocusCard('Collected fees',money(fees),'Stripe fee from the balance transaction when available; otherwise estimated at 2.9% + 30 cents.')+
-accountingFocusCard('Collected net',money(net),'What the business roughly keeps from payments already recorded.','highlight')+
-accountingFocusCard('Pending gross',money(pending),'Remaining balances still owed. Pending is not failed; it means not collected yet.',pending>0?'warning':'')+
-accountingFocusCard('Pending fee est.',money(pendingFees),'Estimated Stripe processing fee if the pending balances are collected by card.')+
-accountingFocusCard('Pending net est.',money(pendingNet),'Approximate cash you keep after Stripe fees on outstanding balances.',pending>0?'highlight':'')+
-accountingFocusCard('Failed payments',failed,'Payment attempts that need cleanup before fulfillment.',failed>0?'warning':'')+
-accountingFocusCard('Refunds',money(t.refunds||0),'Money returned to customers. Keep this visible for real cash reporting.')+
+accountingFocusCard('Collected gross',money(gross),'Customer charges before fees.','highlight')+
+accountingFocusCard('Stripe fees',money(fees),'Actual when available; otherwise estimated.')+
+accountingFocusCard('Collected net',money(net),'After Stripe fees.','highlight')+
+accountingFocusCard('Pending gross',money(pending),'Still owed, not failed.',pending>0?'warning':'')+
+accountingFocusCard('Pending fee est.',money(pendingFees),'Estimated card fee.')+
+accountingFocusCard('Pending net est.',money(pendingNet),'Estimated after fees.',pending>0?'highlight':'')+
+accountingFocusCard('Failed payments',failed,'Needs cleanup.',failed>0?'warning':'')+
+accountingFocusCard('Refunds',money(t.refunds||0),'Returned to customers.')+
 '</div>';
 }
 
@@ -4234,11 +4234,11 @@ return '<div class="accounting-focus-card '+esc(klass||'')+'"><span>'+esc(label)
 
 function renderAccountingSide(t){
 return '<aside class="accounting-side"><div><div class="section-title">Owner checks</div><p class="muted">Cash, unpaid orders, and fulfillment checks.</p></div>'+
-accountingSideRow('Deposits collected',money(t.deposits_collected||0),'Money already paid to reserve product')+
-accountingSideRow('Final balances collected',money(t.final_balances_collected||0),'Remaining balances already collected')+
-accountingSideRow('Unpaid orders',t.unpaid_reservations||0,'Customers who still owe money')+
-accountingSideRow('Unfulfilled orders',t.unfulfilled||0,'Orders not marked fulfilled or converted')+
-accountingSideRow('Converted / fulfilled',t.fulfilled_or_converted||0,'Completed order flow')+
+accountingSideRow('Deposits',money(t.deposits_collected||0),'Paid to reserve product')+
+accountingSideRow('Final balances',money(t.final_balances_collected||0),'Already collected')+
+accountingSideRow('Unpaid orders',t.unpaid_reservations||0,'Still owe money')+
+accountingSideRow('Unfulfilled orders',t.unfulfilled||0,'Not fulfilled yet')+
+accountingSideRow('Completed',t.fulfilled_or_converted||0,'Done')+
 '</aside>';
 }
 
@@ -4373,7 +4373,7 @@ var sync=(state.dashboard&&state.dashboard.sync_status)||{};
 var summary=(state.dashboard&&state.dashboard.summary)||{};
 var rawBackupCount=Number(summary.raw_backup_customers||0)+Number(summary.raw_backup_inquiries||0);
 var canSyncRaw=isFounder()&&state.dashboard&&state.dashboard.database_enabled!==false&&rawBackupCount>0;
-var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Airtable is the raw receipt. Sync it into the private CRM to make one organized customer profile the center of truth.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="settingsSyncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'<div class="notice good"><strong>Private CRM is ready for raw backup sync.</strong><br>No Airtable reconciliation sync has been recorded yet.</div>';
+var rawNotice=rawBackupCount?'<div class="notice warn"><strong>'+esc(rawBackupCount)+' Airtable-only record(s) need review.</strong><br>Sync raw records into the private CRM so each person has one profile.'+(canSyncRaw?'<div class="actions" style="margin-top:12px"><button class="btn" id="settingsSyncRawBackupBtn">Sync raw backup</button></div>':'')+'</div>':'<div class="notice good"><strong>Private CRM is ready for raw backup sync.</strong><br>No Airtable reconciliation sync has been recorded yet.</div>';
 var recentEvents=(state.dashboard&&state.dashboard.recent_events)||[];
 function yes(value){return value?'<span class="ok">On</span>':'<span class="error">Missing</span>'}
 function bool(value){return value?'<span class="ok">Yes</span>':'<span class="muted">No</span>'}
@@ -4470,7 +4470,7 @@ var readyCount=readyRows.length;
 var readyAmount=readyRows.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
 if(!readyCount){statusText.innerHTML='<span class="error">None of the picked balances are ready to charge. Run a dry run or pick ready balances first.</span>';return}
 var safety=state.finalBalanceSafety||{};
-var message='Collect final balances for '+readyCount+' ready customer(s), totaling '+money(readyAmount)+'?\n\nAnything missing saved-card permission, notice history, or the 24-hour wait will be skipped and reported. Stripe mode: '+(safety.stripe_mode||'unknown')+'.';
+var message='Collect '+money(readyAmount)+' from '+readyCount+' ready customer(s)?\n\nAnything missing card approval, balance email, or the 24-hour wait will be skipped. Stripe mode: '+(safety.stripe_mode||'unknown')+'.';
 if(!window.confirm(message)){statusText.innerHTML='<span class="muted">Batch charge cancelled.</span>';return}
 }
 state.batchBusy=true;
@@ -4496,7 +4496,7 @@ var readyAmount=readyRows.reduce(function(sum,row){return sum+Number(row.final_b
 if(!dryRun){
 if(!readyRows.length){statusText.innerHTML='<span class="error">No emailed balances are ready to charge yet.</span>';return}
 var safety=state.finalBalanceSafety||{};
-var message='Collect every emailed-and-ready final balance now?\\n\\nReady balances: '+readyRows.length+'\\nEstimated total: '+money(readyAmount)+'\\nStripe mode: '+(safety.stripe_mode||'unknown')+'\\nNotice wait: '+(safety.notice_hours||24)+'h\\n\\nAnything unsafe will be skipped and shown in the results.';
+var message='Collect all ready balances now?\\n\\nCustomers: '+readyRows.length+'\\nEstimated total: '+money(readyAmount)+'\\nStripe mode: '+(safety.stripe_mode||'unknown')+'\\nWait: '+(safety.notice_hours||24)+'h\\n\\nAnything missing approval will be skipped.';
 if(!window.confirm(message)){statusText.innerHTML='<span class="muted">Automatic charge cancelled.</span>';return}
 }
 state.batchBusy=true;
@@ -4537,14 +4537,14 @@ function finalBalanceSafetyPanel(){
 var s=state.finalBalanceSafety;
 if(!s)return '';
 var locked=s.stripe_mode==='live'&&!s.allow_live_final_charges;
-return '<section class="panel finals-safety"><div class="bar"><div><div class="section-title">Charging safety lock</div><div class="meta">'+
+return '<section class="panel finals-safety"><div class="bar"><div><div class="section-title">Collection lock</div><div class="meta">'+
 '<span class="pill">Stripe mode <strong>'+esc(s.stripe_mode||'missing')+'</strong></span>'+
 '<span class="pill">Live final charges <strong>'+esc(s.allow_live_final_charges?'enabled':'locked')+'</strong></span>'+
 '<span class="pill">Notice wait <strong>'+esc(s.notice_hours||24)+'h</strong></span>'+
 '<span class="pill">Webhook secret <strong>'+esc(s.stripe_webhook_secret_configured?'set':'missing')+'</strong></span>'+
 '</div></div></div>'+
-(locked?'<p class="error">Live final-balance charges are locked. You can send notices and run dry runs, but live collection stays blocked until ALLOW_LIVE_FINAL_CHARGES=true.</p>':'<p class="muted">Live collection is enabled in Vercel. The CRM still blocks unsafe records: no saved card, no future-charge permission, no notice, active wait period, or duplicate charge risk.</p>')+
-'<p class="muted">Run one Stripe test-mode order end to end before enabling live final charges. Before collecting from real customers, dry run the batch first.</p>'+
+(locked?'<p class="error">Live collection is locked. Emails and dry runs still work.</p>':'<p class="muted">Live collection is enabled. Missing approval still stays blocked.</p>')+
+'<details class="crm-drawer"><summary>Launch safety</summary><div class="notice">Test one Stripe order before collecting from real customers. Run a dry run first.</div></details>'+
 '</section>';
 }
 function exportAccountingCsv(){
