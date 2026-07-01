@@ -32,12 +32,24 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "Organization",
+      "@type": ["Organization", "Brand"],
       "@id": "https://www.yogacloak.com/#organization",
       "name": "yogacloak",
+      "legalName": "yogacloak",
       "url": "https://www.yogacloak.com/",
-      "logo": "https://www.yogacloak.com/favicon.png",
-      "sameAs": ["https://www.instagram.com/yogacloak"]
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.yogacloak.com/favicon.png",
+        "caption": "yogacloak logo"
+      },
+      "description": "yogacloak is an apparel brand that makes post-hot-yoga cover-ups. The Cloak is a hooded, absorbent wrap designed to wear immediately after hot yoga class — over a wet sports bra, through the parking lot, and into the rest of the day. The Wrap is a lighter alternative for warmer climates. Both are made for the transition between the studio and the street.",
+      "foundingDate": "2025",
+      "areaServed": "US",
+      "sameAs": [
+        "https://www.instagram.com/yogacloak",
+        "https://www.tiktok.com/@yogacloak",
+        "https://www.pinterest.com/yogacloak"
+      ]
     },
     {
       "@type": "WebSite",
