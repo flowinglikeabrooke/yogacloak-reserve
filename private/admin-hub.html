@@ -3988,7 +3988,7 @@ var stats=[
 ['Pending emails',groups['Needs Notice'].length,'Later'],
 ['Waiting',groups['Waiting Period'].length,'24h'],
 ['Ready',groups['Ready to Charge'].length,'Dry run'],
-['Payment link',groups.Blocked.length,'Manual']
+['Blocked',groups.Blocked.length,'See reason']
 ].map(function(item){return '<div class="finals-stat"><span>'+esc(item[0])+'</span><strong>'+esc(item[1])+'</strong><small>'+esc(item[2])+'</small></div>'}).join('');
 var selectedCount=state.selected.size;
 var primaryLanes=[
@@ -3997,7 +3997,7 @@ var primaryLanes=[
 ['Ready to Charge','Dry run first.']
 ].map(function(item){return finalBalanceLane(item[0],item[1],groups[item[0]])}).join('');
 var referenceLanes=[
-['Blocked','Needs Stripe link.'],
+['Blocked','Deposit not paid, or a payment link is needed. Each record shows why.'],
 ['Already Charged','Collected.']
 ].map(function(item){return finalBalanceLane(item[0],item[1],groups[item[0]])}).join('');
 var disabled=state.batchBusy?' disabled':'';
@@ -4045,11 +4045,11 @@ return '<div class="finals-next-list">'+items.map(function(item){return '<div cl
 }
 
 function finalGroupLabel(group){
-return ({'Needs Notice':'Pending balance email','Waiting Period':'Waiting period','Ready to Charge':'Ready for dry run','Already Charged':'Collected','Blocked':'Needs payment link'}[group]||group);
+return ({'Needs Notice':'Pending balance email','Waiting Period':'Waiting period','Ready to Charge':'Ready for dry run','Already Charged':'Collected','Blocked':'Blocked · see reason'}[group]||group);
 }
 
 function finalStatusLabel(group){
-return ({'Needs Notice':'Pending email','Waiting Period':'Waiting','Ready to Charge':'Ready check','Already Charged':'Collected','Blocked':'Payment link needed'}[group]||formatStatus(group));
+return ({'Needs Notice':'Pending email','Waiting Period':'Waiting','Ready to Charge':'Ready check','Already Charged':'Collected','Blocked':'Blocked'}[group]||formatStatus(group));
 }
 
 function finalBalanceLane(group,description,rows){
@@ -4421,7 +4421,7 @@ var readyCount=readyRows.length;
 var readyAmount=readyRows.reduce(function(sum,row){return sum+Number(row.final_balance_total||0)},0);
 if(!readyCount){statusText.innerHTML='<span class="error">None of the picked balances are ready to charge. Run a dry run or pick ready balances first.</span>';return}
 var safety=state.finalBalanceSafety||{};
-var message='Collect '+money(readyAmount)+' from '+readyCount+' ready customer(s)?\n\nAnything missing card approval, balance email, or the 24-hour wait will be skipped. Stripe mode: '+(safety.stripe_mode||'unknown')+'.';
+var message='Charge '+readyCount+' ready customer(s) totaling '+money(readyAmount)+'?\n\nAnything missing card approval, balance email, or the 24-hour wait will be skipped. Stripe mode: '+(safety.stripe_mode||'unknown')+'.';
 if(!window.confirm(message)){statusText.innerHTML='<span class="muted">Batch charge cancelled.</span>';return}
 }
 state.batchBusy=true;
@@ -4488,14 +4488,14 @@ function finalBalanceSafetyPanel(){
 var s=state.finalBalanceSafety;
 if(!s)return '';
 var locked=s.stripe_mode==='live'&&!s.allow_live_final_charges;
-return '<section class="panel finals-safety"><div class="bar"><div><div class="section-title">Collection lock</div><div class="meta">'+
+return '<section class="panel finals-safety"><div class="bar"><div><div class="section-title">Charging safety lock</div><div class="meta">'+
 '<span class="pill">Stripe mode <strong>'+esc(s.stripe_mode||'missing')+'</strong></span>'+
 '<span class="pill">Live final charges <strong>'+esc(s.allow_live_final_charges?'enabled':'locked')+'</strong></span>'+
 '<span class="pill">Notice wait <strong>'+esc(s.notice_hours||24)+'h</strong></span>'+
 '<span class="pill">Webhook secret <strong>'+esc(s.stripe_webhook_secret_configured?'set':'missing')+'</strong></span>'+
 '</div></div></div>'+
 (locked?'<p class="error">Live collection is locked. Emails and dry runs still work.</p>':'<p class="muted">Live collection is enabled. Missing approval still stays blocked.</p>')+
-'<details class="crm-drawer"><summary>Launch safety</summary><div class="notice">Test one Stripe order before collecting from real customers. Run a dry run first.</div></details>'+
+'<details class="crm-drawer"><summary>Launch safety</summary><div class="notice">Run one Stripe test-mode order end to end before enabling live final charges. Run a dry run first.</div></details>'+
 '</section>';
 }
 function exportAccountingCsv(){
