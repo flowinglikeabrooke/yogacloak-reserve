@@ -3,6 +3,7 @@
 
 import crypto from 'crypto';
 import {
+  createCustomerEvent,
   findOrCreateCustomer,
   recordPayment,
   updateReservationByAirtableId,
@@ -182,9 +183,48 @@ export default async function handler(req, res) {
 
     const event = JSON.parse(rawBody.toString('utf8'));
 
+    if (event.type === 'checkout.session.expired') {
+      const session = event.data.object;
+      const metadata = session.metadata || {};
+      if (metadata.reservation_record_id) {
+        const reservation = await airtableRequest(`${TABLES.reservations}/${metadata.reservation_record_id}`).catch(() => null);
+        const fields = reservation?.fields || {};
+        if ((fields['Reservation Status'] || '') === 'Pending Payment') {
+          await updateRecord(TABLES.reservations, metadata.reservation_record_id, {
+            'Reservation Status': 'Expired',
+            Notes: JSON.stringify({
+              ...parseNotes(fields.Notes),
+              checkout_expired_at: new Date().toISOString(),
+              stripe_checkout_session_id: session.id
+            })
+          });
+          try {
+            const rows = await updateReservationByAirtableId(metadata.reservation_record_id, { status: 'Expired' });
+            const row = rows[0];
+            if (row?.customer_id) {
+              await createCustomerEvent({
+                customerId: row.customer_id,
+                type: 'checkout_expired',
+                title: 'Checkout expired',
+                details: 'Stripe checkout expired before payment. The hold was released.',
+                metadata: { checkout_session_id: session.id, airtable_reservation_id: metadata.reservation_record_id }
+              });
+            }
+          } catch (err) {
+            console.warn('Supabase checkout-expired save failed; Airtable was already updated:', err.message);
+          }
+        }
+      }
+      return res.status(200).json({ received: true });
+    }
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const metadata = session.metadata || {};
+      // A completed session is only a purchase when Stripe confirms payment.
+      if (session.payment_status && session.payment_status !== 'paid') {
+        return res.status(200).json({ received: true, ignored: `payment_status=${session.payment_status}` });
+      }
       const reservedProducts = String(metadata.products || '').split(',').map((product) => product.trim()).filter(Boolean);
       const amountPaid = session.amount_total ? session.amount_total / 100 : Number(metadata.deposit_total || 0);
       const paidDate = new Date().toISOString().slice(0, 10);

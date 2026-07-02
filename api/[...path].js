@@ -2,6 +2,7 @@ import adminAccounting from '../server/api/admin-accounting.js';
 import adminActions from '../server/api/admin-actions.js';
 import adminAddInternalNote from '../server/api/admin-add-internal-note.js';
 import adminAutomations from '../server/api/admin-automations.js';
+import adminBackfillCorrections from '../server/api/admin-backfill-corrections.js';
 import adminCommunications from '../server/api/admin-communications.js';
 import adminCustomerDetail from '../server/api/admin-customer-detail.js';
 import adminCustomers from '../server/api/admin-customers.js';
@@ -63,6 +64,7 @@ const routes = {
   'admin-actions': adminActions,
   'admin-add-internal-note': adminAddInternalNote,
   'admin-automations': adminAutomations,
+  'admin-backfill-corrections': adminBackfillCorrections,
   'admin-communications': adminCommunications,
   'admin-customer-detail': adminCustomerDetail,
   'admin-customers': adminCustomers,

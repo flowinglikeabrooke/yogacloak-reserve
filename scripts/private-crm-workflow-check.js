@@ -38,7 +38,8 @@ includes(adminData, 'normalized_email: null', 'manual merge clears duplicate uni
 includes(adminData, 'normalized_phone: null', 'manual merge clears duplicate unique phone key');
 includes(identity, "['deleted', 'merged'].includes(existingStatus) ? existing.status : row.status", 'submission replay does not reactivate deleted or merged inquiries');
 includes(identity, 'full_name.ilike.${cleanFullName}', 'customer identity lookup searches full name for exact normalized duplicate matching');
-includes(identity, 'Same normalized full name during intake.', 'same full-name customer duplicates are merged during intake');
+includes(identity, 'never hard-match on it', 'name-only matches are not auto-matched or auto-merged during intake');
+includes(identity, "type: 'possible_duplicate'", 'name-only duplicate candidates are flagged for founder review');
 includes(identity, 'attachLooseCustomerRecords(source, target, now)', 'automatic intake merge attaches loose matched records');
 includes(adminData, 'Customer profile edited in the admin hub.', 'profile edits run through customer identity reconciliation');
 includes(communications, "markCustomerContacted(customer.id, 'emailed')", 'sending customer email updates contact status');

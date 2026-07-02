@@ -424,7 +424,7 @@ export default async function handler(req, res) {
           productInterest: productNames,
           sizeInterest: products.includes('cloak') ? sizeLabel(size) : 'Not Applicable',
           email,
-          status: 'converted',
+          status: 'checkout_started',
           eventTitle: 'Reservation checkout started',
           metadata: { products, cloak_size: size || '', deposit_total: depositTotal }
         });
@@ -493,7 +493,8 @@ export default async function handler(req, res) {
           finalBalanceTotal,
           checkoutSessionId: checkout.id,
           checkoutUrl: checkout.url || '',
-          futureChargeAuthorized: true,
+          // Only the Stripe webhook may set this after a confirmed paid deposit.
+          futureChargeAuthorized: false,
           eventTitle: 'Reservation checkout ready',
           eventDetails: `Checkout opened for ${productNames}.`,
           metadata: {

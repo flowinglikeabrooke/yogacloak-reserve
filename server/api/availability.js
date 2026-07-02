@@ -172,6 +172,10 @@ export default async function handler(req, res) {
     const crmReservations = await loadCrmReservations();
     for (const row of crmReservations || []) {
       if (row.airtable_reservation_id && seenAirtableReservationIds.has(row.airtable_reservation_id)) continue;
+      if (row.status === 'Pending Payment') {
+        const startedAt = Date.parse(row.created_at || '') || 0;
+        if (!startedAt || Date.now() - startedAt > PENDING_HOLD_MS) continue;
+      }
       const keys = productKeysFromValue(row.product_selection || row.notes?.products || row.notes?.inferred_products);
       if (keys.has('cloak')) {
         cloakTaken += 1;

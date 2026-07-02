@@ -2197,6 +2197,23 @@ if(!sync.last_synced_at)return '<div class="notice"><strong>Private CRM is ready
 return '<div class="notice good"><strong>Last raw backup sync: '+esc(date(sync.last_synced_at))+'</strong><div class="meta"><span class="pill">Synced <strong>'+esc(sync.recent_synced||0)+'</strong></span><span class="pill">Skipped <strong>'+esc(sync.recent_skipped||0)+'</strong></span><span class="pill">Failed <strong>'+esc(sync.recent_failed||0)+'</strong></span></div></div>';
 }
 
+async function runBackfillCorrections(fix){
+if(fix&&!window.confirm('Correct paid-looking orders that Stripe cannot confirm? Unconfirmed orders move back to Checkout started or Checkout expired. Customer profiles and lead history are not touched.')){statusText.innerHTML='<span class="muted">Backfill correction cancelled.</span>';return}
+setBusy(fix?'Correcting orders Stripe cannot confirm...':'Auditing orders against Stripe...');
+try{
+var data=await post('/api/admin-backfill-corrections',{fix:Boolean(fix)});
+var issues=(data.issues||[]).length;
+var corrections=(data.corrections||[]).length;
+if(fix){
+state.dashboard=await endpoint('/api/admin-dashboard');
+render();
+statusText.innerHTML='<span class="ok">Backfill done: '+esc(corrections)+' order(s) corrected, '+esc(issues)+' data gap(s) reviewed.</span>';
+}else{
+statusText.innerHTML=issues?'<span class="error">'+esc(issues)+' order record(s) look paid but have no confirmed Stripe payment link. Use Correct unconfirmed orders to fix them.</span>':'<span class="ok">Every paid-looking order has a confirmed Stripe payment.</span>';
+}
+}catch(err){statusText.innerHTML='<span class="error">'+esc(err.message||'Could not run the backfill audit.')+'</span>'}
+}
+
 async function syncRawAirtable(){
 setBusy('Syncing Airtable raw backup into private CRM...');
 try{
@@ -3029,6 +3046,19 @@ return (Date.now()-noticeMs)/(1000*60*60)>=hours;
 }
 
 function formatStatus(value){
+var ownerLabels={
+'pending payment':'Checkout started · deposit not paid',
+'checkout_started':'Checkout started',
+'pending_checkout':'Pending checkout',
+'abandoned_checkout':'Checkout abandoned',
+'expired_checkout':'Checkout expired',
+'reserved':'Deposit paid · Reserved',
+'final balance notice sent':'Final notice sent',
+'converted to order':'Paid in full',
+'expired':'Checkout expired'
+};
+var key=String(value||'').trim().toLowerCase();
+if(ownerLabels[key])return ownerLabels[key];
 return String(value||'').replace(/_/g,' ').replace(/\b\w/g,function(ch){return ch.toUpperCase()});
 }
 
@@ -4326,9 +4356,14 @@ row('Email webhook','Set EMAIL_WEBHOOK_SECRET or RESEND_WEBHOOK_SECRET before tu
 row('Pre-deploy check','Run npm run security:check before launch or after security changes.')+
 row('Privacy','This page is noindex,nofollow, no-store, and is not linked from the public site.')+
 '</tbody></table></section>'+
+'<section class="panel"><div class="section-title">Order data corrections</div><p class="muted">Stripe is the source of truth for payments. Audit finds orders marked paid without a confirmed Stripe payment; Correct moves them back to Checkout started or Checkout expired without touching customer profiles or lead history.</p><div class="actions"><button class="btn quiet" id="backfillAuditBtn">Audit paid-looking orders</button><button class="btn" id="backfillFixBtn">Correct unconfirmed orders</button></div></section>'+
 '<section class="panel"><div class="bar"><div><div class="section-title">Raw activity + backup</div><p class="muted">This is the system/data layer. Keep it here so Today stays focused on work.</p></div></div>'+syncStatusNotice()+rawNotice+rawSyncReport()+table(['Signal','Contact','Details','Date','Action'],recentEvents.map(function(row){var customerId=row.customer_id||row.customers&&row.customers.id;return [esc(row.title||row.event_type),customerLink(customerId,row.customers&&row.customers.full_name||''),esc(row.details||''),esc(date(row.occurred_at)),openProfileButton(customerId,'Open timeline')]}),true)+'</section>';
 var settingsSyncBtn=document.getElementById('settingsSyncRawBackupBtn');
 if(settingsSyncBtn){settingsSyncBtn.addEventListener('click',syncRawAirtable)}
+var backfillAuditBtn=document.getElementById('backfillAuditBtn');
+if(backfillAuditBtn){backfillAuditBtn.addEventListener('click',function(){runBackfillCorrections(false)})}
+var backfillFixBtn=document.getElementById('backfillFixBtn');
+if(backfillFixBtn){backfillFixBtn.addEventListener('click',function(){runBackfillCorrections(true)})}
 bindCustomerOpeners();
 }
 

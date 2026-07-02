@@ -60,16 +60,20 @@ function productText(value) {
   return String(value || '');
 }
 
+const DEPOSIT_PAID_STATUSES = new Set(['Reserved', 'Confirmed', 'Final Balance Notice Sent', 'Converted to Order']);
+
 function crmReservationReadiness(row) {
   const amount = Number(row.final_balance_total || 0);
   const charged = Boolean(row.final_balance_payment_intent_id || row.final_balance_charged_at || row.final_balance_status === 'charged');
+  const depositPaid = DEPOSIT_PAID_STATUSES.has(String(row.status || '').trim());
   const noticeSent = Boolean(row.final_balance_notice_sent_at);
   const noticeHours = Number(process.env.FINAL_BALANCE_NOTICE_HOURS || 24);
   const ageHours = noticeSent ? (Date.now() - Date.parse(row.final_balance_notice_sent_at)) / (1000 * 60 * 60) : 0;
   const waitRemaining = noticeSent ? Math.max(0, noticeHours - ageHours) : 0;
   const savedMethod = Boolean(row.stripe_customer_id && row.stripe_payment_method_id);
-  const canAutoCharge = Boolean(row.airtable_reservation_id && savedMethod && row.future_charge_authorized && amount > 0);
+  const canAutoCharge = Boolean(depositPaid && row.airtable_reservation_id && savedMethod && row.future_charge_authorized && amount > 0);
   const blockedReasons = [];
+  if (!depositPaid) blockedReasons.push('Deposit not paid. Stripe has not confirmed this checkout, so there is no balance to collect yet.');
   if (!row.airtable_reservation_id) blockedReasons.push('Private CRM-only reservation; send a manual notice/payment link unless this is reconnected to its original reservation checkout.');
   if (!savedMethod) blockedReasons.push('No saved Stripe customer/payment method was found.');
   if (!row.future_charge_authorized) blockedReasons.push('Future-charge permission was not found on this Stripe payment.');
@@ -77,12 +81,13 @@ function crmReservationReadiness(row) {
 
   let readinessGroup = 'Blocked';
   if (charged) readinessGroup = 'Already Charged';
-  else if (!noticeSent && amount > 0) readinessGroup = 'Needs Notice';
+  else if (depositPaid && !noticeSent && amount > 0) readinessGroup = 'Needs Notice';
   else if (canAutoCharge && waitRemaining > 0) readinessGroup = 'Waiting Period';
   else if (canAutoCharge && noticeSent && waitRemaining <= 0) readinessGroup = 'Ready to Charge';
 
   let noticeStatus = 'Blocked';
   if (charged) noticeStatus = 'Already charged';
+  else if (!depositPaid) noticeStatus = 'Deposit not paid';
   else if (!noticeSent && amount > 0) noticeStatus = canAutoCharge ? 'Notice not sent' : 'Manual notice/payment link needed';
   else if (waitRemaining > 0) noticeStatus = `Notice sent; wait ${Number(waitRemaining.toFixed(1))}h`;
   else if (noticeSent) noticeStatus = canAutoCharge ? 'Notice wait complete' : 'Notice sent; auto-charge blocked';
